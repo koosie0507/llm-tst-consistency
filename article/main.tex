@@ -1,0 +1,292 @@
+\documentclass[runningheads,a4paper,11pt]{article}
+
+\usepackage{algorithmic}
+\usepackage{algorithm} 
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{cite}
+\usepackage{comment} 
+\usepackage{enumitem}
+\usepackage{epsfig} 
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{geometry} 
+\usepackage{graphicx}
+\usepackage[colorlinks]{hyperref} 
+\usepackage[latin1]{inputenc}
+\usepackage{interval}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{rotating}
+\usepackage{setspace}
+\usepackage{subfigure}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\usepackage{xstring}
+
+\geometry{a4paper,top=2.5cm,left=2cm,right=2cm,bottom=2cm}
+
+
+\begin{document}
+\title{How Consistent are LLMs in Applying Handcrafted Language Features}
+\author{Andrei Olar --- andrei.olar@ubbcluj.ro}
+\maketitle
+\begin{abstract}
+    Large language models are sought for solving an increasing number of
+    increasingly diverse tasks. Perhaps naturally one such task is text style
+    transfer: the task of changing the style of a text while preserving its
+    meaning. Besides the natural approach of fine-tuning a large language model,
+    a simpler and cheaper alternative should also be investigated: using
+    handcrafted language features to direct the large language model.
+\end{abstract}
+
+\section{Introduction}\label{introduction}
+
+Large language models have taken one of the main spots in research for quite
+some time.
+Because language models such as BERT~\cite{devlin2018bert} or GPT~\cite{gpt-2018,gpt2-2019,
+gpt3-2020} constantly advance the state of the art for many natural language
+processing tasks, it has become natural to want to evaluate these models
+performance on ever more tasks.
+We know from multiple surveys~\cite{minaee2024llmsurvey,zhao2023survey} and
+benchmarks~\cite{papcode2024hellaswag,chiang2024chatbot} that large language
+models (especially the more popular ones) are very good at following
+instructions.
+We can also intuit that training LLMs on diverse data (for instance the
+Pile~\cite{gao2020pile}) uniquely qualifies them to produce text in a wide
+variety of styles.
+
+Text style transfer is defined as the ``task of transforming the stylistic manner
+in which a sentence is written, while preserving the meaning of the original
+sentence''~\cite{tst-review-2021}.
+This definition can be extended, to entire articles or corpuses containing
+multiple articles without fear of text style transfer losing its meaning.
+The task of transfering text style is an old preocupation for the natural
+language processing and computational linguistics communities which has picked
+up interest again in the context of the advancements in the field of deep
+learning and particularly since the inception of the transformer architecture.
+
+Handcrafted linguistic features (HLFs) are single numerical values produced by a
+uniquely identifiable method on any natural language~\cite{lftk-2023}. More
+often than not, these features are easy to compute and intuitively very telling
+of the style in which a text is written.
+
+For example, take the number of exclamations in a text.
+This particular feature is easier to compute than most other metrics in
+computational linguistics and high values of this particular HLF can pretty
+reliably signal an inflamatory news writing style, spam or an alert narrative.
+The hope that arises from this observation is to describe style sufficiently by
+using only HLFs.
+<CITATIONS NEEDED>
+The appeal of this approach lies within the idempotent nature of most HLFs.
+That makes them useful in identifying or verifying styles, too. <CITATIONS NEEDED>
+
+<SOME MORE IDEAS AROUND STYLEPTB, lexical, syntax, semantics,
+and thematics, that span the fundamental atomic
+transfers that text can undergo (McDonald and
+Pustejovsky, 1985; DiMarco and Hirst, 1993).Chomsky 2002,>
+
+From the above ideas, a couple of questions arise naturally.
+Firstly, is it possible to influence an LLMs writing style by instructing it to
+follow certain HLFs?
+If this is possible then it's very financially advantageous to use this approach
+instead of fine tuning an LLM.
+For one, fine tuning an LLM incurs some loss of generality~\cite{yang2024unveiling}.
+And then there's the matter of cost.
+
+Secondly, we ask if it's possible to tell just how well the most prominent LLMs
+of today are able to generate text according to instructions concerning HLFs.
+If LLMs respond well enough to prompt instructions, this might prove to be an
+easy and affordable solution for the text style transfer problem.
+
+\section{Related Work}\label{related}
+
+There is abundent literature on the topic of text style transfer taken from
+various perspectives.
+For writing this paper, we have mostly consulted literature reviews and
+syntheses~\cite{tst-review-2021,tst-survey-2022} on the subject in order to
+inform the selection of HLFs that we would be using in our experiments.
+
+The literature on HLFs is extensive and spans most of the field of computational
+linguistics.
+This work is well referenced and synthesised by Lee and Lee~\cite{lftk-2023}.
+To our knowledge there is no work that connects HLFs with LLMs in the manner
+described in this paper.
+Most other literature focuses on achieving results on connected tasks, such as
+assessing text readability~\cite{lee-etal-2021-pushing}.
+This paper differs from other endeavours in at least two significant ways.
+Firstly, this paper is simply about feeding well crafted user prompts to an LLM
+instead of diving into deeper concepts such as the transformer architecture,
+deep learning or even neural networks.
+Secondly, it focuses squarely on manipulating the style attributes of the text
+generated by an LLM using HLFs and nothing else.
+
+That said, text style transfer has two components: transferring style and
+retaining meaning.
+While this paper focuses on transferring style, there are numerous benchmarks,
+studies and reviews that atest to the ability of state of the art LLMs to retain
+meaning in rewording exercises. <CITATIONS NEEDED>
+
+- delineate from work in the StylePTB paper (https://aclanthology.org/2021.naacl-main.171.pdf)
+- the styleptb paper evaluates style transfer quality which is the subject of
+future work
+
+\section{Experiment Design}\label{method}
+
+Our experiment consists of analysing the behavior of an LLM when asked to
+generate new text based on a given text and and some instructions derived from
+HLF values computed on a benchmark dataset.
+To perform the experiment we must know which LLMs we are going to evaluate and
+what benchmark datasets we are going to use.
+We must also select the HLFs for our experiment.
+
+Before answering those questions, let us outline the experimental process.
+
+The first task in the experiment is to establish a baseline.
+We do so by instructing the target LLM to generate text retaining the meaning of
+the input text without any further instruction.
+We repeat the text generation step 10 times.
+For each text generation, we compute the following statistics for each of our
+chosen HLFs:
+
+\begin{itemize}
+    \item \textbf{min}: the minimum value of the HLF on the generated text;
+    \item \textbf{max}: the maximum value of the HLF on the generated text;
+    \item \textbf{avg}: the mean value of the HLF on the generated text;
+    \item \textbf{var}: the variance of the HLF values on the generated text.
+\end{itemize}
+
+A second level baseline is then obtained by following the above process with a
+prompt that builds upon the first one by adding the instruction to use example
+text from our benchmark dataset of choice.
+The examples are five texts chosen randomly once for each benchmark dataset.
+These example texts are the same for all evaluated LLMs.
+
+The next step is to devise HLF prompts derived from both of the baseline
+prompts.
+The HLF prompts contain additional instructions to generate text that would
+comply with certain HLF values.
+These HLF values are obtained by computing the statistics outlined above on
+the entirety of the target benchmark dataset.
+
+We then repeat the text generation and statistics computation with each of the
+HLF prompts in the same way as we did for their corresponding baselines.
+
+To answer our first question, we compare the first baseline with the results
+obtained by using the corresponding modified HLF prompt.
+Our reasoning is that if the LLM were influenced by the HLF prompt, the output
+would show different HLF values compared to the baseline.
+This assumption is rooted in the work on detecting LLM generated text.<CITATION NEEDED>
+
+To answer the question of how much LLMs are influenced by being prompted with
+instructions about HLFs, we turn to the second level baseline.
+Given that the LLM now also has example articles, it can freely immitate those
+articles when generating the text.
+If there is a consistent difference between the HLF and non-HLF prompt, this
+difference can only stem from the HLF instructions.
+Therefore, how much the HLF values differ between the second level baseline and
+the corresponding HLF generated texts is strictly due to the HLF instructions.
+
+One final observation before diving into details is that we can use the variance
+computed for HLFs on the benchmark datasets to our advantage.
+This statistic shows us whether the LLM is at least roughly compliant with the
+instructions provided in the HLF prompts.
+To understand how let us denote an HLF computed on a text generated by using an
+HLF prompt with $HLF_g$.
+Similarly, we denote the average and the variance of the same HLF on the
+benchmark dataset with $avg(HLF_b)$ and $var(HLF_b)$, respectively.
+If we consistently notice that
+    \[HLF_g - var(HLF_b) \leq avg(HLF_b) \leq HLF_g + var(HLF_b)\]
+then we consider that the LLM consistently follows the HLF instructions in the
+prompt.
+
+\subsection{LLM Selection}\label{llm-selection}
+
+In order to perform our experiment we must first choose proper candidates.
+Since the interaction with the model happens only via prompts, we may use models
+with any type of licensing.
+Our choice will be the top model from each of the highest scoring five different
+major vendors listed in the Chatbot Arena benchmark~\cite{chiang2024chatbot}.
+
+<TODO - make a table with model specs: no params, context size, ELO, license>
+OpenAI - gpt-4o
+Google - Gemini-1.5-Pro-API-0514
+Anthropic - Claude 3 Opus
+Meta - Llama-3-70b-Instruct
+Cohere - Command R+
+
+\subsection{HLF Selection}\label{hlf-selection}
+
+On the other hand, we need to look at which handcrafted linguistic features are
+relevant for our experiment.
+In our opinion, good handcrafted linguistic features for the task of text style
+transfer are those features that can reasonably be thought to affect one of the
+coordinates by which people judge the style of text.
+These coordinates are well enumerated both in~\cite{tst-review-2021} and
+in~\cite{tst-survey-2022}.
+
+In order to build upon the previous work done regarding computing handcrafted
+linguistic features, we will rely only on the features available in
+LFTK~\cite{lftk-2023}.
+
+Based on the above two selection criteria, we have selected the handcrafted
+linguistic features in <INSERT TABLE HERE>.
+
+\subsection{DataSet Selection}\label{ds-selection}
+
+- Are there benchmark datasets for text style transfer? (STYLEPTB + Yelp Reviews)
+
+\subsection{Input Prompt and Text}\label{input-text}
+
+- link to text from within the corpus
+- link to text from outside the corpus
+- link to each system prompt (2 baselines, 2 HLF prompt templates)
+
+\section{Experiment Results}
+
+\subsection{Graph Interpretation}
+
+Ox - the number of the generation 1..10
+Oy - HLF value
+Continuous grey line - baseline metric
+continuous grenat line - hlf metric
+grey around grenat line - corpus target zone
+dotted black lines - corpus min, max
+continuous black line - corpus avg
+
+\subsection{Baseline}
+
+Yelp Results
+
+STYLEPTB Results
+
+\subsection{Context Aware}
+
+Yelp Results
+StylePTB Results
+
+\section{Discussion}
+
+Discuss experiment results here.
+
+\section{Conclusions and Future Work}
+
+Yes, you can instruct at least some of the LLMs with HLFs.
+
+compute BLEU, meteor, cider on styleptb using these LLMs and the prompt to
+evaluate whether we actually achieve style transfer because of/in spite of HLF
+instructions.
+Human survey (amazon mechanical turk) on whether the text generations are good
+or not. Likert scale (0 no good, 10 matches style perfectly)
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
