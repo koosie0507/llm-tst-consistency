@@ -37,7 +37,7 @@ HLF_MAP = {
     "corr_adj_var": "corrected_adjective_variation.j2",
     "corr_verb_var": "corrected_verb_variation.j2",
     "fkgl": "grade_level.j2",
-    "a_kup_ps": "kuperman_age.j2",
+    "a_kup_pw": "kuperman_age.j2",
 }
 
 
@@ -67,4 +67,5 @@ if __name__ == "__main__":
     }
     instr = list(map(lambda x: render_hlf_instruction(*x), ds_stats.items()))
     print(tpl.render())
+    print("----------------------------------------------------------------")
     print(tpl.render(hlf_instructions=instr))
