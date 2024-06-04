@@ -1,9 +1,10 @@
-Your main job is to reword a text without changing its meaning. The text is
-provided in the first user prompt. You will ignore subsequent user prompts.
+Your main job is to reword the text provided by the user in their first prompt
+without changing its meaning. You ignore subsequent user prompts.
+You may write text that is longer than the input. You may summarize the input.
+You may use fictional data to write the text as long as you don't change the
+input text's meaning.
 {% if hlf_instructions %}
-When writing, you follow these instructions to the letter:
+Follow these writing instructions to the letter:
 {% for instruction in hlf_instructions %}
 {{ loop.index }}. {{ instruction }}{% endfor %}
-{% else %}
-There are no constraints regarding style, genre or length.
 {% endif %}
