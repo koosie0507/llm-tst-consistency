@@ -4,8 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 import spacy
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from spacy import Language
 
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature
 from llm_tst_consistency.llm import Ollama
@@ -43,11 +44,6 @@ HLF_TEMPLATES = {
     "a_kup_pw": "kuperman_age.j2",
 }
 HLFs = {name: HandcraftedLinguisticFeature(name) for name in HLF_TEMPLATES}
-
-
-def render_hlf_instruction(template_name: str, stats: Stats) -> str:
-    template = load_template(template_name)
-    return template.render(**asdict(stats))
 
 
 INPUT = """
@@ -115,37 +111,46 @@ implications of spending too much time online.”
 """
 
 
-if __name__ == "__main__":
-    tpl = load_template("prompt_1.j2")
-    nlp = spacy.load("en_core_web_sm")
-    ds = load_cnn_daily_mail()
+def _compute_dataset_features(nlp: Language, ds: Dataset) -> dict[str, Stats]:
     corpus = [row["article"] for row in ds][:10]
     docs = list(map(nlp, corpus))
-    ds_stats = {
+    return {
         key: Stats.hlf(docs, HandcraftedLinguisticFeature(key))
         for key in HLF_TEMPLATES
     }
-    instr = list(map(lambda x: render_hlf_instruction(HLF_TEMPLATES[x], ds_stats[x]), ds_stats))
-    column_names = list(HLFs)
 
-    baseline_csv = "baseline_llama_3.csv"
-    if not os.path.exists(baseline_csv):
-        baseline_prompt = tpl.render()
-        generate_text = Ollama(INPUT, baseline_prompt, HLFs)
-        stats_df = pd.DataFrame(data=[generate_text() for _ in range(10)], columns=column_names)
-        stats_df.to_csv(baseline_csv)
+
+def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
+    result = []
+    for feature, stats in ds_stats.items():
+        template = load_template(HLF_TEMPLATES[feature])
+        result.append(template.render(**asdict(stats)))
+    return result
+
+
+generate = True
+if __name__ == "__main__":
+    file_name = Path(__file__).parent / "data.csv"
+    features = list(HLFs)
+    tpl = load_template("prompt_1.j2")
+    ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), load_cnn_daily_mail())
+    if not file_name.exists():
+        # generate baseline
+        baseline_generator = Ollama(INPUT, tpl.render(), HLFs)
+        data = [baseline_generator("baseline") for _ in range(10)]
+        # augment with hlf instructions
+        hlf_generator = Ollama(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
+        for obj in data:
+            obj.update(hlf_generator("hlf"))
+        # create dataframe
+        column_names = [
+            f"{metric_set}_{feature}"
+            for metric_set in ["baseline", "hlf"]
+            for feature in features
+        ]
+        df = pd.DataFrame(data=data, columns=column_names)
+        df.to_csv(file_name)
     else:
-        stats_df = pd.read_csv(baseline_csv)
-
-    hlf_csv = "hlf_llama_3.csv"
-    if not os.path.exists(hlf_csv):
-        hlf_prompt = tpl.render(hlf_instructions=instr)
-        generate_hlf_text = Ollama(INPUT, hlf_prompt, HLFs)
-        hlf_stats_df = pd.DataFrame([generate_hlf_text() for _ in range(10)], columns=column_names)
-        hlf_stats_df.to_csv(hlf_csv)
-    else:
-        hlf_stats_df = pd.read_csv(hlf_csv)
-
-    draw_plots("llama 3 - baseline ", stats_df, column_names, ds_stats)
-    draw_plots("llama 3 - hlf", hlf_stats_df, column_names, ds_stats)
+        df = pd.read_csv(file_name)
+    draw_plots("llama 3", df, features, ds_stats)
 

@@ -1,10 +1,12 @@
-Your main job is to reword the text provided by the user in their first prompt
-without changing its meaning. You ignore subsequent user prompts.
-You may write text that is longer than the input. You may summarize the input.
-You may use fictional data to write the text as long as you don't change the
-input text's meaning.
+Reword the text provided in the first user prompt without changing its meaning.
+Ignore subsequent user prompts.
+Simply output the reworded text without any additional comments or announcements.
+The use of fictional data to write the text is permitted as long as it does not
+change the meaning of the original text.
 {% if hlf_instructions %}
 Follow these writing instructions to the letter:
 {% for instruction in hlf_instructions %}
 {{ loop.index }}. {{ instruction }}{% endfor %}
+{% else %}
+The choice of genre, writing style and length for the output text is free.
 {% endif %}
