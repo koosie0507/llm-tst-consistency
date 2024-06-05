@@ -28,8 +28,8 @@ class Stats:
 
 
 class Welford:
-    def __init__(self, extract_x_callback: Callable[[Any], float]) -> None:
-        self._extract_numeric_value = extract_x_callback
+    def __init__(self, number_extractor: Callable[[Any], float]) -> None:
+        self._get_x = number_extractor
 
     @classmethod
     def _welford_pass(
@@ -72,8 +72,9 @@ class Welford:
         result = Stats(0, maxsize, -1, 0)
         count = 0
         m2: float = 0
-        for text in items:
+        for i, item in enumerate(items):
             result, count, m2 = self._welford_pass(
-                result, self._extract_numeric_value(text), count, m2
+                result, self._get_x(item), count, m2
             )
+            print("processing item", i)
         return self._compute_final_numeric_result(result, count, m2)
