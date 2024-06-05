@@ -142,15 +142,16 @@ def distance_norms_to_target(a: list[float], b: list[float], target: list[float]
     return distance_a, distance_b
 
 
-def is_significant(x: float, y: float, confidence: float = 0.95) -> bool:
-    c = x - y
+def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     std_dev = np.std([x, y])
-    z_score = c / std_dev
+    z_score = abs(x - y) / std_dev
+
+    # need to double-check this formula
     p_value = 1 - 0.5 * (1 + erf(z_score / np.sqrt(2)))
-    threshold = 1 - confidence
     if isnan(p_value):
         return False
-    # Return the p-value and a message indicating whether c is statistically significant
+
+    threshold = 1 - confidence
     return p_value < threshold
 
 
@@ -195,10 +196,10 @@ if __name__ == "__main__":
 
         dist_a, dist_b = distance_norms_to_target(a, b, target)
         euclid[feature] = dist_a - dist_b
-        euclid[f"is_{feature}_significant"] = is_significant(dist_a, dist_b)
+        euclid[f"is_{feature}_significant"] = is_diff_significant(dist_a, dist_b)
 
         area_a, area_b = areas_to_target(a, b, target)
         area[feature] = area_a - area_b
-        area[f"is_{feature}_significant"] = is_significant(area_a, area_b)
+        area[f"is_{feature}_significant"] = is_diff_significant(area_a, area_b)
 
     diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area])
