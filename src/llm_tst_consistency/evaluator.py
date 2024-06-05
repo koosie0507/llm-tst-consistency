@@ -8,6 +8,7 @@ import pandas as pd
 import spacy
 from datasets import load_dataset, Dataset
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from scipy.stats import ks_2samp
 from spacy import Language
 
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature
@@ -190,17 +191,29 @@ if __name__ == "__main__":
     draw_plots("llama 3", df, features, ds_stats)
     euclid = {}
     area = {}
+    ks = {}
     for feature in features:
+        feat_sig_name = f"is_{feature}_significant"
         target = [ds_stats[feature].mean]*len(df)
         a = df[f"baseline_{feature}"].values
         b = df[f"hlf_{feature}"].values
 
+        # Kolmogorov-Smirnov test
+        ks_ab = ks_2samp(a, b)
+        ks_a = ks_2samp(a, target)
+        ks_b = ks_2samp(b, target)
+        ks[feature] = (ks_a.statistic - ks_b.statistic) < 0
+        ks[feat_sig_name] = ks_ab.pvalue < 0.25
+
+        # Euclidian distance
         dist_a, dist_b = distance_norms_to_target(a, b, target)
-        euclid[feature] = dist_a - dist_b
-        euclid[f"is_{feature}_significant"] = is_diff_significant(dist_a, dist_b)
+        euclid[feature] = (dist_a - dist_b) > 0
+        euclid[feat_sig_name] = is_diff_significant(dist_a, dist_b)
 
+        # Area surface to target
         area_a, area_b = areas_to_target(a, b, target)
-        area[feature] = area_a - area_b
-        area[f"is_{feature}_significant"] = is_diff_significant(area_a, area_b)
+        area[feature] = (area_a - area_b) > 0
+        area[feat_sig_name] = is_diff_significant(area_a, area_b)
 
-    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area])
+    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area, ks])
+    pass

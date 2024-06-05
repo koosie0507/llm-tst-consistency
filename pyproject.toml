@@ -16,6 +16,7 @@ datasets = "^2.19.2"
 lftk = "^1.0.9"
 plotly = "^5.22.0"
 orjson = "^3.10.3"
+scipy = "^1.13.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.2.1"
