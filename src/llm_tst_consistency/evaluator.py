@@ -144,7 +144,7 @@ def distance_norms_to_target(a: list[float], b: list[float], target: list[float]
 
 def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     std_dev = np.std([x, y])
-    z_score = abs(x - y) / std_dev
+    z_score = x - y / std_dev
 
     # need to double-check this formula
     p_value = 1 - 0.5 * (1 + erf(z_score / np.sqrt(2)))
