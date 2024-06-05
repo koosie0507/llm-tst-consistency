@@ -1,7 +1,9 @@
-import os.path
 from dataclasses import asdict
+from math import isnan, erf
 from pathlib import Path
 
+import numpy as np
+import orjson as json
 import pandas as pd
 import spacy
 from datasets import load_dataset, Dataset
@@ -128,12 +130,42 @@ def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
     return result
 
 
-generate = True
+def areas_to_target(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
+    area_a = np.trapz(np.abs(np.array(a) - np.array(target)))
+    area_b = np.trapz(np.abs(np.array(b) - np.array(target)))
+    return area_a, area_b
+
+
+def distance_norms_to_target(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
+    distance_a = np.linalg.norm(np.array(a) - np.array(target))
+    distance_b = np.linalg.norm(np.array(b) - np.array(target))
+    return distance_a, distance_b
+
+
+def is_significant(x: float, y: float, confidence: float = 0.95) -> bool:
+    c = x - y
+    std_dev = np.std([x, y])
+    z_score = c / std_dev
+    p_value = 1 - 0.5 * (1 + erf(z_score / np.sqrt(2)))
+    threshold = 1 - confidence
+    if isnan(p_value):
+        return False
+    # Return the p-value and a message indicating whether c is statistically significant
+    return p_value < threshold
+
+
 if __name__ == "__main__":
     file_name = Path(__file__).parent / "data.csv"
     features = list(HLFs)
     tpl = load_template("prompt_1.j2")
-    ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), load_cnn_daily_mail())
+    stats_file_name = Path(__file__).parent / "cnn_dailymail.json"
+    if not stats_file_name.exists():
+        ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), load_cnn_daily_mail())
+        stats_file_name.write_bytes(json.dumps(ds_stats))
+    else:
+        ds_stats = json.loads(stats_file_name.read_text())
+        for key in ds_stats:
+            ds_stats[key] = Stats(**ds_stats[key])
     if not file_name.exists():
         # generate baseline
         baseline_generator = Ollama(INPUT, tpl.render(), HLFs)
@@ -152,5 +184,21 @@ if __name__ == "__main__":
         df.to_csv(file_name)
     else:
         df = pd.read_csv(file_name)
-    draw_plots("llama 3", df, features, ds_stats)
 
+    draw_plots("llama 3", df, features, ds_stats)
+    euclid = {}
+    area = {}
+    for feature in features:
+        target = [ds_stats[feature].mean]*len(df)
+        a = df[f"baseline_{feature}"].values
+        b = df[f"hlf_{feature}"].values
+
+        dist_a, dist_b = distance_norms_to_target(a, b, target)
+        euclid[feature] = dist_a - dist_b
+        euclid[f"is_{feature}_significant"] = is_significant(dist_a, dist_b)
+
+        area_a, area_b = areas_to_target(a, b, target)
+        area[feature] = area_a - area_b
+        area[f"is_{feature}_significant"] = is_significant(area_a, area_b)
+
+    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area])
