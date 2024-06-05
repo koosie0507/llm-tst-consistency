@@ -193,27 +193,32 @@ if __name__ == "__main__":
     area = {}
     ks = {}
     for feature in features:
-        feat_sig_name = f"is_{feature}_significant"
+        diff_col = f"{feature}_diff"
+        is_closer_col = f"is_{feature}_closer"
+        is_different_col = f"is_{feature}_different"
         target = [ds_stats[feature].mean]*len(df)
-        a = df[f"baseline_{feature}"].values
-        b = df[f"hlf_{feature}"].values
+        baseline = df[f"baseline_{feature}"].values
+        hlf = df[f"hlf_{feature}"].values
 
         # Kolmogorov-Smirnov test
-        ks_ab = ks_2samp(a, b)
-        ks_a = ks_2samp(a, target)
-        ks_b = ks_2samp(b, target)
-        ks[feature] = (ks_a.statistic - ks_b.statistic) < 0
-        ks[feat_sig_name] = ks_ab.pvalue < 0.25
+        ks_bh = ks_2samp(baseline, hlf)
+        ks_bt = ks_2samp(baseline, target)
+        ks_ht = ks_2samp(hlf, target)
+        ks[diff_col] = ks_bt.statistic - ks_ht.statistic
+        ks[is_closer_col] = ks_bt.statistic > ks_ht.statistic
+        ks[is_different_col] = ks_bh.pvalue < 0.25
 
         # Euclidian distance
-        dist_a, dist_b = distance_norms_to_target(a, b, target)
-        euclid[feature] = (dist_a - dist_b) > 0
-        euclid[feat_sig_name] = is_diff_significant(dist_a, dist_b)
+        dist_a, dist_b = distance_norms_to_target(baseline, hlf, target)
+        euclid[diff_col] = dist_a - dist_b
+        euclid[is_closer_col] = dist_a > dist_b
+        euclid[is_different_col] = is_diff_significant(dist_a, dist_b)
 
         # Area surface to target
-        area_a, area_b = areas_to_target(a, b, target)
-        area[feature] = (area_a - area_b) > 0
-        area[feat_sig_name] = is_diff_significant(area_a, area_b)
+        area_a, area_b = areas_to_target(baseline, hlf, target)
+        area[diff_col] = area_a - area_b
+        area[is_closer_col] = area_a > area_b
+        area[is_different_col] = is_diff_significant(area_a, area_b)
 
     diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area, ks])
     pass
