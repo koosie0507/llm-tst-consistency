@@ -171,17 +171,18 @@ if __name__ == "__main__":
         # generate baseline
         baseline_generator = Ollama(INPUT, tpl.render(), HLFs)
         data = [baseline_generator("baseline") for _ in range(10)]
+
         # augment with hlf instructions
         hlf_generator = Ollama(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
         for obj in data:
             obj.update(hlf_generator("hlf"))
+
         # create dataframe
-        column_names = [
+        df = pd.DataFrame(data=data, columns=[
             f"{metric_set}_{feature}"
             for metric_set in ["baseline", "hlf"]
             for feature in features
-        ]
-        df = pd.DataFrame(data=data, columns=column_names)
+        ])
         df.to_csv(file_name)
     else:
         df = pd.read_csv(file_name)
