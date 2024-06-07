@@ -13,7 +13,7 @@ from scipy.stats import ks_2samp
 from spacy import Language
 
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature, KupermanAgeOfAcquisition
-from llm_tst_consistency.llm import OpenAI
+from llm_tst_consistency.llm import OpenAI, Gemini
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.stats import Stats
 
@@ -129,11 +129,11 @@ if __name__ == "__main__":
             ds_stats[key] = Stats(**ds_stats[key])
     if not file_name.exists():
         # generate baseline
-        baseline_generator = OpenAI(INPUT, tpl.render(), HLFs)
+        baseline_generator = Gemini(INPUT, tpl.render(), HLFs)
         data = [baseline_generator("baseline") for _ in range(10)]
 
         # augment with hlf instructions
-        hlf_generator = OpenAI(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
+        hlf_generator = Gemini(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
         for obj in data:
             obj.update(hlf_generator("hlf"))
 
