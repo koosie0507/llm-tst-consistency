@@ -76,5 +76,4 @@ class Welford:
             result, count, m2 = self._welford_pass(
                 result, self._get_x(item), count, m2
             )
-            print("processing item", i)
         return self._compute_final_numeric_result(result, count, m2)

@@ -1,1 +1,3 @@
-write the same word every {{ (1 / mean) | round(2, "common") }} other words, but not more often than every {{ (1 / high) | round(2, "common") }} words, nor more rarely than every {{ (1 / low) | round(2, "common") }} words
+* **Simple Type/Token Ratio**: balance the use of unique words against the total
+number of words to hit the **target ratio** of {{ mean }}; **min**={{ low }};
+**max**={{ high }}.

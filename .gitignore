@@ -1,3 +1,6 @@
+*.env
+report.*
+*.json
 *.csv
 .idea
 __pycache__

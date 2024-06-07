@@ -2,6 +2,7 @@ from dataclasses import asdict
 from math import isnan, erf
 from pathlib import Path
 
+import dotenv
 import numpy as np
 import orjson as json
 import pandas as pd
@@ -11,10 +12,13 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from scipy.stats import ks_2samp
 from spacy import Language
 
-from llm_tst_consistency.hlf import HandcraftedLinguisticFeature
-from llm_tst_consistency.llm import Ollama
+from llm_tst_consistency.hlf import HandcraftedLinguisticFeature, KupermanAgeOfAcquisition
+from llm_tst_consistency.llm import OpenAI
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.stats import Stats
+
+
+MAX_CORPUS_SIZE = 100
 
 
 def load_template(name):
@@ -37,10 +41,10 @@ def load_cnn_daily_mail():
 
 
 HLF_TEMPLATES = {
-    "t_uword": "total_unique_words.j2",
+    "t_word": "total_words.j2",
     "t_sent": "total_sentences.j2",
-    "t_n_ent": "total_named_entities.j2",
-    "n_uadj": "total_unique_adjectives.j2",
+    "n_uverb": "number_of_unique_verbs.j2",
+    "n_uadj": "number_of_unique_adjectives.j2",
     "simp_ttr": "simple_type_token_ratio.j2",
     "a_verb_pw": "avg_verbs_per_word.j2",
     "corr_adj_var": "corrected_adjective_variation.j2",
@@ -48,7 +52,10 @@ HLF_TEMPLATES = {
     "fkgl": "grade_level.j2",
     "a_kup_pw": "kuperman_age.j2",
 }
-HLFs = {name: HandcraftedLinguisticFeature(name) for name in HLF_TEMPLATES}
+HLFs = {
+    name: KupermanAgeOfAcquisition(name) if name == "a_kup_pw" else HandcraftedLinguisticFeature(name)
+    for name in HLF_TEMPLATES
+}
 
 
 INPUT = """I've been to this cafe a few times. The service is great and the menu
@@ -64,11 +71,11 @@ stars they deserve.
 
 
 def _compute_dataset_features(nlp: Language, ds: Dataset) -> dict[str, Stats]:
-    corpus = [row["article"] for row in ds]
+    corpus = [row["article"] for row in ds][:MAX_CORPUS_SIZE]
     docs = list(map(nlp, corpus))
     return {
-        key: Stats.hlf(docs, HandcraftedLinguisticFeature(key))
-        for key in HLF_TEMPLATES
+        name: Stats.hlf(docs, feature)
+        for name, feature in HLFs.items()
     }
 
 
@@ -93,7 +100,7 @@ def euclid_norms(a: list[float], b: list[float], target: list[float]) -> tuple[f
 
 
 def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
-    c = x - y
+    c = abs(x - y)
     std_dev = np.std([x, y])
     mu = np.mean([x, y])
     z_score = c - mu / std_dev
@@ -108,6 +115,7 @@ def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
 
 
 if __name__ == "__main__":
+    dotenv.load_dotenv()
     file_name = Path(__file__).parent / "data.csv"
     features = list(HLFs)
     tpl = load_template("prompt_1.j2")
@@ -121,11 +129,11 @@ if __name__ == "__main__":
             ds_stats[key] = Stats(**ds_stats[key])
     if not file_name.exists():
         # generate baseline
-        baseline_generator = Ollama(INPUT, tpl.render(), HLFs)
+        baseline_generator = OpenAI(INPUT, tpl.render(), HLFs)
         data = [baseline_generator("baseline") for _ in range(10)]
 
         # augment with hlf instructions
-        hlf_generator = Ollama(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
+        hlf_generator = OpenAI(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
         for obj in data:
             obj.update(hlf_generator("hlf"))
 
@@ -171,5 +179,5 @@ if __name__ == "__main__":
         area[is_closer_col] = area_a > area_b
         area[is_different_col] = is_diff_significant(area_a, area_b)
 
-    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area, ks])
-    pass
+    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area, ks], index=["by euclidian norm", "by area", "k-s test"])
+    diff_df.to_csv("report.csv")

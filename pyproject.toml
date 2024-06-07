@@ -17,6 +17,7 @@ lftk = "^1.0.9"
 plotly = "^5.22.0"
 orjson = "^3.10.3"
 scipy = "^1.13.1"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.2.1"
