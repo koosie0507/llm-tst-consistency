@@ -7,39 +7,20 @@ import numpy as np
 import orjson as json
 import pandas as pd
 import spacy
-from datasets import load_dataset, Dataset
+from datasets import Dataset
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from scipy.stats import ks_2samp
 from spacy import Language
 
+from llm_tst_consistency.dataset_loaders import load_cnn_daily_mail
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature, KupermanAgeOfAcquisition
 from llm_tst_consistency.llm import OpenAI, Gemini, Claude3, Ollama
 from llm_tst_consistency.plot import draw_plots
+from llm_tst_consistency.reporting import make_report
 from llm_tst_consistency.stats import Stats
 
 
 MAX_CORPUS_SIZE = 100
-
-
-def load_template(name):
-    templates_dir = Path(__file__).parent / "templates"
-    env = Environment(
-        loader=FileSystemLoader(templates_dir),
-        autoescape=select_autoescape()
-    )
-    return env.get_template(name)
-
-
-def is_cnn(record: dict) -> bool:
-    return "(CNN)" in record.get("article", "")
-
-
-def load_cnn_daily_mail():
-    return load_dataset(
-        "abisee/cnn_dailymail", "3.0.0", split="test"
-    ).filter(is_cnn)
-
-
 HLF_TEMPLATES = {
     "t_word": "total_words.j2",
     "t_sent": "total_sentences.j2",
@@ -57,63 +38,6 @@ HLFs = {
     for name in HLF_TEMPLATES
 }
 
-
-INPUT = """I've been to this cafe a few times. The service is great and the menu
-is affordable. It has a large spacious space, reliable free wifi, and good food.
-
-It is quite new and seems a bit confused with which demographic of clienteles
-they are catering to. It has a great potential to be a hub for creative, hipster
-crowd.
-
-At the moment, it is underrated. Thus, I give them an extra star on top of the 4
-stars they deserve.
-"""
-
-
-def _compute_dataset_features(nlp: Language, ds: Dataset) -> dict[str, Stats]:
-    corpus = [row["article"] for row in ds][:MAX_CORPUS_SIZE]
-    docs = list(map(nlp, corpus))
-    return {
-        name: Stats.hlf(docs, feature)
-        for name, feature in HLFs.items()
-    }
-
-
-def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
-    result = []
-    for feature, stats in ds_stats.items():
-        template = load_template(HLF_TEMPLATES[feature])
-        result.append(template.render(**asdict(stats)))
-    return result
-
-
-def areas(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
-    area_a = np.trapz(np.abs(np.array(a) - np.array(target)))
-    area_b = np.trapz(np.abs(np.array(b) - np.array(target)))
-    return area_a, area_b
-
-
-def euclid_norms(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
-    distance_a = np.linalg.norm(np.array(a) - np.array(target))
-    distance_b = np.linalg.norm(np.array(b) - np.array(target))
-    return distance_a, distance_b
-
-
-def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
-    c = abs(x - y)
-    std_dev = np.std([x, y])
-    mu = np.mean([x, y])
-    z_score = c - mu / std_dev
-
-    # need to double-check this formula
-    p_value = 1 - 0.5 * (1 + erf(z_score / np.sqrt(2)))
-    if isnan(p_value):
-        return False
-
-    threshold = 1 - confidence
-    return p_value < threshold
-
-
 LLMs = {
     "claude3": Claude3,
     "gemini": Gemini,
@@ -128,6 +52,31 @@ DATASETS = {
 CURRENT_DATASET = "cnn_dailymail"
 
 
+def _load_input_text(ds_name):
+    fpath = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_input.txt"
+    if fpath.exists() and fpath.is_file():
+        return fpath.read_text()
+    raise ValueError(f"could not find input file associated with dataset", ds_name)
+
+
+def _load_j2(template_name):
+    templates_dir = Path(__file__).parent / "templates"
+    env = Environment(
+        loader=FileSystemLoader(templates_dir),
+        autoescape=select_autoescape()
+    )
+    return env.get_template(template_name)
+
+
+def _compute_dataset_features(nlp: Language, ds: Dataset) -> dict[str, Stats]:
+    corpus = [row["article"] for row in ds][:MAX_CORPUS_SIZE]
+    docs = list(map(nlp, corpus))
+    return {
+        name: Stats.hlf(docs, feature)
+        for name, feature in HLFs.items()
+    }
+
+
 def _load_dataset_stats(ds_name, ds_loader):
     stats_file_name = Path(__file__).parent / f"{ds_name}.json"
     if not stats_file_name.exists():
@@ -140,14 +89,21 @@ def _load_dataset_stats(ds_name, ds_loader):
     return ds_stats
 
 
-def _generate_text_metrics(trials, prompt_template, hlf_instructions, input_text, model_cls):
-    features = list(HLFs)
-    tpl = load_template(prompt_template)
+def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
+    result = []
+    for feature, stats in ds_stats.items():
+        template = _load_j2(HLF_TEMPLATES[feature])
+        result.append(template.render(**asdict(stats)))
+    return result
+
+
+def _generate_text_metrics(trial_count, prompt_template, hlf_instructions, input_text, model_cls, features):
+    tpl = _load_j2(prompt_template)
 
     # generate baseline
     baseline_prompt = tpl.render()
     baseline_generator = model_cls(input_text, baseline_prompt, HLFs)
-    data = [baseline_generator("baseline") for _ in range(trials)]
+    data = [baseline_generator("baseline") for _ in range(trial_count)]
 
     # augment with hlf instructions
     hlf_prompt = tpl.render(hlf_instructions=hlf_instructions)
@@ -162,60 +118,14 @@ def _generate_text_metrics(trials, prompt_template, hlf_instructions, input_text
     ])
 
 
-def _load_generated_text_metrics(model_family, ds_name, generator):
+def _load_generated_text_metrics(model_family, ds_name, generate_text_cb):
     file_name = Path(__file__).parent / f"gen_results_{model_family}_{ds_name}.csv"
     if not file_name.exists():
-        df = generator()
+        df = generate_text_cb()
         df.to_csv(file_name)
     else:
         df = pd.read_csv(file_name)
     return df
-
-
-def _make_report(features, ds_stats, df):
-    euclid = {}
-    area = {}
-    ks = {}
-    for feature in features:
-        diff_col = f"{feature}_diff"
-        is_closer_col = f"is_{feature}_closer"
-        is_different_col = f"is_{feature}_different"
-        target = [ds_stats[feature].mean]*len(df)
-        baseline = df[f"baseline_{feature}"].values
-        hlf = df[f"hlf_{feature}"].values
-
-        # Kolmogorov-Smirnov test
-        ks_bh = ks_2samp(baseline, hlf)
-        ks_bt = ks_2samp(baseline, target)
-        ks_ht = ks_2samp(hlf, target)
-        ks[diff_col] = ks_bt.statistic - ks_ht.statistic
-        ks[is_closer_col] = ks_bt.statistic > ks_ht.statistic
-        ks[is_different_col] = ks_bh.pvalue < 0.25
-
-        # Euclidian distance
-        dist_a, dist_b = euclid_norms(baseline, hlf, target)
-        euclid[diff_col] = dist_a - dist_b
-        euclid[is_closer_col] = dist_a > dist_b
-        euclid[is_different_col] = is_diff_significant(dist_a, dist_b)
-
-        # Area surface to target
-        area_a, area_b = areas(baseline, hlf, target)
-        area[diff_col] = area_a - area_b
-        area[is_closer_col] = area_a > area_b
-        area[is_different_col] = is_diff_significant(area_a, area_b)
-
-    return pd.DataFrame(
-        columns=list(euclid.keys()),
-        data=[euclid, area, ks],
-        index=["by euclidian norm", "by area", "k-s test"]
-    )
-
-
-def _load_input_text(ds_name):
-    fpath = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_input.txt"
-    if fpath.exists() and fpath.is_file():
-        return fpath.read_text()
-    raise ValueError(f"could not find input file associated with dataset", ds_name)
 
 
 def main():
@@ -225,17 +135,26 @@ def main():
     model_class = LLMs[CURRENT_LLM]
     if CURRENT_DATASET not in DATASETS:
         exit(1)
+    system_prompt_template = "prompt_1.j2"
 
     features = list(HLFs)
     ds_stats = _load_dataset_stats(CURRENT_DATASET, DATASETS[CURRENT_DATASET])
     input_text = _load_input_text(CURRENT_DATASET)
+    hlf_instructions = _write_hlf_instructions(ds_stats)
     df = _load_generated_text_metrics(
-        CURRENT_LLM, CURRENT_DATASET, lambda: _generate_text_metrics(
-            100, "prompt_1.j2", _write_hlf_instructions(ds_stats), input_text, model_class
+        CURRENT_LLM,
+        CURRENT_DATASET,
+        lambda: _generate_text_metrics(
+            100,
+            system_prompt_template,
+            hlf_instructions,
+            input_text,
+            model_class,
+            features
         )
     )
     draw_plots(CURRENT_LLM, df, features, ds_stats)
-    report = _make_report(features, ds_stats, df)
+    report = make_report(features, ds_stats, df)
     report.to_csv(f"report_{CURRENT_LLM}_{CURRENT_DATASET}.csv")
 
 
