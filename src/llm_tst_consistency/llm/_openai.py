@@ -26,7 +26,7 @@ class OpenAI:
 
     def __call__(self, prefix: str = "") -> dict[str, float]:
         response = self._client.chat.completions.create(
-            model="gpt-3.5-turbo", messages=self._messages
+            model="gpt-4o", messages=self._messages
         )
         doc = self._nlp(response.choices[0].message.content)
         return {
