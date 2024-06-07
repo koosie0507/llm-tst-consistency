@@ -1,15 +1,12 @@
 from dataclasses import asdict
-from math import isnan, erf
 from pathlib import Path
 
 import dotenv
-import numpy as np
 import orjson as json
 import pandas as pd
 import spacy
 from datasets import Dataset
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from scipy.stats import ks_2samp
 from spacy import Language
 
 from llm_tst_consistency.dataset_loaders import load_cnn_daily_mail
