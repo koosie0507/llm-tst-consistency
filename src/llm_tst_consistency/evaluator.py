@@ -13,7 +13,7 @@ from scipy.stats import ks_2samp
 from spacy import Language
 
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature, KupermanAgeOfAcquisition
-from llm_tst_consistency.llm import OpenAI, Gemini, Claude3
+from llm_tst_consistency.llm import OpenAI, Gemini, Claude3, Ollama
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.stats import Stats
 
@@ -114,40 +114,65 @@ def is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     return p_value < threshold
 
 
-if __name__ == "__main__":
-    dotenv.load_dotenv()
-    file_name = Path(__file__).parent / "data.csv"
-    features = list(HLFs)
-    tpl = load_template("prompt_1.j2")
-    stats_file_name = Path(__file__).parent / "cnn_dailymail.json"
+LLMs = {
+    "claude3": Claude3,
+    "gemini": Gemini,
+    "gpt": OpenAI,
+    "llama3": Ollama,
+}
+CURRENT_LLM = "llama3"
+
+DATASETS = {
+    "cnn_dailymail": load_cnn_daily_mail,
+}
+CURRENT_DATASET = "cnn_dailymail"
+
+
+def _load_dataset_stats(ds_name, ds_loader):
+    stats_file_name = Path(__file__).parent / f"{ds_name}.json"
     if not stats_file_name.exists():
-        ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), load_cnn_daily_mail())
+        ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), ds_loader())
         stats_file_name.write_bytes(json.dumps(ds_stats))
     else:
         ds_stats = json.loads(stats_file_name.read_text())
         for key in ds_stats:
             ds_stats[key] = Stats(**ds_stats[key])
+    return ds_stats
+
+
+def _generate_text_metrics(trials, prompt_template, hlf_instructions, input_text, model_cls):
+    features = list(HLFs)
+    tpl = load_template(prompt_template)
+
+    # generate baseline
+    baseline_prompt = tpl.render()
+    baseline_generator = model_cls(input_text, baseline_prompt, HLFs)
+    data = [baseline_generator("baseline") for _ in range(trials)]
+
+    # augment with hlf instructions
+    hlf_prompt = tpl.render(hlf_instructions=hlf_instructions)
+    hlf_generator = model_cls(input_text, hlf_prompt, HLFs)
+    for obj in data:
+        obj.update(hlf_generator("hlf"))
+
+    return pd.DataFrame(data=data, columns=[
+        f"{metric_set}_{feature}"
+        for metric_set in ["baseline", "hlf"]
+        for feature in features
+    ])
+
+
+def _load_generated_text_metrics(model_family, ds_name, generator):
+    file_name = Path(__file__).parent / f"gen_results_{model_family}_{ds_name}.csv"
     if not file_name.exists():
-        # generate baseline
-        baseline_generator = Claude3(INPUT, tpl.render(), HLFs)
-        data = [baseline_generator("baseline") for _ in range(10)]
-
-        # augment with hlf instructions
-        hlf_generator = Claude3(INPUT, tpl.render(hlf_instructions=_write_hlf_instructions(ds_stats)), HLFs)
-        for obj in data:
-            obj.update(hlf_generator("hlf"))
-
-        # create dataframe
-        df = pd.DataFrame(data=data, columns=[
-            f"{metric_set}_{feature}"
-            for metric_set in ["baseline", "hlf"]
-            for feature in features
-        ])
+        df = generator()
         df.to_csv(file_name)
     else:
         df = pd.read_csv(file_name)
+    return df
 
-    draw_plots("llama 3", df, features, ds_stats)
+
+def _make_report(features, ds_stats, df):
     euclid = {}
     area = {}
     ks = {}
@@ -179,5 +204,41 @@ if __name__ == "__main__":
         area[is_closer_col] = area_a > area_b
         area[is_different_col] = is_diff_significant(area_a, area_b)
 
-    diff_df = pd.DataFrame(columns=list(euclid.keys()), data=[euclid, area, ks], index=["by euclidian norm", "by area", "k-s test"])
-    diff_df.to_csv("report.csv")
+    return pd.DataFrame(
+        columns=list(euclid.keys()),
+        data=[euclid, area, ks],
+        index=["by euclidian norm", "by area", "k-s test"]
+    )
+
+
+def _load_input_text(ds_name):
+    fpath = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_input.txt"
+    if fpath.exists() and fpath.is_file():
+        return fpath.read_text()
+    raise ValueError(f"could not find input file associated with dataset", ds_name)
+
+
+def main():
+    # select the model
+    if CURRENT_LLM not in LLMs:
+        exit(2)
+    model_class = LLMs[CURRENT_LLM]
+    if CURRENT_DATASET not in DATASETS:
+        exit(1)
+
+    features = list(HLFs)
+    ds_stats = _load_dataset_stats(CURRENT_DATASET, DATASETS[CURRENT_DATASET])
+    input_text = _load_input_text(CURRENT_DATASET)
+    df = _load_generated_text_metrics(
+        CURRENT_LLM, CURRENT_DATASET, lambda: _generate_text_metrics(
+            100, "prompt_1.j2", _write_hlf_instructions(ds_stats), input_text, model_class
+        )
+    )
+    draw_plots(CURRENT_LLM, df, features, ds_stats)
+    report = _make_report(features, ds_stats, df)
+    report.to_csv(f"report_{CURRENT_LLM}_{CURRENT_DATASET}.csv")
+
+
+if __name__ == "__main__":
+    dotenv.load_dotenv()
+    main()

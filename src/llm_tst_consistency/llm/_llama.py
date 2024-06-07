@@ -1,3 +1,5 @@
+import os
+
 import ollama
 import spacy
 
@@ -14,7 +16,7 @@ class Ollama:
         ]
         self._hlf_cfg = hlf_cfg
         self._nlp = spacy.load("en_core_web_sm")
-        self._client = ollama.Client(host="172.30.212.3")
+        self._client = ollama.Client(host=os.getenv("LTC_OLLAMA_HOST"))
 
     @staticmethod
     def _apply_prefix(name: str, prefix: str) -> str:
@@ -23,7 +25,7 @@ class Ollama:
         return f"{prefix}_{name}"
 
     def __call__(self, prefix: str = "") -> dict[str, float]:
-        response = self._client.chat(model="llama3:70b-text", messages=self._messages)
+        response = self._client.chat(model="llama3", messages=self._messages)
         doc = self._nlp(response["message"]["content"])
         return {
             self._apply_prefix(name, prefix): hlf(doc)
