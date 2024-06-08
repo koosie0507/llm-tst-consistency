@@ -23,6 +23,7 @@ anthropic = {version = "^0.28.0", extras = ["vertex"]}
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.2.1"
+black = "^24.4.2"
 
 [build-system]
 requires = ["poetry-core"]

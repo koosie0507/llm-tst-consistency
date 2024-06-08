@@ -1,4 +1,7 @@
+import os
 from dataclasses import asdict
+from enum import StrEnum
+from functools import partial
 from pathlib import Path
 
 import dotenv
@@ -11,13 +14,15 @@ from spacy import Language
 
 from llm_tst_consistency.dataset_loaders import load_cnn_daily_mail
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature, KupermanAgeOfAcquisition
-from llm_tst_consistency.llm import OpenAI, Gemini, Claude3, Ollama
+from llm_tst_consistency.llm import GPT, Gemini, Claude3, Ollama
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.reporting import make_report
 from llm_tst_consistency.stats import Stats
 
 
-MAX_CORPUS_SIZE = 100
+dotenv.load_dotenv()
+MAX_CORPUS_SIZE = os.getenv("LTC_MAX_CORPUS_SIZE", 1)
+TRIAL_COUNT = os.getenv("LTC_TRIAL_COUNT", 3)
 HLF_TEMPLATES = {
     "t_word": "total_words.j2",
     "t_sent": "total_sentences.j2",
@@ -36,17 +41,49 @@ HLFs = {
 }
 
 LLMs = {
-    "claude3": Claude3,
-    "gemini": Gemini,
-    "gpt": OpenAI,
-    "llama3": Ollama,
+    "claude3": partial(
+        Claude3,
+        model_name="claude-3-opus-20240229",
+        api_key=os.getenv("LTC_ANTHROPIC_KEY"),
+        hlf_cfg=HLFs,
+    ),
+    "gemini": partial(
+        Gemini,
+        project_name=os.getenv("LTC_GOOGLE_PROJECT"),
+        location=os.getenv("LTC_GOOGLE_LOCATION"),
+        hlf_cfg=HLFs,
+        model_name="gemini-1.5-pro",
+    ),
+    "gpt": partial(
+        GPT,
+        model_name="gpt-4o",
+        api_key=os.getenv("LTC_OPENAI_KEY"),
+        hlf_cfg=HLFs,
+    ),
+    "llama3_8b": partial(
+        Ollama,
+        model_name="llama3",
+        host=os.getenv("LTC_OLLAMA_HOST"),
+        hlf_cfg=HLFs,
+    ),
+    "mixtral_8x7b": partial(
+        Ollama,
+        model_name="mixtral:8x7b",
+        host=os.getenv("LTC_OLLAMA_HOST"),
+        hlf_cfg=HLFs,
+    )
 }
-CURRENT_LLM = "llama3"
+CURRENT_LLM = "mixtral"
 
 DATASETS = {
     "cnn_dailymail": load_cnn_daily_mail,
 }
 CURRENT_DATASET = "cnn_dailymail"
+
+
+class MetricLevel(StrEnum):
+    BASELINE = "baseline"
+    HLF = "hlf"
 
 
 def _load_input_text(ds_name):
@@ -99,18 +136,18 @@ def _generate_text_metrics(trial_count, prompt_template, hlf_instructions, input
 
     # generate baseline
     baseline_prompt = tpl.render()
-    baseline_generator = model_cls(input_text, baseline_prompt, HLFs)
-    data = [baseline_generator("baseline") for _ in range(trial_count)]
+    baseline_generator = model_cls(text=input_text, prompt=baseline_prompt, metric_level=MetricLevel.BASELINE)
+    data = [baseline_generator() for _ in range(trial_count)]
 
     # augment with hlf instructions
     hlf_prompt = tpl.render(hlf_instructions=hlf_instructions)
-    hlf_generator = model_cls(input_text, hlf_prompt, HLFs)
+    hlf_generator = model_cls(text=input_text, prompt=hlf_prompt, metric_level=MetricLevel.HLF)
     for obj in data:
-        obj.update(hlf_generator("hlf"))
+        obj.update(hlf_generator())
 
     return pd.DataFrame(data=data, columns=[
-        f"{metric_set}_{feature}"
-        for metric_set in ["baseline", "hlf"]
+        f"{metric_level}_{feature}"
+        for metric_level in MetricLevel
         for feature in features
     ])
 
@@ -142,7 +179,7 @@ def main():
         CURRENT_LLM,
         CURRENT_DATASET,
         lambda: _generate_text_metrics(
-            100,
+            TRIAL_COUNT,
             system_prompt_template,
             hlf_instructions,
             input_text,
@@ -156,5 +193,4 @@ def main():
 
 
 if __name__ == "__main__":
-    dotenv.load_dotenv()
     main()
