@@ -4,7 +4,31 @@ import vertexai
 import vertexai.generative_models as gai
 
 from llm_tst_consistency.hlf import HandcraftedLinguisticFeature
-from llm_tst_consistency.llm._base import BaseModel, DEFAULT_NLP_MODEL
+from llm_tst_consistency.llm._base import BaseModel
+
+
+safety_config = [
+    gai.SafetySetting(
+        category=gai.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    ),
+    gai.SafetySetting(
+        category=gai.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    ),
+    gai.SafetySetting(
+        category=gai.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    ),
+    gai.SafetySetting(
+        category=gai.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    ),
+    gai.SafetySetting(
+        category=gai.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    ),
+]
 
 
 class Gemini(BaseModel):
@@ -32,5 +56,7 @@ class Gemini(BaseModel):
 
     def _generate_text(self) -> str:
         time.sleep(12)
-        response = self._model.generate_content(self._input_text)
+        response = self._model.generate_content(
+            self._input_text, safety_settings=safety_config
+        )
         return response.text

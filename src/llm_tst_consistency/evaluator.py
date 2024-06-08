@@ -222,12 +222,14 @@ def main(
         False,
         "--input-from-dataset",
         is_flag=True,
-        help="use this flag to load input text from the chosen dataset"
-    )
+        help="use this flag to load input text from the chosen dataset",
+    ),
 ):
     features = list(HLFs)
     for prompt_name in prompt_names:
-        prompt_discriminator = prompt_name if not input_from_dataset else f"{prompt_name}_ifd"
+        prompt_discriminator = (
+            prompt_name if not input_from_dataset else f"{prompt_name}_ifd"
+        )
         for ds_name in ds_names:
             report = pd.DataFrame()
             # read input text corresponding to dataset
