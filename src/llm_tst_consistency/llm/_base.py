@@ -33,6 +33,5 @@ class BaseModel:
     def __call__(self) -> dict[str, float]:
         doc = self._nlp(self._generate_text())
         return {
-            self._apply_prefix(name): hlf(doc)
-            for name, hlf in self._hlf_cfg.items()
+            self._apply_prefix(name): hlf(doc) for name, hlf in self._hlf_cfg.items()
         }

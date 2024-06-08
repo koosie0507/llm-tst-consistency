@@ -26,7 +26,9 @@ class KupermanAgeOfAcquisition(HandcraftedLinguisticFeature):
         aoa_of_unique_words = [
             round(rating)
             for word in unique_words
-            for rating in self._aoa_ratings.loc[self._aoa_ratings["Word"] == word, "Rating.Mean"]
+            for rating in self._aoa_ratings.loc[
+                self._aoa_ratings["Word"] == word, "Rating.Mean"
+            ]
         ]
         if len(aoa_of_unique_words) == 0:
             return 100

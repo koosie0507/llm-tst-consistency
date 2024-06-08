@@ -19,7 +19,7 @@ class GPT(BaseModel):
             model_name,
             hlf_cfg,
             metric_level=kwargs.get("metric_level"),
-            nlp_model_name=kwargs.get("nlp_model_name")
+            nlp_model_name=kwargs.get("nlp_model_name"),
         )
         self._messages = [
             {"role": "system", "content": prompt},

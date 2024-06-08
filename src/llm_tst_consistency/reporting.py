@@ -5,13 +5,17 @@ import pandas as pd
 from scipy.stats import ks_2samp
 
 
-def _compute_areas_to_target(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
+def _compute_areas_to_target(
+    a: list[float], b: list[float], target: list[float]
+) -> tuple[float, float]:
     area_a = np.trapz(np.abs(np.array(a) - np.array(target)))
     area_b = np.trapz(np.abs(np.array(b) - np.array(target)))
     return area_a, area_b
 
 
-def _compute_euclidian_norms_to_target(a: list[float], b: list[float], target: list[float]) -> tuple[float, float]:
+def _compute_euclidian_norms_to_target(
+    a: list[float], b: list[float], target: list[float]
+) -> tuple[float, float]:
     distance_a = np.linalg.norm(np.array(a) - np.array(target))
     distance_b = np.linalg.norm(np.array(b) - np.array(target))
     return distance_a, distance_b
@@ -40,7 +44,7 @@ def make_report(features, ds_stats, df):
         diff_col = f"{feature}_diff"
         is_closer_col = f"is_{feature}_closer"
         is_different_col = f"is_{feature}_different"
-        target = [ds_stats[feature].mean]*len(df)
+        target = [ds_stats[feature].mean] * len(df)
         baseline = df[f"baseline_{feature}"].values
         hlf = df[f"hlf_{feature}"].values
 
@@ -67,5 +71,5 @@ def make_report(features, ds_stats, df):
     return pd.DataFrame(
         columns=list(euclid.keys()),
         data=[euclid, area, ks],
-        index=["by euclidian norm", "by area", "k-s test"]
+        index=["by euclidian norm", "by area", "k-s test"],
     )

@@ -22,13 +22,12 @@ class Gemini(BaseModel):
             model_name,
             hlf_cfg,
             metric_level=kwargs.get("metric_level"),
-            nlp_model_name=kwargs.get("nlp_model_name")
+            nlp_model_name=kwargs.get("nlp_model_name"),
         )
         self._input_text = text
         vertexai.init(project=project_name, location=location)
         self._model = gai.GenerativeModel(
-            model_name=self._model_name,
-            system_instruction=[prompt]
+            model_name=self._model_name, system_instruction=[prompt]
         )
 
     def _generate_text(self) -> str:

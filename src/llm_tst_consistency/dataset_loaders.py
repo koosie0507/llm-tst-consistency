@@ -6,6 +6,4 @@ def is_cnn(record: dict) -> bool:
 
 
 def load_cnn_daily_mail():
-    return load_dataset(
-        "abisee/cnn_dailymail", "3.0.0", split="test"
-    ).filter(is_cnn)
+    return load_dataset("abisee/cnn_dailymail", "3.0.0", split="test").filter(is_cnn)

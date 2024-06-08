@@ -20,7 +20,7 @@ class Claude3(BaseModel):
             model_name,
             hlf_cfg,
             metric_level=kwargs.get("metric_level"),
-            nlp_model_name=kwargs.get("nlp_model_name")
+            nlp_model_name=kwargs.get("nlp_model_name"),
         )
         self._system_prompt = prompt
         self._messages = [{"role": "user", "content": text}]

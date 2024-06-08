@@ -53,9 +53,7 @@ class Welford:
         return result, n, m2
 
     @classmethod
-    def _compute_final_numeric_result(
-        cls, result: Stats, n: int, m2: float
-    ) -> Stats:
+    def _compute_final_numeric_result(cls, result: Stats, n: int, m2: float) -> Stats:
         if n < 1:
             return Stats.empty()
         if n > 1:
@@ -73,7 +71,5 @@ class Welford:
         count = 0
         m2: float = 0
         for i, item in enumerate(items):
-            result, count, m2 = self._welford_pass(
-                result, self._get_x(item), count, m2
-            )
+            result, count, m2 = self._welford_pass(result, self._get_x(item), count, m2)
         return self._compute_final_numeric_result(result, count, m2)
