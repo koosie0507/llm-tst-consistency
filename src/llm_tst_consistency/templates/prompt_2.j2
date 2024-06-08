@@ -1,20 +1,18 @@
 # Purpose
 Write text that conveys the meaning of the first user prompt.
 You may use any writing style.
-You can use the provided examples to inspire your writing style. Examples are
-separated by the '---' delimiter.
-{% if hlf_instructions %}
-# Handcrafted Linguistic Feature Instructions
+You are expected to write text with similar linguistic features as the provided examples.
+Individual examples are separated by the '---' delimiter surrounded by line separators.
+The examples must not influence the meaning of the output text.
 
+{% if examples %}# Examples
+{{ examples }}
+{% endif %}
+{% if hlf_instructions %}# Handcrafted Linguistic Feature Instructions
 Ensure the text you write conforms to the following linguistic feature targets.
 You may use fictional names to comply with named entity requirements.
-{% for instruction in hlf_instructions %}
-{{ instruction }}{% endfor %}
-
+{% for instruction in hlf_instructions %}{{ instruction }}
+{% endfor %}
 Ensure that each feature’s value stays within the range designated by the
 minimum and maximum threshold.
-{% endif %}
-{% if examples %}
-# Examples
-{{ examples }}
 {% endif %}

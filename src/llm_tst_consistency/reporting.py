@@ -24,8 +24,10 @@ def _compute_euclidian_norms_to_target(
 def _is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     c = abs(x - y)
     std_dev = np.std([x, y])
+    if std_dev == 0:
+        return False
     mu = np.mean([x, y])
-    z_score = c - mu / std_dev
+    z_score = (c - mu) / std_dev
 
     # need to double-check this formula
     p_value = 1 - 0.5 * (1 + erf(z_score / np.sqrt(2)))

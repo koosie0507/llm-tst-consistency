@@ -126,14 +126,15 @@ def _generate_text_metrics(
     tpl = _load_j2(prompt_template)
 
     # generate baseline
-    baseline_prompt = tpl.render(examples=examples)
+    example_text = f"{os.linesep}---{os.linesep}".join(examples)
+    baseline_prompt = tpl.render(examples=example_text)
     baseline_generator = model_cls(
         text=input_text, prompt=baseline_prompt, metric_level=MetricLevel.BASELINE
     )
     data = [baseline_generator() for _ in range(trial_count)]
 
     # augment with hlf instructions
-    hlf_prompt = tpl.render(hlf_instructions=hlf_instructions, examples=examples)
+    hlf_prompt = tpl.render(hlf_instructions=hlf_instructions, examples=example_text)
     hlf_generator = model_cls(
         text=input_text, prompt=hlf_prompt, metric_level=MetricLevel.HLF
     )
