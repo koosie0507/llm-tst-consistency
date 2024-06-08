@@ -20,6 +20,7 @@ scipy = "^1.13.1"
 python-dotenv = "^1.0.1"
 google-cloud-aiplatform = "^1.54.0"
 anthropic = {version = "^0.28.0", extras = ["vertex"]}
+kaleido = "0.2.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.2.1"
