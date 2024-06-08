@@ -12,7 +12,7 @@ import typer
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from spacy import Language
 
-from llm_tst_consistency.dataset_loaders import load_cnn_daily_mail
+from llm_tst_consistency.dataset_loaders import load_cnn_daily_mail, load_yelp
 from llm_tst_consistency.hlf import (
     HandcraftedLinguisticFeature,
     KupermanAgeOfAcquisition,
@@ -82,11 +82,15 @@ LLM_CONFIG = {
 }
 DATASET_CONFIG = {
     DatasetName.CNN_DAILY_MAIL: load_cnn_daily_mail,
+    DatasetName.YELP_REVIEWS: load_yelp,
 }
 
 
-def _load_input_text(ds_name):
-    fpath = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_input.txt"
+def _load_input_text(ds_name, from_dataset=False):
+    filename = f"{ds_name}_input.txt"
+    if from_dataset:
+        filename = f"{ds_name}_input_from_dataset.txt"
+    fpath = Path(__file__).parent.parent.parent / "data" / filename
     if fpath.exists() and fpath.is_file():
         return fpath.read_text()
     raise ValueError(f"could not find input file associated with dataset", ds_name)
@@ -214,24 +218,31 @@ def main(
         help="the maximum number of examples to use in the prompts that make use of them",
         envvar="LTC_EXAMPLE_COUNT",
     ),
+    input_from_dataset: bool = typer.Option(
+        False,
+        "--input-from-dataset",
+        is_flag=True,
+        help="use this flag to load input text from the chosen dataset"
+    )
 ):
+    features = list(HLFs)
     for prompt_name in prompt_names:
         for ds_name in ds_names:
             report = pd.DataFrame()
+            # read input text corresponding to dataset
+            input_text = _load_input_text(ds_name, from_dataset=input_from_dataset)
+            # compute/load dataset stats
+            ds_stats, examples = _process_dataset(
+                ds_name,
+                DATASET_CONFIG[ds_name],
+                max_corpus_size=max_size,
+                max_example_count=example_count,
+            )
+            # create prompt based on dataset stats
+            hlf_instructions = _write_hlf_instructions(ds_stats)
+
             for llm in llms:
-                # read input text corresponding to dataset
-                input_text = _load_input_text(ds_name)
-                # compute/load dataset stats
-                ds_stats, examples = _process_dataset(
-                    ds_name,
-                    DATASET_CONFIG[ds_name],
-                    max_corpus_size=max_size,
-                    max_example_count=example_count,
-                )
-                # create prompt based on dataset stats
-                hlf_instructions = _write_hlf_instructions(ds_stats)
                 # load text generation results / run text generation and compute results
-                features = list(HLFs)
                 df = _load_generated_text_metrics(
                     prompt_name,
                     llm,
@@ -246,9 +257,11 @@ def main(
                         examples,
                     ),
                 )
-                #
+                plot_dir = prompt_name
+                if input_from_dataset:
+                    plot_dir += "-ifd"
                 draw_plots(
-                    prompt_name,
+                    plot_dir,
                     f"{prompt_name}-{llm}-{ds_name}",
                     df,
                     features,
@@ -256,7 +269,10 @@ def main(
                 )
                 individual_report = make_report(llm, ds_name, features, ds_stats, df)
                 report = pd.concat([report, individual_report], axis=0)
-            report.to_csv(f"report_{prompt_name}_{ds_name}.csv")
+            report_name = f"report_{prompt_name}_{ds_name}.csv"
+            if input_from_dataset:
+                report_name = f"report_{prompt_name}_ifd_{ds_name}.csv"
+            report.to_csv(report_name)
 
 
 if __name__ == "__main__":
