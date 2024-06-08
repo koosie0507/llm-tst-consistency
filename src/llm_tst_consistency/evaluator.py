@@ -17,7 +17,7 @@ from llm_tst_consistency.hlf import (
     HandcraftedLinguisticFeature,
     KupermanAgeOfAcquisition,
 )
-from llm_tst_consistency.llm import GPT, Gemini, Claude3, Ollama
+from llm_tst_consistency.llm import GPT, Gemini, Claude3, Ollama, CommandR
 from llm_tst_consistency.parameters import LLMName, MetricLevel, DatasetName, PromptName
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.reporting import make_report
@@ -73,6 +73,12 @@ LLM_CONFIG = {
         host=os.getenv("LTC_OLLAMA_HOST"),
         hlf_cfg=HLFs,
     ),
+    LLMName.COMMAND_R: partial(
+        CommandR,
+        model_name="command-r-plus",
+        api_key=os.getenv("LTC_COHERE_API_KEY"),
+        hlf_cfg=HLFs,
+    ),
 }
 DATASET_CONFIG = {
     DatasetName.CNN_DAILY_MAIL: load_cnn_daily_mail,
@@ -100,10 +106,15 @@ def _compute_dataset_features(nlp: Language, corpus: list[str]) -> dict[str, Sta
 
 
 def _process_dataset(ds_name, ds_loader, max_corpus_size, max_example_count):
-    stats_file_name = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_settings.json"
+    stats_file_name = (
+        Path(__file__).parent.parent.parent / "data" / f"{ds_name}_settings.json"
+    )
     if not stats_file_name.exists():
         corpus = ds_loader(max_corpus_size)
-        obj = {"stats": _compute_dataset_features(spacy.load("en_core_web_sm"), corpus), "examples": list(sample(corpus, max_example_count))}
+        obj = {
+            "stats": _compute_dataset_features(spacy.load("en_core_web_sm"), corpus),
+            "examples": list(sample(corpus, max_example_count)),
+        }
         stats_file_name.write_bytes(json.dumps(obj))
     else:
         obj = json.loads(stats_file_name.read_text())
@@ -122,7 +133,14 @@ def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
 
 
 def _generate_text_metrics(
-    trial_count, prompt_template, hlf_instructions, input_text, model_cls, features, examples=None):
+    trial_count,
+    prompt_template,
+    hlf_instructions,
+    input_text,
+    model_cls,
+    features,
+    examples=None,
+):
     tpl = _load_j2(prompt_template)
 
     # generate baseline
@@ -152,7 +170,10 @@ def _generate_text_metrics(
 
 
 def _load_generated_text_metrics(prompt_name, model_family, ds_name, generate_text_cb):
-    file_name = Path(__file__).parent / f"gen_results_{prompt_name}_{model_family}_{ds_name}.csv"
+    file_name = (
+        Path(__file__).parent
+        / f"gen_results_{prompt_name}_{model_family}_{ds_name}.csv"
+    )
     if not file_name.exists():
         df = generate_text_cb()
         df.to_csv(file_name)
@@ -195,13 +216,18 @@ def main(
     ),
 ):
     for prompt_name in prompt_names:
-        report = pd.DataFrame()
-        for llm in llms:
-            for ds_name in ds_names:
+        for ds_name in ds_names:
+            report = pd.DataFrame()
+            for llm in llms:
                 # read input text corresponding to dataset
                 input_text = _load_input_text(ds_name)
                 # compute/load dataset stats
-                ds_stats, examples = _process_dataset(ds_name, DATASET_CONFIG[ds_name], max_corpus_size=max_size, max_example_count=example_count)
+                ds_stats, examples = _process_dataset(
+                    ds_name,
+                    DATASET_CONFIG[ds_name],
+                    max_corpus_size=max_size,
+                    max_example_count=example_count,
+                )
                 # create prompt based on dataset stats
                 hlf_instructions = _write_hlf_instructions(ds_stats)
                 # load text generation results / run text generation and compute results
@@ -218,13 +244,19 @@ def main(
                         LLM_CONFIG[llm],
                         features,
                         examples,
-                    )
+                    ),
                 )
                 #
-                draw_plots(prompt_name, f"{prompt_name}-{llm}-{ds_name}", df, features, ds_stats)
+                draw_plots(
+                    prompt_name,
+                    f"{prompt_name}-{llm}-{ds_name}",
+                    df,
+                    features,
+                    ds_stats,
+                )
                 individual_report = make_report(llm, ds_name, features, ds_stats, df)
                 report = pd.concat([report, individual_report], axis=0)
-        report.to_csv(f"report_{prompt_name}.csv")
+            report.to_csv(f"report_{prompt_name}_{ds_name}.csv")
 
 
 if __name__ == "__main__":

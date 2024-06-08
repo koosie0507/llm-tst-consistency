@@ -12,6 +12,7 @@ class LLMName(StrEnum):
     GPT = "gpt"
     LLAMA3 = "llama3_8b"
     MIXTRAL = "mixtral_8x7b"
+    COMMAND_R = "command_r"
 
 
 class DatasetName(StrEnum):
