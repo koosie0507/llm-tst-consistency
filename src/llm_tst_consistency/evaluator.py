@@ -80,7 +80,7 @@ LLMs = {
         hlf_cfg=HLFs,
     ),
 }
-CURRENT_LLM = "mixtral"
+CURRENT_LLM = "llama3_8b"
 
 DATASETS = {
     "cnn_dailymail": load_cnn_daily_mail,

@@ -1,4 +1,5 @@
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Iterable
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -74,10 +75,55 @@ def _create_hlf(df: pd.DataFrame, feature: str) -> BaseTraceType:
     )
 
 
-def _add_trace_to_plot(
-    fig: Figure, trace: BaseTraceType, i: int, col_count: int
-) -> None:
-    fig.add_trace(trace, row=i // col_count + 1, col=i % col_count + 1)
+def draw_one_figure(title, features, df, ds_stats, plot_col_count):
+    fig = make_subplots(
+        rows=len(features) // plot_col_count + 1,
+        subplot_titles=features,
+        cols=plot_col_count,
+    )
+    for i, f in enumerate(features):
+        for trace in _make_feature_traces(f, df, ds_stats):
+            fig.add_trace(
+                trace, row=i // plot_col_count + 1, col=i % plot_col_count + 1
+            )
+    fig.update_layout(height=200 * len(features), width=900, title_text=title)
+    return fig
+
+
+def draw_multiple_figures(title, features, df, ds_stats):
+    for i, f in enumerate(features):
+        fig = go.Figure()
+        for trace in _make_feature_traces(f, df, ds_stats):
+            fig.add_trace(trace)
+        fig.update_layout(height=480, width=640, title_text=f"{title} - {f}")
+        yield f, fig
+
+
+def _make_feature_traces(feature_name, df, ds_stats):
+    return [
+        _create_hlf(df, feature_name),
+        _create_baseline(df, feature_name),
+        _create_benchmark_trace(
+            df,
+            feature_name,
+            f"{feature_name} benchmark min",
+            ds_stats[feature_name].low,
+        ),
+        _create_benchmark_trace(
+            df,
+            feature_name,
+            f"{feature_name} benchmark max",
+            ds_stats[feature_name].high,
+        ),
+        _create_benchmark_trace(
+            df,
+            feature_name,
+            f"{feature_name} benchmark average",
+            ds_stats[feature_name].mean,
+            "#000000",
+            "solid",
+        ),
+    ]
 
 
 def draw_plots(
@@ -89,30 +135,11 @@ def draw_plots(
 ):
     df = _add_variance(df, benchmark_stats, features, _baseline_name)
     df = _add_variance(df, benchmark_stats, features, _hlf_name)
-    fig = make_subplots(
-        rows=len(features) // col_count + 1, subplot_titles=features, cols=col_count
-    )
+    img_path = Path(__file__).parent.parent.parent / "article" / "plots" / title
+    if not (img_path.exists() and img_path.is_dir()):
+        img_path.mkdir(exist_ok=True, parents=True)
 
-    for i, f in enumerate(features):
-        for trace in [
-            _create_hlf(df, f),
-            _create_baseline(df, f),
-            _create_benchmark_trace(
-                df, f, f"{f} benchmark min", benchmark_stats[f].low
-            ),
-            _create_benchmark_trace(
-                df, f, f"{f} benchmark max", benchmark_stats[f].high
-            ),
-            _create_benchmark_trace(
-                df,
-                f,
-                f"{f} benchmark average",
-                benchmark_stats[f].mean,
-                "#000000",
-                "solid",
-            ),
-        ]:
-            _add_trace_to_plot(fig, trace, i, col_count)
-
-    fig.update_layout(height=200 * len(features), width=900, title_text=title)
-    fig.show()
+    fig = draw_one_figure(title, features, df, benchmark_stats, col_count)
+    fig.write_image(img_path / f"{title}.png")
+    for feature, fig in draw_multiple_figures(title, features, df, benchmark_stats):
+        fig.write_image(img_path / f"{title}_{feature}.png")
