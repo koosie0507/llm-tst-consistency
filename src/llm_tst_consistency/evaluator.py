@@ -227,6 +227,7 @@ def main(
 ):
     features = list(HLFs)
     for prompt_name in prompt_names:
+        prompt_discriminator = prompt_name if not input_from_dataset else f"{prompt_name}_ifd"
         for ds_name in ds_names:
             report = pd.DataFrame()
             # read input text corresponding to dataset
@@ -243,13 +244,14 @@ def main(
 
             for llm in llms:
                 # load text generation results / run text generation and compute results
+                template_name = f"{prompt_name}.j2"
                 df = _load_generated_text_metrics(
-                    prompt_name,
+                    prompt_discriminator,
                     llm,
                     ds_name,
                     lambda: _generate_text_metrics(
                         trial_count,
-                        f"{prompt_name}.j2",
+                        template_name,
                         hlf_instructions,
                         input_text,
                         LLM_CONFIG[llm],
@@ -257,11 +259,8 @@ def main(
                         examples,
                     ),
                 )
-                plot_dir = prompt_name
-                if input_from_dataset:
-                    plot_dir += "-ifd"
                 draw_plots(
-                    plot_dir,
+                    prompt_discriminator,
                     f"{prompt_name}-{llm}-{ds_name}",
                     df,
                     features,
@@ -269,10 +268,7 @@ def main(
                 )
                 individual_report = make_report(llm, ds_name, features, ds_stats, df)
                 report = pd.concat([report, individual_report], axis=0)
-            report_name = f"report_{prompt_name}_{ds_name}.csv"
-            if input_from_dataset:
-                report_name = f"report_{prompt_name}_ifd_{ds_name}.csv"
-            report.to_csv(report_name)
+            report.to_csv(f"report_{prompt_discriminator}_{ds_name}.csv")
 
 
 if __name__ == "__main__":
