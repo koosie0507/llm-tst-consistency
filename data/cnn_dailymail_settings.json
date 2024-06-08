@@ -1,0 +1,69 @@
+{
+  "stats": {
+    "t_word": {
+      "mean": 645.41,
+      "low": 117,
+      "high": 1892,
+      "variance": 168416.57
+    },
+    "t_sent": {
+      "mean": 27.85,
+      "low": 4,
+      "high": 88,
+      "variance": 292.11
+    },
+    "n_uverb": {
+      "mean": 48.92,
+      "low": 8,
+      "high": 118,
+      "variance": 670.54
+    },
+    "n_uadj": {
+      "mean": 29.48,
+      "low": 3,
+      "high": 75,
+      "variance": 354.53
+    },
+    "simp_ttr": {
+      "mean": 0.46,
+      "low": 0.27,
+      "high": 0.68,
+      "variance": 0.01
+    },
+    "a_verb_pw": {
+      "mean": 0.11,
+      "low": 0.06,
+      "high": 0.15,
+      "variance": 0.0
+    },
+    "corr_adj_var": {
+      "mean": 3.25,
+      "low": 1.23,
+      "high": 5.13,
+      "variance": 0.98
+    },
+    "corr_verb_var": {
+      "mean": 4.09,
+      "low": 1.89,
+      "high": 6.29,
+      "variance": 1.03
+    },
+    "fkgl": {
+      "mean": 9.34,
+      "low": 3.93,
+      "high": 16.69,
+      "variance": 6.55
+    },
+    "a_kup_pw": {
+      "mean": 6.54,
+      "low": 5.43,
+      "high": 7.54,
+      "variance": 0.2
+    }
+  },
+  "examples": [
+    "Boston (CNN)Guilty across the board. But will he face death? After deliberating for 11½ hours, jurors found Dzhokhar Tsarnaev guilty on Wednesday of all 30 counts he faced in the Boston Marathon bombing trial. Seventeen of the 30 counts were capital charges, meaning he is eligible for the death penalty. The trial will next move into a penalty phase, where the jury will hear testimony and arguments from both sides and ultimately be tasked with deciding whether Tsarnaev, 21, will be executed. A look at all of the charges . Jurors will be asked to weigh aggravating factors such as the heinousness of his crimes against mitigating factors such as his family and mental health history, as well as his relative youth. Tsarnaev was 19 at the time of the bombing. The start date of the penalty phase has not yet been set. Since testimony began March 4, federal prosecutors have called 92 witnesses, and the defense just four. It seemed a mismatch from the start. \"He was there,\" Tsarnaev's defense attorney Judy Clarke conceded as the trial opened, but many say the defense strategy always had been to focus on persuading the jury to spare Tsarnaev's life. Tsarnaev lawyer keeps hated criminals off death row . Clarke tried to convince jurors that her client's older brother, 26-year-old Tamerlan Tsarnaev, who died in a shootout with police days after the terror attack, was the instigator of the marathon plot. The younger man, Clarke said, was only following his older brother. After the verdict, CNN legal analyst Paul Callan said Clarke now faces an uphill battle. \"Because No. 1, he (Tsarnaev) is almost functioning as an officer of a military organization attacking the United States -- the claim of course that he's an Islamic radical and that this is almost an army-like attack on civilians. \"And the second thing -- it was so well planned and so callously planned so that civilians would die, so that children would be maimed. And all of this, she has to get around and convince the jury he's not worthy of the death penalty. \"Boy, she's climbing the Mount Everest of death penalty cases in this case,\" Callan said about Clarke. Survivors react to the verdict . Ann O'Neill reported from Boston. Dana Ford reported from Atlanta.",
+    "(CNN)Just kill it already. That was the sentiment of many \"Vampire Diaries\" fans on Tuesday after star Nina Dobrev announced she will be leaving the CW show at the end of this season. \"I always knew I wanted Elena's story to be a six season adventure, and within those six years I got the journey of a lifetime,\" she posted on her social media accounts after a \"goodbye party\" at Lake Lanier outside Atlanta, where the show is filmed. \"I was a human, a vampire, a doppelganger, a crazy immortal, a doppelganger pretending to be human, a human pretending to be a doppelganger. I got kidnapped, killed, resurrected, tortured, cursed, body-snatched, was dead and undead, and there's still so much more to come before the season finale in May.\" And while that may be true, fans were feeling a little jilted. Many chastised the show's producers, some even Dobrev herself, for allowing the show to go on to a seventh season this fall after she departs. Many were upset that Dobrev's departure could sink hopes of seeing a satisfying denouement to the relationship between Dobrev's character, Elena Gilbert, and love interest vampire Damon Salvatore. Fans called the couple \"Delena.\" \"I feel angry, sad, depressed, numb but most of all I feel like part of me died along with Nina leaving TVD. Nothing will be the same again,\" Twitter user iDamonAndElena posted. Producer Julie Plec issued a statement supporting Dobrev's decision. \"Nina is excited to spread her wings, get some rest, travel the world and also take it by storm, and we support her a thousand-fold,\" she said in the statement, according to media accounts. \"We will miss Nina and the four hundred characters she played, but we look forward to the insane and exciting challenge of continuing to tell stories of our Salvatore Brothers and our much-loved and gifted ensemble.\" No thanks, some fans said. Dobrev seemed to anticipate the pain, urging fans to hold on through the show's finale next month. \"If you think you know what's coming, you don't,\" she said.",
+    "(CNN)\"Sell all that you own and distribute the money to the poor, and you will have treasure in heaven; then come, follow me,\" Jesus tells the rich man in one of his best-known parables. It was a mantra he invoked repeatedly: the poor were blessed, and it was easier for a camel to pass through the eye of a needle than it was for the well-to-do to enter paradise.  Meanwhile, Jesus told his Twelve Apostles to leave their day jobs and follow him on an itinerant mission with few prospects of success and no visible means of support. So how did this wandering band of  first-century evangelists support themselves? Clearly, money was a concern, and not just as an impediment to salvation. In the New Testament, money gets 37 mentions, while \"gold\" gets 38 citations, \"silver\" merits 20, and \"copper\" four. \"Coin\" comes up eight times, and \"purse\" and \"denarii\" -- the Roman currency -- get half a dozen mentions each for a total of 119 currency referrals. Perhaps the most relevant reference is also one of the most charged passages in the New Testament: . As the Gospel of John tells it, six days before Passover, Jesus was in Bethany at the house of his friend Lazarus, whom he had raised from the dead. A woman named Mary takes a jar of costly perfumed oil and anoints the feet of the reclining Jesus. She dries his feet with her hair, an irresistible image for artists and dramatists. Judas Iscariot objected to the act. \"Why was this perfume not sold for three hundred denarii and the money given to the poor?\" Judas asks. Though 300 denarii was the annual wage of a laborer, Jesus told Judas to leave her alone, and foreshadowing his fate, said the anointing would be useful for his burial, and besides, \"you always have the poor with you\" -- but Jesus would not always be there. What that passage makes clear is that the Jesus community had a common purse because they needed money to survive. So how much? \"I imagine the ministry functioned at a subsistence level,\" Rabbi Joshua Garroway, a professor of Early Christianity and the Second Commonwealth at Hebrew Union College in Los Angeles. Jesus and his disciples walked, wore what they had, slept outside or in stayed in friends' homes. They ate what they caught or what others shared. \"I venture to guess that begging and hospitality will have sufficed to meet the basic needs of Jesus and the companions with whom he traveled,\" Garroway said. Garroway said that it was possible, even likely, that Jesus and his followers received donations from supporters, and possibly substantial ones from some of the rich people who were drawn to his ministry despite -- or perhaps because of -- his preaching on the perils of wealth. The Gospel of Luke gives us a glimpse of how Jesus' ministry functioned on a practical level: . \"Soon afterwards he went on through cities and villages, proclaiming and bringing the good news of the kingdom of God. The twelve were with him, as well as some women who had been cured of evil spirits and infirmities: Mary, called Magdalene, from whom seven demons had gone out,  and Joanna, the wife of Herod's steward Chuza, and Susanna, and many others, who provided for them  out of their resources.\" So, according to Luke, women whom Jesus had healed in turn provided for him out of their \"resources,\" with Mary Magdalene and Joanna capturing our attention -- one by virtue of her husband, and the other, by her stature in the story of Jesus. Joanna was an upper-class woman married to a man who was intelligent and capable enough to manage the complicated household of Herod Antipas, the son of Herod the Great, the violent and ambitious head of Judea. As part of this volatile but powerful household, Joanna would be uniquely positioned to help Jesus with her resources, being both wealthy and having palace connections. She attends to him during his life, and, the Gospels tell us, after his death, as one of the trio of women who go to his tomb and find it empty. With her on that morning is Mary Magdalene, also identified as -- among other things -- a financial supporter of Jesus. Mary likely came from the prosperous town of Magdala, on the Sea of Galilee. As home to a thriving fishing industry, as well as dye and textile works, Mary could well have come from an affluent family -- or have been a successful business woman herself. Mary Magdalene was free to travel the country with Jesus and his disciples, so was unlikely to have a husband and children waiting for her at home, and in \"Finding Jesus\" we examine the Gnostic gospel of Mary Magdalene and explore the argument that Jesus was, in fact, her husband. She may have simply been an independent woman with her own resources who found a compelling message, and messenger. Not only was Mary Magdalene one of Jesus' most devoted followers, who stuck with him all the way from Galilee to Jerusalem, from the ministry to the cross and the tomb, but also she provided for him from her own means, said Mark Goodacre, a professor of New Testament and Christian Origins at Duke University. When the Gospels speak of her \"ministering\" to Jesus, they are explaining that she was one of the key figures in Jesus' everyday mission, Goodacre continues. Along with other women like Joanna and Susanna, she was one of those who made his mission viable. Along with these women, men like Joseph of Arimathea and Nicodemus, both men of stature and wealth, may have chipped in to help fund Jesus' ministry. The Gospels reveal that both these men were rich, and supported Jesus -- indeed, it was Joseph who removed Jesus from the cross on Good Friday, anointing his body with the help of Nicodemus, and placing him in the tomb that Joseph had reserved for himself. After the resurrection on that first Easter Sunday, the movement Jesus started grew exponentially, and the church's relationship to money grew more complicated as the needs became greater. Michael McKinley is co-author, with David Gibson, of \"Finding Jesus: Faith. Fact. Forgery.: Six Holy Objects That Tell the Remarkable Story of the Gospels.\""
+  ]
+}

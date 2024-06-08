@@ -100,7 +100,7 @@ def _compute_dataset_features(nlp: Language, corpus: list[str]) -> dict[str, Sta
 
 
 def _process_dataset(ds_name, ds_loader, max_corpus_size, max_example_count):
-    stats_file_name = Path(__file__).parent / f"{ds_name}.json"
+    stats_file_name = Path(__file__).parent.parent.parent / "data" / f"{ds_name}_settings.json"
     if not stats_file_name.exists():
         corpus = ds_loader(max_corpus_size)
         obj = {"stats": _compute_dataset_features(spacy.load("en_core_web_sm"), corpus), "examples": list(sample(corpus, max_example_count))}
