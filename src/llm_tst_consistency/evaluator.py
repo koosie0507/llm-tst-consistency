@@ -1,14 +1,14 @@
 import os
 from dataclasses import asdict
-from enum import StrEnum
 from functools import partial
 from pathlib import Path
+from random import sample
 
 import dotenv
 import orjson as json
 import pandas as pd
 import spacy
-from datasets import Dataset
+import typer
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from spacy import Language
 
@@ -18,15 +18,16 @@ from llm_tst_consistency.hlf import (
     KupermanAgeOfAcquisition,
 )
 from llm_tst_consistency.llm import GPT, Gemini, Claude3, Ollama
+from llm_tst_consistency.parameters import LLMName, MetricLevel, DatasetName, PromptName
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.reporting import make_report
 from llm_tst_consistency.stats import Stats
 
 
 dotenv.load_dotenv()
-MAX_CORPUS_SIZE = os.getenv("LTC_MAX_CORPUS_SIZE", 1)
-TRIAL_COUNT = os.getenv("LTC_TRIAL_COUNT", 3)
-HLF_TEMPLATES = {
+cli = typer.Typer(name="evaluator")
+
+HLF_TEMPLATE_CONFIG = {
     "t_word": "total_words.j2",
     "t_sent": "total_sentences.j2",
     "n_uverb": "number_of_unique_verbs.j2",
@@ -44,53 +45,38 @@ HLFs = {
         if name == "a_kup_pw"
         else HandcraftedLinguisticFeature(name)
     )
-    for name in HLF_TEMPLATES
+    for name in HLF_TEMPLATE_CONFIG
 }
-
-LLMs = {
-    "claude3": partial(
+LLM_CONFIG = {
+    LLMName.CLAUDE: partial(
         Claude3,
         model_name="claude-3-opus-20240229",
         api_key=os.getenv("LTC_ANTHROPIC_KEY"),
         hlf_cfg=HLFs,
     ),
-    "gemini": partial(
+    LLMName.GEMINI: partial(
         Gemini,
         project_name=os.getenv("LTC_GOOGLE_PROJECT"),
         location=os.getenv("LTC_GOOGLE_LOCATION"),
         hlf_cfg=HLFs,
         model_name="gemini-1.5-pro",
     ),
-    "gpt": partial(
+    LLMName.GPT: partial(
         GPT,
         model_name="gpt-4o",
         api_key=os.getenv("LTC_OPENAI_KEY"),
         hlf_cfg=HLFs,
     ),
-    "llama3_8b": partial(
+    LLMName.LLAMA3: partial(
         Ollama,
         model_name="llama3",
         host=os.getenv("LTC_OLLAMA_HOST"),
         hlf_cfg=HLFs,
     ),
-    "mixtral_8x7b": partial(
-        Ollama,
-        model_name="mixtral:8x7b",
-        host=os.getenv("LTC_OLLAMA_HOST"),
-        hlf_cfg=HLFs,
-    ),
 }
-CURRENT_LLM = "llama3_8b"
-
-DATASETS = {
-    "cnn_dailymail": load_cnn_daily_mail,
+DATASET_CONFIG = {
+    DatasetName.CNN_DAILY_MAIL: load_cnn_daily_mail,
 }
-CURRENT_DATASET = "cnn_dailymail"
-
-
-class MetricLevel(StrEnum):
-    BASELINE = "baseline"
-    HLF = "hlf"
 
 
 def _load_input_text(ds_name):
@@ -108,46 +94,46 @@ def _load_j2(template_name):
     return env.get_template(template_name)
 
 
-def _compute_dataset_features(nlp: Language, ds: Dataset) -> dict[str, Stats]:
-    corpus = [row["article"] for row in ds][:MAX_CORPUS_SIZE]
+def _compute_dataset_features(nlp: Language, corpus: list[str]) -> dict[str, Stats]:
     docs = list(map(nlp, corpus))
     return {name: Stats.hlf(docs, feature) for name, feature in HLFs.items()}
 
 
-def _load_dataset_stats(ds_name, ds_loader):
+def _process_dataset(ds_name, ds_loader, max_corpus_size, max_example_count):
     stats_file_name = Path(__file__).parent / f"{ds_name}.json"
     if not stats_file_name.exists():
-        ds_stats = _compute_dataset_features(spacy.load("en_core_web_sm"), ds_loader())
-        stats_file_name.write_bytes(json.dumps(ds_stats))
+        corpus = ds_loader(max_corpus_size)
+        obj = {"stats": _compute_dataset_features(spacy.load("en_core_web_sm"), corpus), "examples": list(sample(corpus, max_example_count))}
+        stats_file_name.write_bytes(json.dumps(obj))
     else:
-        ds_stats = json.loads(stats_file_name.read_text())
+        obj = json.loads(stats_file_name.read_text())
+        ds_stats = obj["stats"]
         for key in ds_stats:
             ds_stats[key] = Stats(**ds_stats[key])
-    return ds_stats
+    return obj["stats"], obj["examples"]
 
 
 def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
     result = []
     for feature, stats in ds_stats.items():
-        template = _load_j2(HLF_TEMPLATES[feature])
+        template = _load_j2(HLF_TEMPLATE_CONFIG[feature])
         result.append(template.render(**asdict(stats)))
     return result
 
 
 def _generate_text_metrics(
-    trial_count, prompt_template, hlf_instructions, input_text, model_cls, features
-):
+    trial_count, prompt_template, hlf_instructions, input_text, model_cls, features, examples=None):
     tpl = _load_j2(prompt_template)
 
     # generate baseline
-    baseline_prompt = tpl.render()
+    baseline_prompt = tpl.render(examples=examples)
     baseline_generator = model_cls(
         text=input_text, prompt=baseline_prompt, metric_level=MetricLevel.BASELINE
     )
     data = [baseline_generator() for _ in range(trial_count)]
 
     # augment with hlf instructions
-    hlf_prompt = tpl.render(hlf_instructions=hlf_instructions)
+    hlf_prompt = tpl.render(hlf_instructions=hlf_instructions, examples=examples)
     hlf_generator = model_cls(
         text=input_text, prompt=hlf_prompt, metric_level=MetricLevel.HLF
     )
@@ -164,8 +150,8 @@ def _generate_text_metrics(
     )
 
 
-def _load_generated_text_metrics(model_family, ds_name, generate_text_cb):
-    file_name = Path(__file__).parent / f"gen_results_{model_family}_{ds_name}.csv"
+def _load_generated_text_metrics(prompt_name, model_family, ds_name, generate_text_cb):
+    file_name = Path(__file__).parent / f"gen_results_{prompt_name}_{model_family}_{ds_name}.csv"
     if not file_name.exists():
         df = generate_text_cb()
         df.to_csv(file_name)
@@ -174,35 +160,71 @@ def _load_generated_text_metrics(model_family, ds_name, generate_text_cb):
     return df
 
 
-def main():
-    # select the model
-    if CURRENT_LLM not in LLMs:
-        exit(2)
-    model_class = LLMs[CURRENT_LLM]
-    if CURRENT_DATASET not in DATASETS:
-        exit(1)
-    system_prompt_template = "prompt_1.j2"
-
-    features = list(HLFs)
-    ds_stats = _load_dataset_stats(CURRENT_DATASET, DATASETS[CURRENT_DATASET])
-    input_text = _load_input_text(CURRENT_DATASET)
-    hlf_instructions = _write_hlf_instructions(ds_stats)
-    df = _load_generated_text_metrics(
-        CURRENT_LLM,
-        CURRENT_DATASET,
-        lambda: _generate_text_metrics(
-            TRIAL_COUNT,
-            system_prompt_template,
-            hlf_instructions,
-            input_text,
-            model_class,
-            features,
-        ),
-    )
-    draw_plots(CURRENT_LLM, df, features, ds_stats)
-    report = make_report(features, ds_stats, df)
-    report.to_csv(f"report_{CURRENT_LLM}_{CURRENT_DATASET}.csv")
+@cli.command()
+def main(
+    llms: list[LLMName] = typer.Option(
+        list(LLM_CONFIG), "-l", "--llm", help="run experiment with these LLM(s)"
+    ),
+    ds_names: list[DatasetName] = typer.Option(
+        list(DATASET_CONFIG), "-d", "--dataset", help="run experiment on these datasets"
+    ),
+    prompt_names: list[PromptName] = typer.Option(
+        list(PromptName), "-p", "--prompt", help="run experiment using this prompt"
+    ),
+    trial_count: int = typer.Option(
+        10,
+        "-n",
+        "--count",
+        help="the number of times we should generate text",
+        envvar="LTC_TRIAL_COUNT",
+    ),
+    max_size: int = typer.Option(
+        100,
+        "-s",
+        "--dataset-size",
+        help="the maximum number of items we should take from the dataset",
+        envvar="LTC_MAX_CORPUS_SIZE",
+    ),
+    example_count: int = typer.Option(
+        1,
+        "-e",
+        "--example-count",
+        help="the maximum number of examples to use in the prompts that make use of them",
+        envvar="LTC_EXAMPLE_COUNT",
+    ),
+):
+    for prompt_name in prompt_names:
+        report = pd.DataFrame()
+        for llm in llms:
+            for ds_name in ds_names:
+                # read input text corresponding to dataset
+                input_text = _load_input_text(ds_name)
+                # compute/load dataset stats
+                ds_stats, examples = _process_dataset(ds_name, DATASET_CONFIG[ds_name], max_corpus_size=max_size, max_example_count=example_count)
+                # create prompt based on dataset stats
+                hlf_instructions = _write_hlf_instructions(ds_stats)
+                # load text generation results / run text generation and compute results
+                features = list(HLFs)
+                df = _load_generated_text_metrics(
+                    prompt_name,
+                    llm,
+                    ds_name,
+                    lambda: _generate_text_metrics(
+                        trial_count,
+                        f"{prompt_name}.j2",
+                        hlf_instructions,
+                        input_text,
+                        LLM_CONFIG[llm],
+                        features,
+                        examples,
+                    )
+                )
+                #
+                draw_plots(prompt_name, f"{prompt_name}-{llm}-{ds_name}", df, features, ds_stats)
+                individual_report = make_report(llm, ds_name, features, ds_stats, df)
+                report = pd.concat([report, individual_report], axis=0)
+        report.to_csv(f"report_{prompt_name}.csv")
 
 
 if __name__ == "__main__":
-    main()
+    cli()

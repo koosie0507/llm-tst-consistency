@@ -127,6 +127,7 @@ def _make_feature_traces(feature_name, df, ds_stats):
 
 
 def draw_plots(
+    prompt_name: str,
     title: str,
     df: pd.DataFrame,
     features: list[str],
@@ -135,7 +136,7 @@ def draw_plots(
 ):
     df = _add_variance(df, benchmark_stats, features, _baseline_name)
     df = _add_variance(df, benchmark_stats, features, _hlf_name)
-    img_path = Path(__file__).parent.parent.parent / "article" / "plots" / title
+    img_path = Path(__file__).parent.parent.parent / "article" / "plots" / prompt_name / title
     if not (img_path.exists() and img_path.is_dir()):
         img_path.mkdir(exist_ok=True, parents=True)
 

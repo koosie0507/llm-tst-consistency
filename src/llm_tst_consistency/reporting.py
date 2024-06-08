@@ -36,7 +36,7 @@ def _is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     return p_value < threshold
 
 
-def make_report(features, ds_stats, df):
+def make_report(llm_name, ds_name, features, ds_stats, df):
     euclid = {}
     area = {}
     ks = {}
@@ -44,6 +44,7 @@ def make_report(features, ds_stats, df):
         diff_col = f"{feature}_diff"
         is_closer_col = f"is_{feature}_closer"
         is_different_col = f"is_{feature}_different"
+
         target = [ds_stats[feature].mean] * len(df)
         baseline = df[f"baseline_{feature}"].values
         hlf = df[f"hlf_{feature}"].values
@@ -71,5 +72,9 @@ def make_report(features, ds_stats, df):
     return pd.DataFrame(
         columns=list(euclid.keys()),
         data=[euclid, area, ks],
-        index=["by euclidian norm", "by area", "k-s test"],
+        index=[
+            f"({llm_name},{ds_name}) euclidian norm",
+            f"({llm_name},{ds_name}) area",
+            f"({llm_name},{ds_name}) k-s test",
+        ],
     )
