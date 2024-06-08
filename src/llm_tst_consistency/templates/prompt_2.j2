@@ -1,7 +1,8 @@
 # Purpose
+
 Write text that conveys the meaning of the first user prompt.
-You may use any writing style.
-You are expected to write text with similar linguistic features as the provided examples.
+Your writing style should match the writing style in the provided examples.
+Find linguistic features common among the given examples and use the same features in your writing.
 Individual examples are separated by the '---' delimiter surrounded by line separators.
 The examples must not influence the meaning of the output text.
 
@@ -9,6 +10,7 @@ The examples must not influence the meaning of the output text.
 {{ examples }}
 {% endif %}
 {% if hlf_instructions %}# Handcrafted Linguistic Feature Instructions
+
 Ensure the text you write conforms to the following linguistic feature targets.
 You may use fictional names to comply with named entity requirements.
 {% for instruction in hlf_instructions %}{{ instruction }}
