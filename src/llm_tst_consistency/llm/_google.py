@@ -10,23 +10,23 @@ from llm_tst_consistency.llm._base import BaseModel
 safety_config = [
     gai.SafetySetting(
         category=gai.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold=gai.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     ),
     gai.SafetySetting(
         category=gai.HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold=gai.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     ),
     gai.SafetySetting(
         category=gai.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold=gai.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     ),
     gai.SafetySetting(
         category=gai.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold=gai.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     ),
     gai.SafetySetting(
         category=gai.HarmCategory.HARM_CATEGORY_UNSPECIFIED,
-        threshold=gai.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        threshold=gai.HarmBlockThreshold.BLOCK_ONLY_HIGH,
     ),
 ]
 

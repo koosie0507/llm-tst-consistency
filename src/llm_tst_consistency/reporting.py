@@ -38,13 +38,11 @@ def _is_diff_significant(x: float, y: float, confidence: float = 0.95) -> bool:
     return p_value < threshold
 
 
-def make_report(llm_name, ds_name, features, ds_stats, df):
+def make_report(llm_name, features, ds_stats, df):
     euclid = {}
     area = {}
-    ks = {}
     for feature in features:
         diff_col = f"{feature}_diff"
-        is_closer_col = f"is_{feature}_closer"
         is_different_col = f"is_{feature}_different"
 
         target = [ds_stats[feature].mean] * len(df)
@@ -53,30 +51,23 @@ def make_report(llm_name, ds_name, features, ds_stats, df):
 
         # Kolmogorov-Smirnov test
         ks_bh = ks_2samp(baseline, hlf)
-        ks_bt = ks_2samp(baseline, target)
-        ks_ht = ks_2samp(hlf, target)
-        ks[diff_col] = ks_bt.statistic - ks_ht.statistic
-        ks[is_closer_col] = ks_bt.statistic > ks_ht.statistic
-        ks[is_different_col] = ks_bh.pvalue < 0.25
+        is_diff = ks_bh.pvalue < 0.05
 
         # Euclidian norm
         dist_a, dist_b = _compute_euclidian_norms_to_target(baseline, hlf, target)
-        euclid[diff_col] = dist_a - dist_b
-        euclid[is_closer_col] = dist_a > dist_b
-        euclid[is_different_col] = _is_diff_significant(dist_a, dist_b)
+        euclid[diff_col] = round(dist_a - dist_b, 2)
+        euclid[is_different_col] = is_diff
 
         # Area between curves
         area_a, area_b = _compute_areas_to_target(baseline, hlf, target)
-        area[diff_col] = area_a - area_b
-        area[is_closer_col] = area_a > area_b
-        area[is_different_col] = _is_diff_significant(area_a, area_b)
+        area[diff_col] = round(area_a - area_b, 2)
+        area[is_different_col] = is_diff
 
     return pd.DataFrame(
         columns=list(euclid.keys()),
-        data=[euclid, area, ks],
+        data=[euclid, area],
         index=[
-            f"({llm_name},{ds_name}) euclidian norm",
-            f"({llm_name},{ds_name}) area",
-            f"({llm_name},{ds_name}) k-s test",
+            f"{llm_name} $Diff_N$",
+            f"{llm_name} $Diff_A$",
         ],
     )

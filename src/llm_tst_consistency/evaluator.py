@@ -226,51 +226,69 @@ def main(
     ),
 ):
     features = list(HLFs)
-    for prompt_name in prompt_names:
-        prompt_discriminator = (
-            prompt_name if not input_from_dataset else f"{prompt_name}_ifd"
-        )
-        for ds_name in ds_names:
-            report = pd.DataFrame()
-            # read input text corresponding to dataset
-            input_text = _load_input_text(ds_name, from_dataset=input_from_dataset)
-            # compute/load dataset stats
-            ds_stats, examples = _process_dataset(
-                ds_name,
-                DATASET_CONFIG[ds_name],
-                max_corpus_size=max_size,
-                max_example_count=example_count,
+    count = len(prompt_names)*len(ds_names)*len(llms)
+    with typer.progressbar(range(count), count) as progress:
+        for prompt_name in prompt_names:
+            prompt_discriminator = (
+                prompt_name if not input_from_dataset else f"{prompt_name}_ifd"
             )
-            # create prompt based on dataset stats
-            hlf_instructions = _write_hlf_instructions(ds_stats)
-
-            for llm in llms:
-                # load text generation results / run text generation and compute results
-                template_name = f"{prompt_name}.j2"
-                df = _load_generated_text_metrics(
-                    prompt_discriminator,
-                    llm,
+            for ds_name in ds_names:
+                report = pd.DataFrame()
+                tex_lines = []
+                # read input text corresponding to dataset
+                input_text = _load_input_text(ds_name, from_dataset=input_from_dataset)
+                # compute/load dataset stats
+                ds_stats, examples = _process_dataset(
                     ds_name,
-                    lambda: _generate_text_metrics(
-                        trial_count,
-                        template_name,
-                        hlf_instructions,
-                        input_text,
-                        LLM_CONFIG[llm],
+                    DATASET_CONFIG[ds_name],
+                    max_corpus_size=max_size,
+                    max_example_count=example_count,
+                )
+                # create prompt based on dataset stats
+                hlf_instructions = _write_hlf_instructions(ds_stats)
+
+                for llm in llms:
+                    # load text generation results / run text generation and compute results
+                    template_name = f"{prompt_name}.j2"
+                    df = _load_generated_text_metrics(
+                        prompt_discriminator,
+                        llm,
+                        ds_name,
+                        lambda: _generate_text_metrics(
+                            trial_count,
+                            template_name,
+                            hlf_instructions,
+                            input_text,
+                            LLM_CONFIG[llm],
+                            features,
+                            examples,
+                        ),
+                    )
+                    draw_plots(
+                        prompt_discriminator,
+                        f"{prompt_name}-{llm}-{ds_name}",
+                        df,
                         features,
-                        examples,
-                    ),
-                )
-                draw_plots(
-                    prompt_discriminator,
-                    f"{prompt_name}-{llm}-{ds_name}",
-                    df,
-                    features,
-                    ds_stats,
-                )
-                individual_report = make_report(llm, ds_name, features, ds_stats, df)
-                report = pd.concat([report, individual_report], axis=0)
-            report.to_csv(f"report_{prompt_discriminator}_{ds_name}.csv")
+                        ds_stats,
+                    )
+                    individual_report = make_report(llm, features, ds_stats, df)
+                    report = pd.concat([report, individual_report], axis=0)
+                    progress.update(1, f"f{prompt_name}-{llm}-{ds_name}")
+                report.to_csv(f"report_{prompt_discriminator}_{ds_name}.csv")
+
+                def _format_diffs(value):
+                    if value > 0:
+                        return "\\underline{%s}" % value
+                    if value < 0:
+                        return "\\textit{%s}" % value
+                    return value
+                diff_cols = [
+                    col
+                    for col in report.columns
+                    if col.endswith("_diff")
+                ]
+                formatters = {col: _format_diffs for col in diff_cols}
+                report.to_latex(f"report_{prompt_discriminator}_{ds_name}.tex", formatters=formatters)
 
 
 if __name__ == "__main__":
