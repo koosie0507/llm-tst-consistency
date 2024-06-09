@@ -1,27 +1,28 @@
 \documentclass[runningheads,a4paper,11pt]{article}
 
 \usepackage{algorithmic}
-\usepackage{algorithm} 
+\usepackage{algorithm}
 \usepackage{array}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{booktabs}
-\usepackage{caption}
+\usepackage[justification=centering,font=scriptsize]{caption}
 \usepackage{cite}
-\usepackage{comment} 
+\usepackage{comment}
 \usepackage{enumitem}
-\usepackage{epsfig} 
+\usepackage{epsfig}
 \usepackage{fancyhdr}
 \usepackage[T1]{fontenc}
-\usepackage{geometry} 
+\usepackage{geometry}
 \usepackage{graphicx}
-\usepackage[colorlinks]{hyperref} 
+\usepackage[colorlinks]{hyperref}
+\usepackage{inconsolata}
 \usepackage[latin1]{inputenc}
 \usepackage{interval}
 \usepackage{multicol}
-\usepackage{multirow} 
+\usepackage{multirow}
 \usepackage{rotating}
 \usepackage{setspace}
 \usepackage{subfigure}
@@ -47,6 +48,7 @@
     a simpler and cheaper alternative should also be investigated: using
     handcrafted language features to direct the large language model.
 \end{abstract}
+
 
 \section{Introduction}\label{introduction}
 
@@ -123,6 +125,7 @@ The answer to this question could hint at a relatively simple and accurate way
 of evaluating the quality of (partial) text style transfer using a large
 language model.
 
+
 \section{Related Work}\label{related}
 
 There is abundent literature on the topic of text style transfer.
@@ -184,6 +187,7 @@ LLMs respond well to diversified instructions for controlled text generation in
 general.
 Compared to the existing work, our prompts are guided by HLFs.
 Furthermore, we use those same HLFs to evaluate the performance of the LLM.
+
 
 \section{Experiment Design}\label{method}
 
@@ -270,26 +274,28 @@ then we consider that the LLM follows HLF prompts in a relevant way.
 
 \subsection{LLM Selection}\label{llm-selection}
 
-In order to perform our experiment we must first choose proper candidates.
-Since the interaction with the model happens only via prompts, we may use models
-with any type of licensing.
-For our experiment we choose the top model from each of the highest scoring five
-different major vendors listed on the Chatbot Arena~\cite{chiang2024chatbot}
-leaderboard.
-The final choice is documented in Table~\ref{table-llm}.
+For our experiment we will use some of the best large language models available.
+We trust the competence judgements issued in the the Chatbot Arena~\cite{chiang2024chatbot}
+for each LLM.
+In the interest of covering more ground, we choose large language models from
+different vendors.
+Our choice includes four top performing LLMs and one model that anyone would be
+able to run on their own hardware.
+Our final choice is documented in Table~\ref{table-llm}.
 
 \begin{table}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}\toprule
-        Name                      & Parameters  & Context Size & Elo Score & License Type        \\ \toprule
-        OpenAI GPT-4o             & undisclosed & 128000       & 1287      & Proprietary         \\
-        Google Gemini 1.5 Pro     & undisclosed & 1048576      & 1268      & Proprietary         \\
-        Anthropic Claude 3 Opus   & undisclosed & 200000       & 1248      & Proprietary         \\
-        Meta Llama 3-70B-Instruct & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
-        Cohere Command R+         & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
-                                  &             &              &           & with Acceptable Use \\
-                                  &             &              &           & Addendum            \\ \bottomrule
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        Name                    & Parameters  & Context Size & Elo Score & License Type        \\ \toprule
+        OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
+        Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
+        Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
+        Meta Llama 3-8B         & 8 Billion   & 8000         & 1208      & Llama 3 Community   \\
+        Cohere Command R+       & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
+                                &             &              &           & with Acceptable Use \\
+                                &             &              &           & Addendum            \\ \bottomrule
     \end{tabular}
     \caption{Experiment LLMs}\label{table-llm}
 \end{table}
@@ -305,22 +311,23 @@ However, there is no direct mapping between HLFs and style.
 It falls onto us to choose features based on their influence over text style as
 recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
 
-Another HLF characteristic we have in mind is their level of abstraction.
-Features such as the word count or number of punctuation mark are very concrete.
-On the other side of the spectrum, features such as the Flesch-Kincaid grade
-level~\cite{kincaid1975derivation} are highly abstract.
+We can also describe HLFs in terms of how abstract the instruction to conform to
+them is.
+For example, `write 100 words' is a more concrete instruction than `write as if
+you were in junior highschool'~\cite{kincaid1975derivation}.
 We divide HLFs in five categories ranging from very concrete to highly abstract
 and choose 2 features from each category for a grand total of 10 HLFs.
-Our final selection is available in Table~\ref{table-hlf}.
+Table~\ref{table-hlf} showcases our selection of features.
 
 \begin{table}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}\toprule
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
         Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark \\ \toprule
-        total unique words                & wordsent         & surface          & very concrete   & lexical                  \\
+        total words                       & wordsent         & surface          & very concrete   & lexical                  \\
         total sentences                   & wordsent         & surface          & very concrete   & syntactic                \\ \bottomrule
-        total number of named entities    & entity           & discourse        & concrete        & semantic                 \\
+        total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                 \\
         total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic                \\ \bottomrule
         simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic                \\
         number of verbs per word          & partofspeech     & surface          & regular         & syntactic                \\ \bottomrule
@@ -333,6 +340,7 @@ Our final selection is available in Table~\ref{table-hlf}.
 \end{table}
 \footnotetext{as described in the figure in~\cite{lugea2023stylistics}, chapter 1, page 7}
 
+Each of these features is well documented in literature~\cite{lftk-2023}.
 
 \subsection{DataSet Selection}\label{ds-selection}
 
@@ -341,16 +349,15 @@ We have run this experiment on the datasets listed in Table~\ref{table-ds}.
 \begin{table}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}\toprule
-        Name              & Task                       & Row Count & Content Type & Reference                     \\ \toprule
-        Yelp Reviews Full & Sentiment Classification   & 700000    & Reviews      & \cite{yelp2015neurips}        \\
-                          & Text Style Transfer        & 700000    &              &                               \\
-                          & Text Classification        & 700000    &              &                               \\ \midrule
-        CNN / DailyMail   & Summarization              & 300000    & News         & \cite{cnndm2015}              \\
-                          & Question Answering         &           & Stories      & \cite{cnndm2017}              \\
-                          & Text Generation            &           &              &                               \\ \midrule
-        HANNA             & Automatic Story Generation & 1056      & Stories      & \cite{hanna2024}              \\ \midrule
-        StylePTB          & Text Style Transfer        & 60000     & Sentences    & \cite{lyu-etal-2021-styleptb} \\ \bottomrule
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        Name              & Task                     & Row Count & Content Type & Reference              \\ \toprule
+        Yelp Reviews Full & Sentiment Classification & 700000    & Reviews      & \cite{yelp2015neurips} \\
+                          & Text Style Transfer      & 700000    &              &                        \\
+                          & Text Classification      & 700000    &              &                        \\ \midrule
+        CNN / DailyMail   & Summarization            & 300000    & News         & \cite{cnndm2015}       \\
+                          & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
+                          & Text Generation          &           &              &                        \\ \midrule
     \end{tabular}
     \caption{Experiment LLMs}\label{table-ds}
 \end{table}
@@ -366,25 +373,41 @@ their style might vary from one author to another, they will definitely be more
 formal than Yelp reviews.
 The writing is likely to be more mature, too.
 
-The Human-ANnotated NArratives (HANNA) dataset is interesting because it
-contains stories generated by LLMs. Since LLM generated stories can be assessed
-just as easily as human generated stories by using HLFs, we thought it would be
-a welcome addition to run our experiment for non-human writers, too.
+We use the Huggingface ecosystem to load these
+datasets~\cite{lhoest-etal-2021-datasets}.
+Because of the statistical nature of the experiment and in the interest of
+expediency, we only use the first thousand texts from the test split of each
+dataset.
 
-Finally, StylePTB is a dataset containing fine grained stylistic changes at the
-sentence level. We use this dataset to see how well LLMs do in scenarios
-involving HLFs at the sentence level (for example, part of speech HLFs).
+\subsection{User Prompt and Text}\label{input-text}
 
-\subsection{Input Prompt and Text}\label{input-text}
+This experiment consists of instructing various large language models to reword
+an input text so that it conforms to a bunch of handcrafted linguistic features.
+The input text is provided via a user prompt.
+We provide two user prompts for each dataset.
+These user prompts can be freely examined online in the
+\texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{data}}
+folder of the experiment's Git repository~\cite{olar2024experimentcode}.
 
-The input prompts are derived from the templates available in the Git repository
-that accompanies this article~\cite{olar2024experimentcode}.
-We provide the LLM with a system prompt that contains instructions concerning
-all HLFs.
+For the CNN/DailyMail dataset, the user prompt from outside the dataset is an
+extract from the classic text`The Life and Opinions of Tristram Shandy,
+Gentleman', by Laurence Sterne~\cite{sterne2003life}.
+We judge this text to be far apart in both style and exhibited linguistic
+features from the CNN/DailyMail dataset contents.
+For the Yelp dataset, our chosen user prompt is Oscar Wilde's `Sonnet to
+Liberty'~\cite{wilde1909poems}.
+This text is vastly different from anything in the Yelp review dataset.
+
+The instructions for the LLM are compiled from the Jinja templates available in
+the \texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{templates}}
+folder of the experiment's Git repository~\cite{olar2024experimentcode}.
+This folder includes both the main instruction prompts for the two scenarios
+that we cover in this experiment (`\texttt{prompt\_1}' and `\texttt{prompt\_2}')
+and the templates for generating the instructions for each HLF.
 
 \section{Experiment Results}
 
-\subsection{Graph Interpretation}
+\subsection{Interpretation Conventions}
 
 Handcrafted linguistic features are integer or floating point values that we
 can compute on text.
@@ -401,24 +424,108 @@ The minimum and maximum HLF on the benchmark dataset are plotted using dotted
 black lines.
 A continuous black line designates the average HLF on the benchmark dataset.
 
-Following this description of how to interpret the graphs, we present sample
-findings using the features for which we've observed the best and the worst
-compliance by the LLM.
-These findings were all made on the <DECIDE LATER> dataset.
+Our results tables highlight differences between the generated text's HLF values
+obtained by using the baseline and the HLF prompts.
+We are concerned with how different the plots of each HLF are from the
+continuous black line representing the average HLF on the benchmark dataset and
+how different they are from each other.
+
+We use the two-sampled Kolmogorov-Smirnov test to determine whether the baseline
+results are different from the HLF-enhanced results.
+We consider that any $p-value \le 0.05$ means that the distributions are
+different.
+
+To determine which of the two is closer to the target, we compute the area
+between each result and the target.
+Another way to measure the geometric closeness to the target is by computing the
+Euclidian norm of the vectorial difference between result and target.
+Let us denote with $A_b$ and $A_h$ the areas between baseline and target and HLF
+instruction result and target, respectively.
+Let us similarly denote with $N_b$ and $N_h$ the Euclidian norms.
+Finally, we define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$
+
+The tables that sum up the experiment results show $Diff_A$ and $Diff_N$ for
+each model and we provide a result table for each dataset and prompt variant in
+the online repository of the experiment.
+For each value we specify whether it is significant statistically according to
+the Kolmogorov-Smirnov test.
+
+In the next sections we only present the most relevant results of the
+experiment.
+To save space, we illustrate significant differences between the baseline and
+the HLF instruction results in \textbf{bold} typeface.
+Positive results are \underline{underlined} and negative results are
+\textit{italicized}.
 
 \subsection{Can an LLM Follow HLF Instructions?}
 
-Yelp Results on the best and worst performing metric.
-The rest of the metrics in an Appendix.
+The results on the CNN-DailyMail dataset showcased in
+Table~\ref{table-cnn-dailymail-results} provide the most eloquent answer to this
+question.
+The results on the Yelp dataset are positive, albeit less convincing.
+\begin{table}[!ht]
+    \centering
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lllllllllll}
+            model               & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var            & fkgl                    & a\_kup\_pw                \\
+            \toprule
+            claude3 $Diff_N$    & \underline{\textbf{623.16}}  & \underline{\textbf{24.74}} & \underline{\textbf{51.18}}  & \underline{\textbf{26.68}} & 0.06                      & -0.0                      & \underline{\textbf{0.46}} & \underline{\textbf{1.4}}   & \underline{1.44}        & \textit{\textbf{-1.66}}   \\
+            claude3 $Diff_A$    & \underline{\textbf{1774.0}}  & \underline{\textbf{74.0}}  & \underline{\textbf{158.84}} & \underline{\textbf{81.2}}  & 0.2                       & -0.01                     & \underline{\textbf{1.88}} & \underline{\textbf{4.49}}  & \underline{5.01}        & \textit{\textbf{-4.09}}   \\
+            gemini $Diff_N$     & \underline{\textbf{985.86}}  & \underline{\textbf{34.52}} & \underline{\textbf{100.36}} & \underline{\textbf{53.39}} & \underline{\textbf{0.52}} & 0.05                      & \underline{\textbf{2.62}} & \underline{\textbf{4.68}}  & \textit{-4.17}          & \textit{\textbf{-2.43}}   \\
+            gemini $Diff_A$     & \underline{\textbf{2990.5}}  & \underline{\textbf{106.5}} & \underline{\textbf{320.34}} & \underline{\textbf{159.1}} & \underline{\textbf{1.5}}  & 0.09                      & \underline{\textbf{7.24}} & \underline{\textbf{13.15}} & \textit{-12.65}         & \textit{\textbf{-7.13}}   \\
+            gpt $Diff_N$        & \underline{\textbf{125.87}}  & 1.46                       & 10.95                       & 10.77                      & 0.02                      & -0.01                     & 0.71                      & 0.81                       & \textit{\textbf{-1.72}} & 0.43                      \\
+            gpt $Diff_A$        & \underline{\textbf{327.0}}   & 3.0                        & 29.0                        & 27.0                       & 0.08                      & -0.01                     & 1.82                      & 2.24                       & \textit{\textbf{-5.72}} & 0.44                      \\
+            llama3\_8b $Diff_N$ & 171.31                       & 6.63                       & -9.8                        & 13.8                       & 0.04                      & -0.04                     & 1.03                      & -0.84                      & -0.11                   & -0.76                     \\
+            llama3\_8b $Diff_A$ & 524.0                        & 20.0                       & -32.5                       & 43.5                       & 0.1                       & -0.08                     & 3.64                      & -2.85                      & 1.57                    & -2.29                     \\
+            command\_r $Diff_N$ & \underline{\textbf{1024.78}} & \underline{\textbf{39.67}} & \underline{\textbf{81.58}}  & \underline{\textbf{41.46}} & \underline{\textbf{0.46}} & \underline{\textbf{0.03}} & \underline{\textbf{2.67}} & \underline{\textbf{3.78}}  & \underline{1.4}         & \underline{\textbf{0.14}} \\
+            command\_r $Diff_A$ & \underline{\textbf{3132.5}}  & \underline{\textbf{120.5}} & \underline{\textbf{246.84}} & \underline{\textbf{132.2}} & \underline{\textbf{1.36}} & \underline{\textbf{0.06}} & \underline{\textbf{7.88}} & \underline{\textbf{11.21}} & \underline{3.9}         & \underline{\textbf{1.03}} \\
+            \bottomrule
+        \end{tabular}%
+    }
+    \caption{CNN-DailyMail Results}
+    \label{table-cnn-dailymail-results}
+\end{table}
+
+Command-R+ was the best performer by far, while Llama3 (8B) was predictibly the
+worst at following HLF instructions.
+Figure~\ref{fig-command-r-t-word} shows a positive result, where the result
+obtained with the aid of HLF instructions is closer to the target.
+Figure~\ref{fig-gpt-fkgl} shows a negative result, where the baseline is closer
+to the target.
+Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail_t_word.png}
+        \caption{Command-R+\\Total Words}
+        \label{fig-command-r-t-word}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail_fkgl.png}
+        \caption{GPT\\Flesch-Kincaid Grade Level}
+        \label{fig-gpt-fkgl}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-llama3_8b-cnn_dailymail/prompt_1-llama3_8b-cnn_dailymail_simp_ttr.png}
+        \caption[center]{Llama3-8B\\Simple TTR}
+        \label{fig-llama-simp-ttr}
+    \end{minipage}
+\end{figure}
+
 
 \subsection{Context Aware}
 
 Yelp results on the best and worst performing metric.
 The rest of the metrics (including on all other datasets) in an Appendix.
 
+
 \section{Discussion}
 
 Discuss experiment results here.
+
 
 \section{Conclusions and Future Work}
 
