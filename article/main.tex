@@ -193,17 +193,19 @@ Furthermore, we use those same HLFs to evaluate the performance of the LLM.
 
 Our experiment consists of analysing the behavior of an LLM when asked to
 generate new text based on a given input text and some instructions derived from
-HLF statistics computed on a benchmark dataset.
-To perform the experiment we must know which LLMs we are going to evaluate and
-what benchmark datasets we are going to use.
-We must also select the HLFs for our experiment.
-Before going into details, let us outline the experiment process.
+HLF statistics computed on a corpus containing multiple texts.
+The experiment relies on choosing LLMs to evaluate and finding datasets from
+which we can derive corpuses.
+Then there's the matter of selecting the HLFs for our experiment.
+Let us outline the experiment process before going into further detail.
 
 The first task is to establish a baseline.
 We do so by instructing the target LLM to generate text retaining the meaning of
-the input text without any further instruction.
+the input text without any further instruction related to style or the
+linguistic features of the generated text.
 We repeat the text generation step 10 times using the same prompt and the same
 input text.
+
 For each text generation, we compute the following statistics for each of our
 chosen HLFs:
 
@@ -211,22 +213,24 @@ chosen HLFs:
     \item \textbf{min}: the minimum value of the HLF on the generated text;
     \item \textbf{max}: the maximum value of the HLF on the generated text;
     \item \textbf{avg}: the mean value of the HLF on the generated text;
-    \item \textbf{var}: the variance of the HLF values on the generated text.
 \end{itemize}
 
-A second baseline is obtained by following the same process but with a new
-prompt that builds upon the first one by adding the instruction to use example
-text from our benchmark dataset of choice.
-The examples are three texts chosen randomly once for each benchmark dataset.
-The reason behind choosing three texts is to not overrun the context window of
-the LLM.
+A second baseline is obtained by following the same process and same input text,
+but with a new prompt that builds upon the first one by adding the instruction
+to use example text from our corpus of choice.
+The examples are three texts chosen randomly once at the beginning of the
+experiment from the used corpus.
+We use the same example texts for all evaluated LLMs.
+
+We choose three texts to not overrun the context window of the LLM.
 This hints at the main drawback for our approach: it uses up the context window
 with system instructions.
 While this isn't an issue with all models, some only allow a context window of
 around 8000 tokens so we should be mindful.
-We use the same example texts for all evaluated LLMs.
-Same as before, we construct the baseline by conducting 10 trials using the same
-prompt and input text.
+
+We construct the second baseline by conducting 10 trials using the same
+prompt and input text and otherwise in the same manner in which we created the
+first baseline.
 
 The next step is to devise HLF prompts derived from both baseline prompts.
 The HLF prompts contain additional instructions to generate text that would
@@ -257,8 +261,11 @@ of the LLM complying to HLF instructions.
 This difference is expressed by the change of value for each HLF between the
 baseline and HLF enhanced text generation.
 
-Because of the examples present in the prompt, we perform the second experiment
-with input text both from within and from outside the corpus.
+Because we provide the LLM with examples from the corpus, it is more likely to
+intuit the linguistic features of the corpus.
+To understand whether HLF instructions actually make a difference, we perform
+the experiment using the second type of prompt using input text both from within
+and from outside the corpus.
 
 One final observation before diving into details is that we can use an HLF's
 variance on the benchmark dataset to our advantage.
@@ -274,14 +281,14 @@ then we consider that the LLM follows HLF prompts in a relevant way.
 
 \subsection{LLM Selection}\label{llm-selection}
 
-For our experiment we will use some of the best large language models available.
-We trust the competence judgements issued in the the Chatbot Arena~\cite{chiang2024chatbot}
-for each LLM.
+For our experiment we will use state of the art large language models.
+We used the Chatbot Arena~\cite{chiang2024chatbot} leaderboard for constructing
+our selection.
 In the interest of covering more ground, we choose large language models from
 different vendors.
 Our choice includes four top performing LLMs and one model that anyone would be
 able to run on their own hardware.
-Our final choice is documented in Table~\ref{table-llm}.
+The final selection is available in Table~\ref{table-llm}.
 
 \begin{table}[ht]
     \setlength\tabcolsep{6pt}
@@ -302,17 +309,16 @@ Our final choice is documented in Table~\ref{table-llm}.
 
 \subsection{HLF Selection}\label{hlf-selection}
 
-Our main focus is to understand how susceptible an LLMs is to prompts telling it
-to conform to HLFs.
-LFTK~\cite{lftk-2023} authors categorize HLFs by domain and family.
-Furthermore, information is available on the suitability of each HLF for given
-tasks such as readability assessment or fake news detection.
-However, there is no direct mapping between HLFs and style.
-It falls onto us to choose features based on their influence over text style as
-recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
+Our main focus is to understand how susceptible LLMs are to prompts containing
+instructions to conform to HLFs.
+LFTK authors~\cite{lftk-2023} categorize HLFs by domain and family and make
+available information on the suitability of each HLF for given tasks such as
+readability assessment or fake news detection.
+Besides the domain and family, we also choose features based on their influence
+over text style as recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
 
-We can also describe HLFs in terms of how abstract the instruction to conform to
-them is.
+In this experiment we create specific instructions for each HLF.
+The resulting instructions can be catalogued on the concrete-abstract spectrum.
 For example, `write 100 words' is a more concrete instruction than `write as if
 you were in junior highschool'~\cite{kincaid1975derivation}.
 We divide HLFs in five categories ranging from very concrete to highly abstract
@@ -340,11 +346,14 @@ Table~\ref{table-hlf} showcases our selection of features.
 \end{table}
 \footnotetext{as described in the figure in~\cite{lugea2023stylistics}, chapter 1, page 7}
 
-Each of these features is well documented in literature~\cite{lftk-2023}.
+Each of these features is well documented~\cite{lftk-2023} barring the need for
+a deeper dive here into the subject matter.
 
 \subsection{DataSet Selection}\label{ds-selection}
 
-We have run this experiment on the datasets listed in Table~\ref{table-ds}.
+We must choose source datasets based upon which we create corpuses for our
+experiment.
+Our final selection of datasets is listed in Table~\ref{table-ds}.
 
 \begin{table}[ht]
     \setlength\tabcolsep{6pt}
@@ -352,58 +361,75 @@ We have run this experiment on the datasets listed in Table~\ref{table-ds}.
     \begin{tabular}{@{}lllll@{}}
         \toprule
         Name              & Task                     & Row Count & Content Type & Reference              \\ \toprule
-        Yelp Reviews Full & Sentiment Classification & 700000    & Reviews      & \cite{yelp2015neurips} \\
-                          & Text Style Transfer      & 700000    &              &                        \\
-                          & Text Classification      & 700000    &              &                        \\ \midrule
-        CNN / DailyMail   & Summarization            & 300000    & News         & \cite{cnndm2015}       \\
-                          & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
+        Yelp Reviews      & Sentiment Classification & 50000     & Reviews      & \cite{yelp2015neurips} \\
+        (test split)      & Text Style Transfer      &           &              &                        \\
+                          & Text Classification      &           &              &                        \\ \midrule
+        CNN / DailyMail   & Summarization            & 11490     & News         & \cite{cnndm2015}       \\
+        (test split)      & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
                           & Text Generation          &           &              &                        \\ \midrule
     \end{tabular}
-    \caption{Experiment LLMs}\label{table-ds}
+    \caption{Source Datasets}\label{table-ds}
 \end{table}
 
-The Yelp review data set provides a diverse assortment of writing styles and
-thus allowing us to home in on an LLMs ability to follow HLFs instead of copying
-a writing style.
-The reviews are often relatively short texts written in a coloquial style with
-a fair amount of variation in sentiment.
+We use the Huggingface ecosystem~\cite{lhoest-etal-2021-datasets} to load the
+datasets.
+Yelp reviews are loaded from \texttt{Yelp/yelp\_review\_full}, while CNN stories
+are loaded from \texttt{abisee/cnn\_dailymail}.
 
-On the other hand the CNN and DailyMail stories are news stories and even though
-their style might vary from one author to another, they will definitely be more
-formal than Yelp reviews.
-The writing is likely to be more mature, too.
+The Yelp review data set provides a diverse assortment of reviews from online
+users.
+The authors employ a casual writing style, very similar to what a average
+writing style of an average person would be like.
+The dataset as a whole is useful for many tasks.
+The corpus we construct based on this dataset contains the first 1000 reviews
+from its test split.
 
-We use the Huggingface ecosystem to load these
-datasets~\cite{lhoest-etal-2021-datasets}.
-Because of the statistical nature of the experiment and in the interest of
-expediency, we only use the first thousand texts from the test split of each
-dataset.
+CNN/DailyMail contains stories and news with diverse styles.
+The style varies from one author to another, but also based on the publishing
+entity.
+The articles are more formal, longer and more complex in structure than Yelp
+reviews which makes this dataset a good alternative choice.
+The corpus that is based on this dataset contains the first 1000 CNN articles
+from the test split of the dataset.
+
 
 \subsection{User Prompt and Text}\label{input-text}
 
-This experiment consists of instructing various large language models to reword
+This experiment presupposes instructing various large language models to reword
 an input text so that it conforms to a bunch of handcrafted linguistic features.
 The input text is provided via a user prompt.
-We provide two user prompts for each dataset.
-These user prompts can be freely examined online in the
+
+We provide two input texts that are external to our corpuses, one input text per
+corpus.
+They can be examined online in the
 \texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{data}}
 folder of the experiment's Git repository~\cite{olar2024experimentcode}.
+These user prompts are used when we're not using an input text from the
+corpus itself.
 
 For the CNN/DailyMail dataset, the user prompt from outside the dataset is an
-extract from the classic text`The Life and Opinions of Tristram Shandy,
-Gentleman', by Laurence Sterne~\cite{sterne2003life}.
-We judge this text to be far apart in both style and exhibited linguistic
-features from the CNN/DailyMail dataset contents.
-For the Yelp dataset, our chosen user prompt is Oscar Wilde's `Sonnet to
-Liberty'~\cite{wilde1909poems}.
-This text is vastly different from anything in the Yelp review dataset.
+extract from the classic text \textit{The Life and Opinions of Tristram Shandy,
+Gentleman}, by Laurence Sterne~\cite{sterne2003life}.
+This text is far from a news article in terms of both style and exhibited
+linguistic features from the CNN/DailyMail dataset contents.
+We see a text that is similarly divorced from the style and linguistic
+features of most Yelp reviews in Oscar Wilde's \textit{Sonnet to
+Liberty}~\cite{wilde1909poems}.
+Having input texts that are vastly different from a dataset should inform an LLM
+to generate a baseline that does not conform to the linguistic features of the
+dataset.
 
-The instructions for the LLM are compiled from the Jinja templates available in
-the \texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{templates}}
+We use Jinja templates to compile the text generation instructions for the LLM.
+Both the model prompts and the HLF instructions are constructed using these
+templates.
+The Jinja templates are available in the 
+\texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{templates}}
 folder of the experiment's Git repository~\cite{olar2024experimentcode}.
-This folder includes both the main instruction prompts for the two scenarios
-that we cover in this experiment (`\texttt{prompt\_1}' and `\texttt{prompt\_2}')
-and the templates for generating the instructions for each HLF.
+
+There are two main text generation instruction templates: one without example
+content~(called `\texttt{prompt\_1}') and one with examples from the
+corpus~(`\texttt{prompt\_2}').
+Each of the two instruction templates allow the presence of HLF instructions.
 
 \section{Experiment Results}
 
@@ -413,49 +439,48 @@ Handcrafted linguistic features are integer or floating point values that we
 can compute on text.
 All our graphs show the HLF on the vertical axis, while the horizontal axis is
 reserved for the trial number.
-We plot the HLF values for the text generated from baseline prompts as a
-continuous grey line.
-The similar values obtained by using HLF enhanced prompts are plotted using a
-continuous grenat line.
-To highlight the `tolerance' obtained by adding and subtracting the variance of
-the HLF on the benchmark dataset, we plot light gray areas around the baseline
-and HLF-enhanced plot lines.
+HLF values for the text generated using baseline prompts are plotted as a
+continuous grey line, while the values obtained by using HLF enhanced prompts
+are plotted using a continuous grenat line.
 The minimum and maximum HLF on the benchmark dataset are plotted using dotted
 black lines.
-A continuous black line designates the average HLF on the benchmark dataset.
+A continuous black line designates the average HLF on the corpus.
+We sometimes refer to this average as the \textit{target} value because the LLM
+is primarily instructed to conform to this value.
 
-Our results tables highlight differences between the generated text's HLF values
-obtained by using the baseline and the HLF prompts.
-We are concerned with how different the plots of each HLF are from the
-continuous black line representing the average HLF on the benchmark dataset and
-how different they are from each other.
+Result tables highlight the difference between plots obtained using a
+baseline prompt versus the ones obtained using HLF-enhanced prompts.
+Firstly, we care about the difference between each plot (baseline and HLF) and
+the target (the corpus average).
+Secondly, we measure how different baselines are from HLF-enhanced plots.
 
-We use the two-sampled Kolmogorov-Smirnov test to determine whether the baseline
-results are different from the HLF-enhanced results.
-We consider that any $p-value \le 0.05$ means that the distributions are
-different.
+We use the two-sampled Kolmogorov-Smirnov~\cite{kolmogorov1933,smirnov1939} test
+to determine whether the baseline results are different from the HLF-enhanced
+results.
+We consider that the results are different for a resulting $p\_value \le 0.05$.
 
-To determine which of the two is closer to the target, we compute the area
-between each result and the target.
+To determine which of the two results is closer to the target, we compute the
+area between each result and the target.
 Another way to measure the geometric closeness to the target is by computing the
 Euclidian norm of the vectorial difference between result and target.
 Let us denote with $A_b$ and $A_h$ the areas between baseline and target and HLF
 instruction result and target, respectively.
 Let us similarly denote with $N_b$ and $N_h$ the Euclidian norms.
-Finally, we define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$
+Finally, we define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$.
 
-The tables that sum up the experiment results show $Diff_A$ and $Diff_N$ for
-each model and we provide a result table for each dataset and prompt variant in
-the online repository of the experiment.
-For each value we specify whether it is significant statistically according to
-the Kolmogorov-Smirnov test.
+The result tables show $Diff_A$ and $Diff_N$ for each LLM in the context of a
+prompt and a dataset.
+All result tables for each dataset and prompt variant are available online, in
+the experiment's Git repository~\cite{olar2024experimentcode}.
 
 In the next sections we only present the most relevant results of the
 experiment.
 To save space, we illustrate significant differences between the baseline and
 the HLF instruction results in \textbf{bold} typeface.
-Positive results are \underline{underlined} and negative results are
-\textit{italicized}.
+The \underline{underlined} values represent situations when the HLF-enhanced
+prompt lead to results that are closer to the corpus average than the baseline.
+\textit{Italicized} values represent situations when the baseline was closer
+to the target than the HLF-enhanced result.
 
 \subsection{Can an LLM Follow HLF Instructions?}
 
@@ -515,13 +540,10 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
     \end{minipage}
 \end{figure}
 
-
 \subsection{Context Aware}
 
-Yelp results on the best and worst performing metric.
-The rest of the metrics (including on all other datasets) in an Appendix.
-
-
+In this variant of the experiment, we feed the LLM three examples from the
+corpus.
 \section{Discussion}
 
 Discuss experiment results here.
