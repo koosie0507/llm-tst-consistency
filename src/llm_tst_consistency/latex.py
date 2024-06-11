@@ -30,7 +30,7 @@ def make_latex_table(df, caption, label, features, alignment):
     latex_table += "\\midrule\n".join(table_rows)
 
     # End the table
-    latex_table += "\\bottomrule\n\\end{tabular}}\n"
+    latex_table += "\\bottomrule\n\\end{tabular}%\n}\n"
     latex_table += f"\\caption{{{caption}}}\n\\label{{{label}}}\n"
     latex_table += "\\end{table}"
 
