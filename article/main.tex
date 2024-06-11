@@ -284,10 +284,8 @@ then we consider that the LLM follows HLF prompts in a relevant way.
 For our experiment we will use state of the art large language models.
 We used the Chatbot Arena~\cite{chiang2024chatbot} leaderboard for constructing
 our selection.
-In the interest of covering more ground, we choose large language models from
-different vendors.
-Our choice includes four top performing LLMs and one model that anyone would be
-able to run on their own hardware.
+In the interest of covering more ground, we chose five top performers in the
+Chatbot Arena from different vendors.
 The final selection is available in Table~\ref{table-llm}.
 
 \begin{table}[ht]
@@ -299,12 +297,12 @@ The final selection is available in Table~\ref{table-llm}.
         OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
         Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
         Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
-        Meta Llama 3-8B         & 8 Billion   & 8000         & 1208      & Llama 3 Community   \\
+        Meta Llama 3-70B        & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
         Cohere Command R+       & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
                                 &             &              &           & with Acceptable Use \\
                                 &             &              &           & Addendum            \\ \bottomrule
     \end{tabular}
-    \caption{Experiment LLMs}\label{table-llm}
+    \caption{Large Language Model Selection}\label{table-llm}
 \end{table}
 
 \subsection{HLF Selection}\label{hlf-selection}
@@ -360,13 +358,13 @@ Our final selection of datasets is listed in Table~\ref{table-ds}.
     \centering
     \begin{tabular}{@{}lllll@{}}
         \toprule
-        Name              & Task                     & Row Count & Content Type & Reference              \\ \toprule
-        Yelp Reviews      & Sentiment Classification & 50000     & Reviews      & \cite{yelp2015neurips} \\
-        (test split)      & Text Style Transfer      &           &              &                        \\
-                          & Text Classification      &           &              &                        \\ \midrule
-        CNN / DailyMail   & Summarization            & 11490     & News         & \cite{cnndm2015}       \\
-        (test split)      & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
-                          & Text Generation          &           &              &                        \\ \midrule
+        Name            & Task                     & Row Count & Content Type & Reference              \\ \toprule
+        Yelp Reviews    & Sentiment Classification & 50000     & Reviews      & \cite{yelp2015neurips} \\
+        (test split)    & Text Style Transfer      &           &              &                        \\
+                        & Text Classification      &           &              &                        \\ \midrule
+        CNN / DailyMail & Summarization            & 11490     & News         & \cite{cnndm2015}       \\
+        (test split)    & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
+                        & Text Generation          &           &              &                        \\ \midrule
     \end{tabular}
     \caption{Source Datasets}\label{table-ds}
 \end{table}
@@ -392,7 +390,6 @@ reviews which makes this dataset a good alternative choice.
 The corpus that is based on this dataset contains the first 1000 CNN articles
 from the test split of the dataset.
 
-
 \subsection{User Prompt and Text}\label{input-text}
 
 This experiment presupposes instructing various large language models to reword
@@ -409,12 +406,12 @@ corpus itself.
 
 For the CNN/DailyMail dataset, the user prompt from outside the dataset is an
 extract from the classic text \textit{The Life and Opinions of Tristram Shandy,
-Gentleman}, by Laurence Sterne~\cite{sterne2003life}.
+    Gentleman}, by Laurence Sterne~\cite{sterne2003life}.
 This text is far from a news article in terms of both style and exhibited
 linguistic features from the CNN/DailyMail dataset contents.
 We see a text that is similarly divorced from the style and linguistic
 features of most Yelp reviews in Oscar Wilde's \textit{Sonnet to
-Liberty}~\cite{wilde1909poems}.
+    Liberty}~\cite{wilde1909poems}.
 Having input texts that are vastly different from a dataset should inform an LLM
 to generate a baseline that does not conform to the linguistic features of the
 dataset.
@@ -422,7 +419,7 @@ dataset.
 We use Jinja templates to compile the text generation instructions for the LLM.
 Both the model prompts and the HLF instructions are constructed using these
 templates.
-The Jinja templates are available in the 
+The Jinja templates are available in the
 \texttt{\href{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{templates}}
 folder of the experiment's Git repository~\cite{olar2024experimentcode}.
 
@@ -473,46 +470,47 @@ prompt and a dataset.
 All result tables for each dataset and prompt variant are available online, in
 the experiment's Git repository~\cite{olar2024experimentcode}.
 
-In the next sections we only present the most relevant results of the
-experiment.
 To save space, we illustrate significant differences between the baseline and
 the HLF instruction results in \textbf{bold} typeface.
 The \underline{underlined} values represent situations when the HLF-enhanced
-prompt lead to results that are closer to the corpus average than the baseline.
-\textit{Italicized} values represent situations when the baseline was closer
-to the target than the HLF-enhanced result.
+prompt lead to results that are significantly closer to the corpus average than
+the baseline.
+\textit{Italicized} values represent situations when the baseline was
+significantly closer to the target than the HLF-enhanced result.
+
+In the next sections we only present the most relevant results of the
+experiment.
 
 \subsection{Can an LLM Follow HLF Instructions?}
 
 The results on the CNN-DailyMail dataset showcased in
-Table~\ref{table-cnn-dailymail-results} provide the most eloquent answer to this
-question.
+Table~\ref{table-prompt-1-cnn-dailymail} provide the most eloquent answer to
+this question.
 The results on the Yelp dataset are positive, albeit less convincing.
 \begin{table}[!ht]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
-            model               & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var            & fkgl                    & a\_kup\_pw                \\
+            model                 & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var            & fkgl                    & a\_kup\_pw                \\
             \toprule
-            claude3 $Diff_N$    & \underline{\textbf{623.16}}  & \underline{\textbf{24.74}} & \underline{\textbf{51.18}}  & \underline{\textbf{26.68}} & 0.06                      & -0.0                      & \underline{\textbf{0.46}} & \underline{\textbf{1.4}}   & \underline{1.44}        & \textit{\textbf{-1.66}}   \\
-            claude3 $Diff_A$    & \underline{\textbf{1774.0}}  & \underline{\textbf{74.0}}  & \underline{\textbf{158.84}} & \underline{\textbf{81.2}}  & 0.2                       & -0.01                     & \underline{\textbf{1.88}} & \underline{\textbf{4.49}}  & \underline{5.01}        & \textit{\textbf{-4.09}}   \\
-            gemini $Diff_N$     & \underline{\textbf{985.86}}  & \underline{\textbf{34.52}} & \underline{\textbf{100.36}} & \underline{\textbf{53.39}} & \underline{\textbf{0.52}} & 0.05                      & \underline{\textbf{2.62}} & \underline{\textbf{4.68}}  & \textit{-4.17}          & \textit{\textbf{-2.43}}   \\
-            gemini $Diff_A$     & \underline{\textbf{2990.5}}  & \underline{\textbf{106.5}} & \underline{\textbf{320.34}} & \underline{\textbf{159.1}} & \underline{\textbf{1.5}}  & 0.09                      & \underline{\textbf{7.24}} & \underline{\textbf{13.15}} & \textit{-12.65}         & \textit{\textbf{-7.13}}   \\
-            gpt $Diff_N$        & \underline{\textbf{125.87}}  & 1.46                       & 10.95                       & 10.77                      & 0.02                      & -0.01                     & 0.71                      & 0.81                       & \textit{\textbf{-1.72}} & 0.43                      \\
-            gpt $Diff_A$        & \underline{\textbf{327.0}}   & 3.0                        & 29.0                        & 27.0                       & 0.08                      & -0.01                     & 1.82                      & 2.24                       & \textit{\textbf{-5.72}} & 0.44                      \\
-            llama3\_8b $Diff_N$ & 171.31                       & 6.63                       & -9.8                        & 13.8                       & 0.04                      & -0.04                     & 1.03                      & -0.84                      & -0.11                   & -0.76                     \\
-            llama3\_8b $Diff_A$ & 524.0                        & 20.0                       & -32.5                       & 43.5                       & 0.1                       & -0.08                     & 3.64                      & -2.85                      & 1.57                    & -2.29                     \\
-            command\_r $Diff_N$ & \underline{\textbf{1024.78}} & \underline{\textbf{39.67}} & \underline{\textbf{81.58}}  & \underline{\textbf{41.46}} & \underline{\textbf{0.46}} & \underline{\textbf{0.03}} & \underline{\textbf{2.67}} & \underline{\textbf{3.78}}  & \underline{1.4}         & \underline{\textbf{0.14}} \\
-            command\_r $Diff_A$ & \underline{\textbf{3132.5}}  & \underline{\textbf{120.5}} & \underline{\textbf{246.84}} & \underline{\textbf{132.2}} & \underline{\textbf{1.36}} & \underline{\textbf{0.06}} & \underline{\textbf{7.88}} & \underline{\textbf{11.21}} & \underline{3.9}         & \underline{\textbf{1.03}} \\
-            \bottomrule
+            claude3 $Diff\_N$     & \textbf{\underline{623.16}}  & \textbf{\underline{24.74}} & \textbf{\underline{51.18}}  & \textbf{\underline{26.68}} & 0.06                      & -0.0                      & \textbf{\underline{0.46}} & \textbf{\underline{1.4}}   & 1.44                    & \textbf{\textit{-1.66}}   \\ \midrule
+            claude3 $Diff\_A$     & \textbf{\underline{1774.0}}  & \textbf{\underline{74.0}}  & \textbf{\underline{158.84}} & \textbf{\underline{81.2}}  & 0.2                       & -0.01                     & \textbf{\underline{1.88}} & \textbf{\underline{4.49}}  & 5.01                    & \textbf{\textit{-4.09}}   \\ \midrule
+            gemini $Diff\_N$      & \textbf{\underline{985.86}}  & \textbf{\underline{34.52}} & \textbf{\underline{100.36}} & \textbf{\underline{53.39}} & \textbf{\underline{0.52}} & 0.05                      & \textbf{\underline{2.62}} & \textbf{\underline{4.68}}  & -4.17                   & \textbf{\textit{-2.43}}   \\ \midrule
+            gemini $Diff\_A$      & \textbf{\underline{2990.5}}  & \textbf{\underline{106.5}} & \textbf{\underline{320.34}} & \textbf{\underline{159.1}} & \textbf{\underline{1.5}}  & 0.09                      & \textbf{\underline{7.24}} & \textbf{\underline{13.15}} & -12.65                  & \textbf{\textit{-7.13}}   \\ \midrule
+            gpt $Diff\_N$         & \textbf{\underline{125.87}}  & 1.46                       & 10.95                       & 10.77                      & 0.02                      & -0.01                     & 0.71                      & 0.81                       & \textbf{\textit{-1.72}} & 0.43                      \\ \midrule
+            gpt $Diff\_A$         & \textbf{\underline{327.0}}   & 3.0                        & 29.0                        & 27.0                       & 0.08                      & -0.01                     & 1.82                      & 2.24                       & \textbf{\textit{-5.72}} & 0.44                      \\ \midrule
+            command\_r $Diff\_N$  & \textbf{\underline{1024.78}} & \textbf{\underline{39.67}} & \textbf{\underline{81.58}}  & \textbf{\underline{41.46}} & \textbf{\underline{0.46}} & \textbf{\underline{0.03}} & \textbf{\underline{2.67}} & \textbf{\underline{3.78}}  & 1.4                     & \textbf{\underline{0.14}} \\ \midrule
+            command\_r $Diff\_A$  & \textbf{\underline{3132.5}}  & \textbf{\underline{120.5}} & \textbf{\underline{246.84}} & \textbf{\underline{132.2}} & \textbf{\underline{1.36}} & \textbf{\underline{0.06}} & \textbf{\underline{7.88}} & \textbf{\underline{11.21}} & 3.9                     & \textbf{\underline{1.03}} \\ \midrule
+            llama3\_70b $Diff\_N$ & \textbf{\underline{459.45}}  & \textbf{\underline{17.78}} & \textbf{\underline{36.5}}   & \textbf{\underline{19.75}} & \textbf{\underline{0.12}} & \textbf{\underline{0.03}} & \textbf{\underline{1.43}} & \textbf{\underline{2.18}}  & 1.5                     & \textbf{\textit{-0.06}}   \\ \midrule
+            llama3\_70b $Diff\_A$ & \textbf{\underline{1363.5}}  & \textbf{\underline{54.0}}  & \textbf{\underline{106.5}}  & \textbf{\underline{60.5}}  & \textbf{\underline{0.36}} & \textbf{\underline{0.09}} & \textbf{\underline{4.33}} & \textbf{\underline{6.38}}  & 7.46                    & \textbf{\textit{-0.11}}   \\ \bottomrule
         \end{tabular}%
-    }
-    \caption{CNN-DailyMail Results}
-    \label{table-cnn-dailymail-results}
+    }\caption{CNN Results}\label{table-prompt-1-cnn-dailymail}
 \end{table}
 
-Command-R+ was the best performer by far, while Llama3 (8B) was predictibly the
-worst at following HLF instructions.
+For our selection of features, on the CNN corpus of articles, Command-R+ was the
+best performer.
+GPT scored surprisingly low.
+
 Figure~\ref{fig-command-r-t-word} shows a positive result, where the result
 obtained with the aid of HLF instructions is closer to the target.
 Figure~\ref{fig-gpt-fkgl} shows a negative result, where the baseline is closer
@@ -534,30 +532,223 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
-        \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-llama3_8b-cnn_dailymail/prompt_1-llama3_8b-cnn_dailymail_simp_ttr.png}
-        \caption[center]{Llama3-8B\\Simple TTR}
+        \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail_a_verb_pw.png}
+        \caption[center]{Claude3\\Average Verbs per Word}
         \label{fig-llama-simp-ttr}
     \end{minipage}
 \end{figure}
 
 \subsection{Context Aware}
 
-In this variant of the experiment, we feed the LLM three examples from the
-corpus.
+The second type of instructional prompt we feed to the LLM contains three
+examples from the corpus.
+The hypothesis is that this will influence the baseline result to be closer to
+the corpus average.
+
+In this case, it is interesting to see how the LLM generates text based on input
+text from both within the corpus that contains the example articles and from
+outside the corpus.
+
+In Table~\ref{table-prompt-2-cnn-dailymail} we see the results when an input from
+outside the corpus is used.
+The outlook is similar for what we saw in the first experiment with GPT
+being the least responsive to HLF instructions.
+
+\begin{table}[!ht]
+    \centering
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lllllllllll}
+            model                 & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var           & fkgl                       & a\_kup\_pw                \\
+            \toprule
+            claude3 $Diff\_N$     & \textbf{\underline{718.49}}  & \textbf{\underline{24.13}} & \textbf{\underline{44.43}}  & \textbf{\underline{23.43}} & \textbf{\underline{0.4}}  & 0.03                      & 0.94                      & \textbf{\underline{0.77}} & 1.2                        & 0.07                      \\ \midrule
+            claude3 $Diff\_A$     & \textbf{\underline{2345.54}} & \textbf{\underline{90.18}} & \textbf{\underline{148.36}} & \textbf{\underline{63.6}}  & \textbf{\underline{1.18}} & 0.07                      & 1.36                      & \textbf{\underline{2.55}} & 3.33                       & 0.52                      \\ \midrule
+            gemini $Diff\_N$      & \textbf{\underline{785.6}}   & \textbf{\underline{25.8}}  & \textbf{\underline{60.5}}   & \textbf{\underline{41.6}}  & \textbf{\underline{0.41}} & \textbf{\underline{0.05}} & \textbf{\underline{1.95}} & \textbf{\underline{2.67}} & -4.62                      & \textbf{\textit{-1.94}}   \\ \midrule
+            gemini $Diff\_A$      & \textbf{\underline{2512.0}}  & \textbf{\underline{81.5}}  & \textbf{\underline{210.34}} & \textbf{\underline{125.7}} & \textbf{\underline{1.25}} & \textbf{\underline{0.09}} & \textbf{\underline{5.84}} & \textbf{\underline{8.05}} & -9.46                      & \textbf{\textit{-5.82}}   \\ \midrule
+            gpt $Diff\_N$         & 47.8                         & 5.18                       & 6.13                        & -0.13                      & 0.02                      & 0.0                       & 0.05                      & 0.3                       & 3.06                       & -0.27                     \\ \midrule
+            gpt $Diff\_A$         & 77.0                         & 12.5                       & 13.0                        & -4.0                       & 0.04                      & 0.0                       & -0.17                     & 0.77                      & 8.45                       & -0.16                     \\ \midrule
+            command\_r $Diff\_N$  & \textbf{\underline{263.51}}  & 5.35                       & \textbf{\underline{25.08}}  & \textbf{\underline{17.37}} & \textbf{\textit{-0.09}}   & -0.01                     & \textbf{\underline{1.74}} & \textbf{\underline{1.42}} & \textbf{\underline{10.46}} & \textbf{\underline{1.56}} \\ \midrule
+            command\_r $Diff\_A$  & \textbf{\underline{896.0}}   & 20.5                       & \textbf{\underline{86.0}}   & \textbf{\underline{60.6}}  & \textbf{\textit{-0.21}}   & -0.03                     & \textbf{\underline{5.45}} & \textbf{\underline{4.95}} & \textbf{\underline{31.29}} & \textbf{\underline{5.67}} \\ \midrule
+            llama3\_70b $Diff\_N$ & \textbf{\underline{376.0}}   & \textbf{\underline{15.63}} & \textbf{\underline{38.63}}  & 15.74                      & \textbf{\underline{0.24}} & \textbf{\underline{0.06}} & 1.69                      & \textbf{\underline{2.91}} & 0.31                       & -0.3                      \\ \midrule
+            llama3\_70b $Diff\_A$ & \textbf{\underline{1088.5}}  & \textbf{\underline{45.0}}  & \textbf{\underline{113.0}}  & 41.0                       & \textbf{\underline{0.65}} & \textbf{\underline{0.18}} & 3.53                      & \textbf{\underline{8.56}} & 0.27                       & -0.68                     \\ \bottomrule
+        \end{tabular}%
+    }
+    \caption{prompt 2 - CNN Results\\Input Outside Corpus}
+    \label{table-prompt-2-cnn-dailymail}
+\end{table}
+
+GPT's results would be good if the baseline were very close to the target value.
+As we can see in Figure~\ref{fig-p2-gpt-twords}, this is not always the case.
+We also notice that Command-R+(fig.~\ref{fig-p2-command-r-simpttr}) and Gemini
+(fig.~\ref{fig-p2-gemini-a-kup-pw}) both registered significantly negative
+results, in contrast to their performance in our first scenario.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail_t_word.png}
+        \caption{GPT\\Total Words}
+        \label{fig-p2-gpt-twords}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail_simp_ttr.png}
+        \caption{Command-R+\\Simple TTR}
+        \label{fig-p2-command-r-simpttr}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_a_kup_pw.png}
+        \caption[center]{Gemini\\Kuperman Age of Aquisition}
+        \label{fig-p2-gemini-a-kup-pw}
+    \end{minipage}
+\end{figure}
+
+The results obtained in our first scenario are largely confirmed by our second
+scenario.
+So now we turn to see how using a text from within the corpus affects the
+performance of the large language models.
+The hypothesis is that if the text is `familiar', both the baseline and the HLF
+instruction prompt will produce results that are much closer to the target
+value.
+The expectation is to see less significant results.
+
+\begin{table}[!ht]
+    \centering
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lllllllllll}
+            model                 & t\_word                      & t\_sent                     & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var             & corr\_verb\_var            & fkgl                       & a\_kup\_pw              \\
+            \toprule
+            claude3 $Diff\_N$     & \textbf{\underline{871.02}}  & \textbf{\underline{34.2}}   & \textbf{\underline{34.48}}  & \textbf{\textit{-7.38}}    & \textbf{\underline{0.27}} & 0.01                      & \textbf{\textit{-0.93}}    & \textbf{\textit{-0.72}}    & 1.16                       & -0.14                   \\ \midrule
+            claude3 $Diff\_A$     & \textbf{\underline{2756.12}} & \textbf{\underline{117.18}} & \textbf{\underline{126.36}} & \textbf{\textit{-11.2}}    & \textbf{\underline{0.81}} & -0.01                     & \textbf{\textit{-2.52}}    & \textbf{\textit{-0.74}}    & 3.69                       & -0.4                    \\ \midrule
+            gemini $Diff\_N$      & \textbf{\underline{1315.41}} & \textbf{\underline{46.19}}  & \textbf{\underline{114.47}} & \textbf{\underline{72.38}} & \textbf{\underline{1.17}} & 0.03                      & \textbf{\underline{5.25}}  & \textbf{\underline{6.64}}  & -1.6                       & \textbf{\textit{-2.1}}  \\ \midrule
+            gemini $Diff\_A$      & \textbf{\underline{3996.0}}  & \textbf{\underline{138.0}}  & \textbf{\underline{357.36}} & \textbf{\underline{212.7}} & \textbf{\underline{3.3}}  & 0.06                      & \textbf{\underline{15.49}} & \textbf{\underline{19.4}}  & -13.22                     & \textbf{\textit{-6.19}} \\ \midrule
+            gpt $Diff\_N$         & \textbf{\underline{521.29}}  & \textbf{\underline{23.3}}   & \textbf{\underline{43.13}}  & 19.85                      & \textbf{\underline{0.2}}  & 0.02                      & 1.08                       & \textbf{\underline{1.04}}  & 5.09                       & 0.67                    \\ \midrule
+            gpt $Diff\_A$         & \textbf{\underline{1464.0}}  & \textbf{\underline{65.5}}   & \textbf{\underline{121.84}} & 58.1                       & \textbf{\underline{0.58}} & 0.05                      & 2.93                       & \textbf{\underline{2.59}}  & 14.23                      & 1.89                    \\ \midrule
+            command\_r $Diff\_N$  & \textbf{\underline{371.08}}  & \textbf{\underline{13.31}}  & 22.06                       & \textbf{\underline{17.19}} & \textbf{\underline{0.17}} & \textbf{\underline{0.02}} & 0.88                       & 1.09                       & \textbf{\underline{4.05}}  & -0.15                   \\ \midrule
+            command\_r $Diff\_A$  & \textbf{\underline{1198.0}}  & \textbf{\underline{42.5}}   & 73.0                        & \textbf{\underline{56.5}}  & \textbf{\underline{0.69}} & \textbf{\underline{0.07}} & 2.85                       & 3.99                       & \textbf{\underline{13.89}} & -0.11                   \\ \midrule
+            llama3\_70b $Diff\_N$ & \textbf{\underline{1040.85}} & \textbf{\underline{41.99}}  & \textbf{\underline{80.58}}  & \textbf{\underline{49.12}} & \textbf{\underline{0.55}} & \textbf{\underline{0.04}} & \textbf{\underline{3.99}}  & \textbf{\underline{5.05}}  & 7.18                       & \textbf{\textit{-1.94}} \\ \midrule
+            llama3\_70b $Diff\_A$ & \textbf{\underline{2928.0}}  & \textbf{\underline{118.5}}  & \textbf{\underline{222.0}}  & \textbf{\underline{133.5}} & \textbf{\underline{1.43}} & \textbf{\underline{0.05}} & \textbf{\underline{10.77}} & \textbf{\underline{13.42}} & 17.21                      & \textbf{\textit{-6.2}}  \\ \bottomrule
+        \end{tabular}%
+    }
+    \caption{CNN Results\\Input Inside Corpus}
+    \label{table-prompt-2-ifd-cnn-dailymail}
+\end{table}
+
+The results shown in Table~\ref{table-prompt-2-ifd-cnn-dailymail} contradict our
+expectations outright.
+The most surprising behaviour is exhibited in the context of more concrete HLFs
+such as the total number of words or the number of unique adjectives.
+Claude3 shows regressive behaviour for the number of unique adjectives in
+Figure~\ref{fig-p2-ifd-claude3-nuadj}, while Gemini constructs texts using a
+very different amount of words in Figure~\ref{fig-p2-ifd-gemini-twords}.
+Less surprisingly, Llama3 fails to generate text that conforms to the correct
+Kuperman age of acquisition per word in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
+        \caption{Claude3\\Number of Unique Adjectives}
+        \label{fig-p2-ifd-claude3-nuadj}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_t_word.png}
+        \caption{Gemini\\Total Words}
+        \label{fig-p2-ifd-gemini-twords}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail_a_kup_pw.png}
+        \caption[center]{Llama3\\Kuperman Age of Aquisition}
+        \label{fig-p2-ifd-llama3-a-kup-pw}
+    \end{minipage}
+\end{figure}
+
+The results in this last scenario show that whether LLMs take examples listed in
+the prompt into account or not with respect to conforming to certain linguistic
+features is debatable, providing them with specific instructions derived from
+HLFs makes a significant impact.
+
 \section{Discussion}
 
-Discuss experiment results here.
+In terms of our first question --- whether LLMs are able to follow instructions
+concerning handcrafted linguistic features --- the response is in our opinion
+affirmative.
+Certainly, not all LLMs are created equal in this regard.
+It is debatable whether this experiment is well designed because of the choice
+to derive target HLF values for the LLM from the corpus.
+This is evident in the results obtained for the Yelp dataset.
+While these results also show a significant influence when using HLFs in the
+prompt, the influence is mostly negative.
+This can be attributed to the choice of input text in relation to the corpus,
+the wording in the instruction prompt or to each model's specific training.
 
+This leads us to our second question: how much do handcrafted linguistic feature
+instructions affect the way LLMs write text.
+The results in this regards show us a much less conclusive picture.
+
+Firstly, we cannot assume that the LLM will follow HLF instructions the way we
+intend.
+Whether we obtain the expected outcome or not depends largely on the prompt,
+the chosen HLFs, the model, the target values for the HLFs, a.s.o
+We do, however, notice a few patterns.
+The more abstract the instruction, the less it seems to make a positve impact.
+More importantly, by inspecting the result data, a more abstract instruction
+seems more likely to produce a negative impact on the desired outcome.
+
+Secondly, the choice of input text in relation to the target HLF values seems
+very important.
+Choosing to reword a poem so that it has the same reading ease as a user review
+seems like a setup for poor results.
+This leads us to intuit that LLMs are clearly able to use HLF instructions to
+generate text differently, but there is a limit to their `creativity'.
+
+Finally, the choice of HLFs is very important.
+The text generated by an LLM is less likely to conform to HLFs that result in
+more abstract instructions.
+Furthermore, the combination of chosen HLFs is important.
+Choosing HLFs that measure the uniqueness of a linguistic element (words,
+structures, a.s.o) limits the LLMs ability to conform to other HLFs (for example
+total number of sentences or reading ease).
+This is highlighted in the experiment specifically in the tension between the
+age of acquisition and the adjective or verb variation.
+Predictably, the more concrete instructions take precedence over the more
+abstract ones.
 
 \section{Conclusions and Future Work}
 
-Yes, you can instruct at least some of the LLMs with HLFs.
+We started out by trying to understand whether it is possible to conform the
+output of a large language model to exhibit specific linguistic features.
+To our surprise, it turns out that instructing language models to write text
+that conforms to a selected assortment of linguistic features almost always
+yields significant changes in how the text is being generated.
 
-compute BLEU, meteor, cider on styleptb using these LLMs and the prompt to
-evaluate whether we actually achieve style transfer because of/in spite of HLF
-instructions.
-Human survey (amazon mechanical turk) on whether the text generations are good
-or not. Likert scale (0 no good, 10 matches style perfectly)
+This doesn't mean that the results are always satisfying.
+What the model writes about and the chosen target values for the linguistic
+features are major factors in how successful the overall experience is.
+Unfortunately, at this stage, finding out good target values and good writing
+instructions is a question of trial and error.
+
+Other experiment designs might have been more opportune in examining the
+questions layed out in the introduction.
+For example, using set target values for HLFs (without deriving them from a
+corpus of text) and choosing input text where the HLFs vary greatly would have
+been an alternate design.
+Following through on those approaches is one of the possible expansions on the
+current work.
+
+Another way of expanding on the current work is finding the settings in which
+large language models are most responsive to linguistic features.
+The current experiment was inconclusive in this regard and a legitimate further
+question is whether settings in which text generated by language models
+consistently conforms to certain linguistic features actually exist.
+
+Lastly, a simpler question that is left unanswered relates to the number of
+linguistic features that were used.
+What if we would have measured models' behaviour for single linguistic features
+independently?
+
 
 \bibliographystyle{plain}
 \bibliography{references}
