@@ -31,7 +31,7 @@ def make_latex_table(df, caption, label, features, alignment):
 
     # End the table
     latex_table += "\\bottomrule\n\\end{tabular}%\n}\n"
-    latex_table += f"\\caption{{{caption}}}\n\\label{{{label}}}\n"
+    latex_table += f"\\caption{{{caption.replace('_', ' ')}}}\n\\label{{{label.replace('_', '-')}}}\n"
     latex_table += "\\end{table}"
 
     return latex_table
