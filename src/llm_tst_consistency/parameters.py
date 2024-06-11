@@ -11,6 +11,7 @@ class LLMName(StrEnum):
     GEMINI = "gemini"
     GPT = "gpt"
     LLAMA3 = "llama3_8b"
+    LLAMA3_70B = "llama3_70b"
     MIXTRAL = "mixtral_8x7b"
     COMMAND_R = "command_r"
 

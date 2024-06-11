@@ -17,12 +17,12 @@ from llm_tst_consistency.hlf import (
     HandcraftedLinguisticFeature,
     KupermanAgeOfAcquisition,
 )
+from llm_tst_consistency.latex import make_latex_table
 from llm_tst_consistency.llm import GPT, Gemini, Claude3, Ollama, CommandR
 from llm_tst_consistency.parameters import LLMName, MetricLevel, DatasetName, PromptName
 from llm_tst_consistency.plot import draw_plots
 from llm_tst_consistency.reporting import make_report
 from llm_tst_consistency.stats import Stats
-
 
 dotenv.load_dotenv()
 cli = typer.Typer(name="evaluator")
@@ -67,16 +67,16 @@ LLM_CONFIG = {
         api_key=os.getenv("LTC_OPENAI_KEY"),
         hlf_cfg=HLFs,
     ),
-    LLMName.LLAMA3: partial(
-        Ollama,
-        model_name="llama3",
-        host=os.getenv("LTC_OLLAMA_HOST"),
-        hlf_cfg=HLFs,
-    ),
     LLMName.COMMAND_R: partial(
         CommandR,
         model_name="command-r-plus",
         api_key=os.getenv("LTC_COHERE_API_KEY"),
+        hlf_cfg=HLFs,
+    ),
+    LLMName.LLAMA3_70B: partial(
+        Ollama,
+        model_name="llama3:70b",
+        host=os.getenv("LTC_OLLAMA_HOST"),
         hlf_cfg=HLFs,
     ),
 }
@@ -111,7 +111,7 @@ def _compute_dataset_features(nlp: Language, corpus: list[str]) -> dict[str, Sta
 
 def _process_dataset(ds_name, ds_loader, max_corpus_size, max_example_count):
     stats_file_name = (
-        Path(__file__).parent.parent.parent / "data" / f"{ds_name}_settings.json"
+            Path(__file__).parent.parent.parent / "data" / f"{ds_name}_settings.json"
     )
     if not stats_file_name.exists():
         corpus = ds_loader(max_corpus_size)
@@ -137,13 +137,13 @@ def _write_hlf_instructions(ds_stats: dict[str, Stats]) -> list[str]:
 
 
 def _generate_text_metrics(
-    trial_count,
-    prompt_template,
-    hlf_instructions,
-    input_text,
-    model_cls,
-    features,
-    examples=None,
+        trial_count,
+        prompt_template,
+        hlf_instructions,
+        input_text,
+        model_cls,
+        features,
+        examples=None,
 ):
     tpl = _load_j2(prompt_template)
 
@@ -173,11 +173,8 @@ def _generate_text_metrics(
     )
 
 
-def _load_generated_text_metrics(prompt_name, model_family, ds_name, generate_text_cb):
-    file_name = (
-        Path(__file__).parent
-        / f"gen_results_{prompt_name}_{model_family}_{ds_name}.csv"
-    )
+def _load_generated_text_metrics(out_dir, prompt_name, model_family, ds_name, generate_text_cb):
+    file_name = (out_dir / "results" / f"gen_results_{prompt_name}_{model_family}_{ds_name}.csv")
     if not file_name.exists():
         df = generate_text_cb()
         df.to_csv(file_name)
@@ -188,45 +185,48 @@ def _load_generated_text_metrics(prompt_name, model_family, ds_name, generate_te
 
 @cli.command()
 def main(
-    llms: list[LLMName] = typer.Option(
-        list(LLM_CONFIG), "-l", "--llm", help="run experiment with these LLM(s)"
-    ),
-    ds_names: list[DatasetName] = typer.Option(
-        list(DATASET_CONFIG), "-d", "--dataset", help="run experiment on these datasets"
-    ),
-    prompt_names: list[PromptName] = typer.Option(
-        list(PromptName), "-p", "--prompt", help="run experiment using this prompt"
-    ),
-    trial_count: int = typer.Option(
-        10,
-        "-n",
-        "--count",
-        help="the number of times we should generate text",
-        envvar="LTC_TRIAL_COUNT",
-    ),
-    max_size: int = typer.Option(
-        100,
-        "-s",
-        "--dataset-size",
-        help="the maximum number of items we should take from the dataset",
-        envvar="LTC_MAX_CORPUS_SIZE",
-    ),
-    example_count: int = typer.Option(
-        1,
-        "-e",
-        "--example-count",
-        help="the maximum number of examples to use in the prompts that make use of them",
-        envvar="LTC_EXAMPLE_COUNT",
-    ),
-    input_from_dataset: bool = typer.Option(
-        False,
-        "--input-from-dataset",
-        is_flag=True,
-        help="use this flag to load input text from the chosen dataset",
-    ),
+        llms: list[LLMName] = typer.Option(
+            list(LLM_CONFIG), "-l", "--llm", help="run experiment with these LLM(s)"
+        ),
+        ds_names: list[DatasetName] = typer.Option(
+            list(DATASET_CONFIG), "-d", "--dataset", help="run experiment on these datasets"
+        ),
+        prompt_names: list[PromptName] = typer.Option(
+            list(PromptName), "-p", "--prompt", help="run experiment using this prompt"
+        ),
+        trial_count: int = typer.Option(
+            10,
+            "-n",
+            "--count",
+            help="the number of times we should generate text",
+            envvar="LTC_TRIAL_COUNT",
+        ),
+        max_size: int = typer.Option(
+            100,
+            "-s",
+            "--dataset-size",
+            help="the maximum number of items we should take from the dataset",
+            envvar="LTC_MAX_CORPUS_SIZE",
+        ),
+        example_count: int = typer.Option(
+            1,
+            "-e",
+            "--example-count",
+            help="the maximum number of examples to use in the prompts that make use of them",
+            envvar="LTC_EXAMPLE_COUNT",
+        ),
+        input_from_dataset: bool = typer.Option(
+            False,
+            "--input-from-dataset",
+            is_flag=True,
+            help="use this flag to load input text from the chosen dataset",
+        ),
 ):
+    root_dir = Path(__file__).parent.parent.parent
+    out_dir = root_dir / ".out"
+    report_dir = root_dir / "reports"
     features = list(HLFs)
-    count = len(prompt_names)*len(ds_names)*len(llms)
+    count = len(prompt_names) * len(ds_names) * len(llms)
     with typer.progressbar(range(count), count) as progress:
         for prompt_name in prompt_names:
             prompt_discriminator = (
@@ -251,6 +251,7 @@ def main(
                     # load text generation results / run text generation and compute results
                     template_name = f"{prompt_name}.j2"
                     df = _load_generated_text_metrics(
+                        out_dir,
                         prompt_discriminator,
                         llm,
                         ds_name,
@@ -274,21 +275,16 @@ def main(
                     individual_report = make_report(llm, features, ds_stats, df)
                     report = pd.concat([report, individual_report], axis=0)
                     progress.update(1, f"f{prompt_name}-{llm}-{ds_name}")
-                report.to_csv(f"report_{prompt_discriminator}_{ds_name}.csv")
-
-                def _format_diffs(value):
-                    if value > 0:
-                        return "\\underline{%s}" % value
-                    if value < 0:
-                        return "\\textit{%s}" % value
-                    return value
-                diff_cols = [
-                    col
-                    for col in report.columns
-                    if col.endswith("_diff")
-                ]
-                formatters = {col: _format_diffs for col in diff_cols}
-                report.to_latex(f"report_{prompt_discriminator}_{ds_name}.tex", formatters=formatters)
+                report.to_csv(report_dir / f"report_{prompt_discriminator}_{ds_name}.csv")
+                latex = make_latex_table(
+                    report,
+                    f"{prompt_discriminator} - {ds_name} results",
+                    f"table-{prompt_discriminator}-{ds_name}",
+                    features,
+                    ["l"] * (len(features) + 1)
+                )
+                with open(out_dir / "reports" / f"{prompt_discriminator}_{ds_name}.tex", mode="w") as f:
+                    f.write(latex)
 
 
 if __name__ == "__main__":

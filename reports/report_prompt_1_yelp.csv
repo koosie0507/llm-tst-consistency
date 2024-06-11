@@ -1,0 +1,11 @@
+,t_word_diff,is_t_word_different,t_sent_diff,is_t_sent_different,n_uverb_diff,is_n_uverb_different,n_uadj_diff,is_n_uadj_different,simp_ttr_diff,is_simp_ttr_different,a_verb_pw_diff,is_a_verb_pw_different,corr_adj_var_diff,is_corr_adj_var_different,corr_verb_var_diff,is_corr_verb_var_different,fkgl_diff,is_fkgl_different,a_kup_pw_diff,is_a_kup_pw_different
+claude3 $Diff_N$,-281.9,True,-13.22,True,-25.79,True,-14.56,False,-0.06,False,0.0,False,-1.27,False,-1.14,False,6.89,True,1.0,True
+claude3 $Diff_A$,-774.0,True,-27.76,True,-70.0,True,-38.0,False,-0.19,False,0.02,False,-3.25,False,-3.39,False,21.68,True,2.9,True
+gemini $Diff_N$,-109.27,False,0.05,False,-7.25,False,-13.18,False,-0.14,False,0.01,False,-1.01,False,-0.4,False,1.62,False,-0.4,False
+gemini $Diff_A$,-252.82,False,-0.78,False,-17.5,False,-23.14,False,-0.52,False,0.01,False,-1.85,False,-1.07,False,7.14,False,-0.93,False
+gpt $Diff_N$,-21.62,False,2.42,False,-3.8,False,-8.84,False,0.0,False,-0.01,False,-0.8,False,-0.53,False,8.94,False,-0.37,False
+gpt $Diff_A$,-34.72,False,9.68,False,-10.54,False,-24.57,False,-0.03,False,-0.02,False,-2.37,False,-1.58,False,19.26,False,-1.03,False
+command_r $Diff_N$,-40.1,False,1.22,False,2.43,False,-13.64,True,0.05,False,-0.04,True,-1.17,True,0.59,False,-7.25,True,-1.67,True
+command_r $Diff_A$,-75.5,False,1.5,False,12.94,False,-34.0,True,0.19,False,-0.12,True,-2.76,True,2.83,False,-20.49,True,-4.76,True
+llama3_70b $Diff_N$,-210.45,True,6.87,True,-13.46,True,-15.17,True,-0.16,False,-0.02,True,-1.78,True,-1.31,True,3.7,False,-1.58,True
+llama3_70b $Diff_A$,-607.52,True,19.42,True,-41.22,True,-44.77,True,-0.42,False,-0.05,True,-5.48,True,-4.34,True,9.79,False,-4.98,True

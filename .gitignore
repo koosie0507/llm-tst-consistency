@@ -1,3 +1,4 @@
+report_*.tex
 *.env
 report.*
 *.json
