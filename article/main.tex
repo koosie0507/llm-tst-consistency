@@ -1,4 +1,7 @@
-\documentclass[runningheads,a4paper,11pt]{article}
+\pdfoutput=1
+
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
 
 \usepackage{algorithmic}
 \usepackage{algorithm}
@@ -7,9 +10,9 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{balance}
 \usepackage{booktabs}
-\usepackage[justification=centering,font=scriptsize]{caption}
-\usepackage{cite}
+\usepackage[justification=centering]{caption}
 \usepackage{comment}
 \usepackage{enumitem}
 \usepackage{epsfig}
@@ -17,10 +20,10 @@
 \usepackage[T1]{fontenc}
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage[colorlinks]{hyperref}
 \usepackage{inconsolata}
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{interval}
+\usepackage{microtype}
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{rotating}
@@ -33,12 +36,13 @@
 \usepackage{xcolor}
 \usepackage{xstring}
 
-\geometry{a4paper,top=2.5cm,left=2cm,right=2cm,bottom=2cm}
 
+\title{LLM Output Compliance with Handcrafted Linguistic Features --- An Experiment}
+\author{Andrei Olar\\
+Universitatea Babeș-Bolyai, Cluj-Napoca, România\\
+\texttt{andrei.olar@ubbcluj.ro}\\}
 
 \begin{document}
-\title{How Consistent are LLMs in Applying Handcrafted Language Features}
-\author{Andrei Olar --- andrei.olar@ubbcluj.ro}
 \maketitle
 \begin{abstract}
     Large language models are sought for solving an increasing number of
@@ -125,7 +129,6 @@ The answer to this question could hint at a relatively simple and accurate way
 of evaluating the quality of (partial) text style transfer using a large
 language model.
 
-
 \section{Related Work}\label{related}
 
 There is abundent literature on the topic of text style transfer.
@@ -187,7 +190,6 @@ LLMs respond well to diversified instructions for controlled text generation in
 general.
 Compared to the existing work, our prompts are guided by HLFs.
 Furthermore, we use those same HLFs to evaluate the performance of the LLM.
-
 
 \section{Experiment Design}\label{method}
 
@@ -267,18 +269,6 @@ To understand whether HLF instructions actually make a difference, we perform
 the experiment using the second type of prompt using input text both from within
 and from outside the corpus.
 
-One final observation before diving into details is that we can use an HLF's
-variance on the benchmark dataset to our advantage.
-This statistic shows whether the LLM takes the HLF prompts into account enough
-for the generated text to fall within the parameters of the benchmark dataset.
-Let us denote an HLF computed on a generated text using an HLF prompt with
-$HLF_g$.
-Similarly denote the average and the variance of the same HLF on the benchmark
-dataset with $avg(HLF_b)$ and $var(HLF_b)$, respectively.
-If we consistently notice that
-\[HLF_g - var(HLF_b) \leq avg(HLF_b) \leq HLF_g + var(HLF_b)\]
-then we consider that the LLM follows HLF prompts in a relevant way.
-
 \subsection{LLM Selection}\label{llm-selection}
 
 For our experiment we will use state of the art large language models.
@@ -286,24 +276,28 @@ We used the Chatbot Arena~\cite{chiang2024chatbot} leaderboard for constructing
 our selection.
 In the interest of covering more ground, we chose five top performers in the
 Chatbot Arena from different vendors.
-The final selection is available in Table~\ref{table-llm}.
+The final selection is available in Table~\ref{table-llm}. The identifier
 
-\begin{table}[ht]
+\begin{table*}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}
-        \toprule
-        Name                    & Parameters  & Context Size & Elo Score & License Type        \\ \toprule
-        OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
-        Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
-        Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
-        Meta Llama 3-70B        & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
-        Cohere Command R+       & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
-                                &             &              &           & with Acceptable Use \\
-                                &             &              &           & Addendum            \\ \bottomrule
-    \end{tabular}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{@{}llllll@{}}
+            \toprule
+            ID          & Name                    & Parameters  & Context Size & Elo Score & License Type        \\ \toprule
+            gpt         & OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
+            gemini      & Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
+            claude3     & Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
+            llama3\_70b & Meta Llama 3-70B        & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
+            command\_r  & Cohere Command R+       & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
+                        &                         &             &              &           & with Acceptable Use \\
+                        &                         &             &              &           & Addendum            \\ \bottomrule
+        \end{tabular}%
+    }
     \caption{Large Language Model Selection}\label{table-llm}
-\end{table}
+\end{table*}
+
+The ID of the LLM is used as the reference throughout figures and tables.
 
 \subsection{HLF Selection}\label{hlf-selection}
 
@@ -323,51 +317,58 @@ We divide HLFs in five categories ranging from very concrete to highly abstract
 and choose 2 features from each category for a grand total of 10 HLFs.
 Table~\ref{table-hlf} showcases our selection of features.
 
-\begin{table}[ht]
+\begin{table*}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}
-        \toprule
-        Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark \\ \toprule
-        total words                       & wordsent         & surface          & very concrete   & lexical                  \\
-        total sentences                   & wordsent         & surface          & very concrete   & syntactic                \\ \bottomrule
-        total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                 \\
-        total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic                \\ \bottomrule
-        simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic                \\
-        number of verbs per word          & partofspeech     & surface          & regular         & syntactic                \\ \bottomrule
-        corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                  \\
-        corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                  \\ \bottomrule
-        Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic                \\
-        Kuperman age of aquisition        & worddiff         & lexico-semantics & highly abstract & lexical                  \\ \bottomrule
-    \end{tabular}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{@{}llllll@{}}
+            \toprule
+            LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark \\ \toprule
+            t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical                  \\
+            t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic                \\ \bottomrule
+            n\_uverb        & total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                 \\
+            n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic                \\ \bottomrule
+            simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic                \\
+            a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic                \\ \bottomrule
+            corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                  \\
+            corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                  \\ \bottomrule
+            fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic                \\
+            a\_kup\_pw      & Kuperman age of aquisition        & worddiff         & lexico-semantics & highly abstract & lexical                  \\ \bottomrule
+        \end{tabular}%
+    }
     \caption{Handcrafted Linguistic Features}\label{table-hlf}
-\end{table}
+\end{table*}
 \footnotetext{as described in the figure in~\cite{lugea2023stylistics}, chapter 1, page 7}
 
-Each of these features is well documented~\cite{lftk-2023} barring the need for
-a deeper dive here into the subject matter.
+Each of these features is well documented~\cite{lftk-2023}, barring the need for
+an extended description here.
+The LFTK ID is used throughout tables and figures to refer to a specific HLF.
 
 \subsection{DataSet Selection}\label{ds-selection}
 
-We must choose source datasets based upon which we create corpuses for our
-experiment.
+The experiment design rests upon measuring HLFs on corpuses of texts and
+computing statistics.
+LLMs also make use of examples extracted from a corpus to guide text generation.
+We obtain a corpus from a dataset.
 Our final selection of datasets is listed in Table~\ref{table-ds}.
 
-\begin{table}[ht]
+\begin{table*}[ht]
     \setlength\tabcolsep{6pt}
     \centering
-    \begin{tabular}{@{}lllll@{}}
-        \toprule
-        Name            & Task                     & Row Count & Content Type & Reference              \\ \toprule
-        Yelp Reviews    & Sentiment Classification & 50000     & Reviews      & \cite{yelp2015neurips} \\
-        (test split)    & Text Style Transfer      &           &              &                        \\
-                        & Text Classification      &           &              &                        \\ \midrule
-        CNN / DailyMail & Summarization            & 11490     & News         & \cite{cnndm2015}       \\
-        (test split)    & Question Answering       &           & Stories      & \cite{cnndm2017}       \\
-                        & Text Generation          &           &              &                        \\ \midrule
-    \end{tabular}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{@{}lllll@{}}
+            \toprule
+            Name            & Task                     & Number of Samples & Content Type & Reference              \\ \toprule
+            Yelp Reviews    & Sentiment Classification & 50000             & Reviews      & \cite{yelp2015neurips} \\
+            (test split)    & Text Style Transfer      &                   &              &                        \\
+                            & Text Classification      &                   &              &                        \\ \midrule
+            CNN / DailyMail & Summarization            & 11490             & News         & \cite{cnndm2015}       \\
+            (test split)    & Question Answering       &                   & Stories      & \cite{cnndm2017}       \\
+                            & Text Generation          &                   &              &                        \\ \midrule
+        \end{tabular}%
+    }
     \caption{Source Datasets}\label{table-ds}
-\end{table}
+\end{table*}
 
 We use the Huggingface ecosystem~\cite{lhoest-etal-2021-datasets} to load the
 datasets.
@@ -478,16 +479,30 @@ the baseline.
 \textit{Italicized} values represent situations when the baseline was
 significantly closer to the target than the HLF-enhanced result.
 
+Lastly, it should be noted that each HLF has an independent value range.
+The number of total words ranges from small numbers into the hundreds or more,
+while the corrected verb variation is always a small number.
+The area and the Euclidian norm are calculated using the raw values of each HLF.
+That makes the values in each table column incomparable to the values in another
+table column.
+Because we don't show the measure of the difference between the baseline and the
+result, but the relative closeness to a target based on that measure, comparing
+values from the same column is also ill-advised.
+
 In the next sections we only present the most relevant results of the
 experiment.
 
-\subsection{Can an LLM Follow HLF Instructions?}
+\subsection{HLF Instruction Impact}
 
-The results on the CNN-DailyMail dataset showcased in
-Table~\ref{table-prompt-1-cnn-dailymail} provide the most eloquent answer to
-this question.
-The results on the Yelp dataset are positive, albeit less convincing.
-\begin{table}[!ht]
+The results on the corpus containing CNN articles showcased in
+Table~\ref{table-prompt-1-cnn-dailymail} shows that most LLMs take into account
+instructions concerning the linguistic features of their output.
+
+The results on the review corpus generated from the Yelp dataset are similarly
+significant, but the HLF instructions determine outcomes that are further away
+from the target.
+
+\begin{table*}[htp]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
@@ -505,11 +520,7 @@ The results on the Yelp dataset are positive, albeit less convincing.
             llama3\_70b $Diff\_A$ & \textbf{\underline{1363.5}}  & \textbf{\underline{54.0}}  & \textbf{\underline{106.5}}  & \textbf{\underline{60.5}}  & \textbf{\underline{0.36}} & \textbf{\underline{0.09}} & \textbf{\underline{4.33}} & \textbf{\underline{6.38}}  & 7.46                    & \textbf{\textit{-0.11}}   \\ \bottomrule
         \end{tabular}%
     }\caption{CNN Results}\label{table-prompt-1-cnn-dailymail}
-\end{table}
-
-For our selection of features, on the CNN corpus of articles, Command-R+ was the
-best performer.
-GPT scored surprisingly low.
+\end{table*}
 
 Figure~\ref{fig-command-r-t-word} shows a positive result, where the result
 obtained with the aid of HLF instructions is closer to the target.
@@ -517,7 +528,7 @@ Figure~\ref{fig-gpt-fkgl} shows a negative result, where the baseline is closer
 to the target.
 Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
 
-\begin{figure}[ht!]
+\begin{figure*}[htp]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail_t_word.png}
@@ -536,9 +547,9 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
         \caption[center]{Claude3\\Average Verbs per Word}
         \label{fig-llama-simp-ttr}
     \end{minipage}
-\end{figure}
+\end{figure*}
 
-\subsection{Context Aware}
+\subsection{HLF Instructions and Context Awareness}
 
 The second type of instructional prompt we feed to the LLM contains three
 examples from the corpus.
@@ -554,7 +565,7 @@ outside the corpus is used.
 The outlook is similar for what we saw in the first experiment with GPT
 being the least responsive to HLF instructions.
 
-\begin{table}[!ht]
+\begin{table*}[hpb]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
@@ -574,7 +585,7 @@ being the least responsive to HLF instructions.
     }
     \caption{prompt 2 - CNN Results\\Input Outside Corpus}
     \label{table-prompt-2-cnn-dailymail}
-\end{table}
+\end{table*}
 
 GPT's results would be good if the baseline were very close to the target value.
 As we can see in Figure~\ref{fig-p2-gpt-twords}, this is not always the case.
@@ -582,7 +593,7 @@ We also notice that Command-R+(fig.~\ref{fig-p2-command-r-simpttr}) and Gemini
 (fig.~\ref{fig-p2-gemini-a-kup-pw}) both registered significantly negative
 results, in contrast to their performance in our first scenario.
 
-\begin{figure}[ht!]
+\begin{figure*}[hpb]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail_t_word.png}
@@ -601,7 +612,7 @@ results, in contrast to their performance in our first scenario.
         \caption[center]{Gemini\\Kuperman Age of Aquisition}
         \label{fig-p2-gemini-a-kup-pw}
     \end{minipage}
-\end{figure}
+\end{figure*}
 
 The results obtained in our first scenario are largely confirmed by our second
 scenario.
@@ -612,7 +623,7 @@ instruction prompt will produce results that are much closer to the target
 value.
 The expectation is to see less significant results.
 
-\begin{table}[!ht]
+\begin{table*}[ht]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
@@ -632,7 +643,7 @@ The expectation is to see less significant results.
     }
     \caption{CNN Results\\Input Inside Corpus}
     \label{table-prompt-2-ifd-cnn-dailymail}
-\end{table}
+\end{table*}
 
 The results shown in Table~\ref{table-prompt-2-ifd-cnn-dailymail} contradict our
 expectations outright.
@@ -644,7 +655,7 @@ very different amount of words in Figure~\ref{fig-p2-ifd-gemini-twords}.
 Less surprisingly, Llama3 fails to generate text that conforms to the correct
 Kuperman age of acquisition per word in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 
-\begin{figure}[ht!]
+\begin{figure*}[ht]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
@@ -663,7 +674,7 @@ Kuperman age of acquisition per word in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
         \caption[center]{Llama3\\Kuperman Age of Aquisition}
         \label{fig-p2-ifd-llama3-a-kup-pw}
     \end{minipage}
-\end{figure}
+\end{figure*}
 
 The results in this last scenario show that whether LLMs take examples listed in
 the prompt into account or not with respect to conforming to certain linguistic
@@ -749,7 +760,6 @@ linguistic features that were used.
 What if we would have measured models' behaviour for single linguistic features
 independently?
 
-
-\bibliographystyle{plain}
 \bibliography{references}
+
 \end{document}
