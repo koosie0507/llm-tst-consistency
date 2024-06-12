@@ -91,11 +91,20 @@ def draw_one_figure(title, features, df, ds_stats, plot_col_count):
 
 
 def draw_multiple_figures(title, features, df, ds_stats):
-    for i, f in enumerate(features):
+    for f in features:
         fig = go.Figure()
         for trace in _make_feature_traces(f, df, ds_stats):
             fig.add_trace(trace)
-        fig.update_layout(height=480, width=640, title_text=f"{title} - {f}")
+            
+        fig.update_layout(
+            height=480,
+            width=640,
+            font_color="black",
+            #title_text=f"{title} - {f}",
+            showlegend=False,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+        )
         yield f, fig
 
 
