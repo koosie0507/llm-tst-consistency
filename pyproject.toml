@@ -2,7 +2,7 @@
 name = "llm-tst-consistency"
 version = "0.1.0"
 description = ""
-authors = ["Andrei Olar <andrei.olar@ubbcluj.ro>"]
+authors = []
 readme = "README.md"
 packages = [{include = "llm_tst_consistency", from = "src"}]
 
