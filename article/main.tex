@@ -60,16 +60,15 @@ Universitatea Babeș-Bolyai, Cluj-Napoca, România\\
 
 \section{Introduction}\label{introduction}
 
-\textbf{Large language models (LLMs)} have are a commonplace research topic
+\textbf{Large language models (LLMs)} have become a commonplace research topic
 today.
 Because language models such as BERT~\cite{devlin2018bert} or
 GPT~\cite{gpt-2018,gpt2-2019,gpt3-2020} constantly advance the state of the art
-on many natural language processing tasks, it has become natural to want to
-evaluate the performance of these generalist models on ever more specialized
-tasks.
-We know from multiple surveys~\cite{minaee2024llmsurvey,zhao2023survey} and
-benchmarks~\cite{papcode2024hellaswag,chiang2024chatbot} that large language
-models (especially the more popular ones) are good at following instructions.
+on many natural language processing tasks, it is interesting to evaluate them on
+more specialized tasks.
+Multiple surveys~\cite{minaee2024llmsurvey,zhao2023survey} and
+benchmarks~\cite{papcode2024hellaswag,chiang2024chatbot} show that large
+language models are good at following instructions.
 We can also intuit that training LLMs on diverse data (for instance the
 Pile~\cite{gao2020pile}) uniquely qualifies them to produce text in a wide
 variety of styles.
@@ -80,26 +79,26 @@ the original sentence''~\cite{tst-review-2021}.
 This definition can be extended to entire articles or corpuses of text because
 these are also the object of linguistic style and
 stylistics~\cite{lugea2023stylistics}.
-The task of transfering text style is an old preocupation for the natural
-language processing and computational linguistics communities which has picked
-up interest again in the context of the advancements in the field of deep
-learning and particularly since the inception of the transformer architecture.
+The task of transferring text style has a certain maturity.
+The interest in this task is renewed by the advancements made with LLMs.
 
 \textbf{Handcrafted linguistic features (HLFs)} are single numerical values
 produced by a uniquely identifiable method on any natural
 language~\cite{lftk-2023}.
 More often than not, these values are easy to compute while the methods used for
 obtaining them are usually idempotent.
-This makes them very attractive because of the dual purpose that they can serve.
-On the one hand, they can be used to instruct the generation of text (``write
-no more than 10 sentences'') while on the other they can be used to analyse text
-and, therefore, verify generated text.
+This makes them very attractive because of their dual potential purpose.
+On one hand, they can be used to instruct the generation of text (``write no
+more than 10 sentences'').
+On the other hand they can be used to analyse text.
+This ability allows verifying whether a text has the expected value for an HLF.
 
-Some HLFs statistically describe text in terms of its basic syntactical and
-morphological components.
-Knowing this we could follow Noam Chomsky's ideas~\cite{chomsky2002syntactic}
-which imply that the style of a text is influenced by its underlying syntactic
-structures.
+Taking Noam Chomsky's ideas~\cite{chomsky2002syntactic} that syntax and meaning
+are different things, we intuit that we can define writing style only in terms
+of both syntax and meaning.
+We shy away from discussing meaning, but syntax and orderly constructs like it
+seem to be within our grasp.
+
 Traditionally, linguistic style was thought to be the result of morphological
 and syntactic arrangements~\cite{lugea2023stylistics}.
 More recent schools of thought on linguistic style find semantics and pragmatics
@@ -107,16 +106,13 @@ to be inextricably linked to author style~\cite{verma2019lexical}, but argue
 that a great deal can still be inferred from lexicon, syntax and a `surface'
 level which contains basic HLFs such as the number of words in a sentence.
 
-For example, a high number of exclamations in a text is often a revealing
-signal of an inflamatory news writing style, of spam or of alert narration or
-dialogue.
-Similar observations have been made about other characteristics of written text
-that might be computed as HLFs~\cite{hovy1987generating,lugea2023stylistics}.
+Some have observed that many characteristics of written text can be computed as
+HLFs~\cite{hovy1987generating,lugea2023stylistics}.
 Combining multiple HLFs that are revelatory of linguistic style could provide us
 with an easily interpretable and verifiable stylistic profile.
 
-These apparently disparate strands of thought lead us to the two research
-questions we'd like to answer in this paper.
+These are the strands of thought that have inspired us to pursue two research
+questions in the age of LLMs.
 
 Firstly, \textbf{is it possible to influence an LLM's writing style by
     instructing it to generate text that complies to certain HLFs}?
@@ -143,9 +139,8 @@ have served as inspiration for writing this paper~\cite{lyu-etal-2023-fine}.
 We should note though that we are not attempting to transfer text style, but
 merely to instruct an LLM to follow instructions based on HLFs.
 
-Linguistic style, then, is the sum of identifiable language choices manifest in
-a text made from the language system by the text
-producer~\cite{lugea2023stylistics}.
+Linguistic style is the sum of identifiable language choices manifest in a text
+made from the language system by the text producer~\cite{lugea2023stylistics}.
 Another way to think about it is that style is the form used for delivering
 meaning~\cite{tst_sigkdd_review_2022}.
 The ample literature on the subject seems to agree that style depends on context
@@ -184,7 +179,7 @@ relative to a baseline obtained without using HLFs in the generation process.
 We are not discussing the effectiveness of style transfer, author verification
 or other tasks (yet).
 
-Finally, this paper documents a form of controllable text generation
+Our paper describes an experiment in controllable text generation
 (CTG)~\cite{zhang-ctg-2022}.
 Hightened recent interest in CTG and especially in benchmarking LLMs in the
 context of CTG~\cite{chen2024benchmarking} is particularly relevant for this
@@ -192,94 +187,103 @@ paper.
 Such research alleviates the burden of proof regarding the level to which
 LLMs respond well to diversified instructions for controlled text generation in
 general.
-Compared to the existing work, our prompts are guided by HLFs.
-Furthermore, we use those same HLFs to evaluate the performance of the LLM.
+This paper differs from the existing CTG work with its use of HLFs for writing
+the text generation instructions.
+It additionally uses HLFs to measure the performance of LLMs in terms of their
+ability to generate text that conforms to some chosen target HLF values.
 
 \section{Experiment Design}\label{method}
 
-Our experiment consists of analysing the behavior of an LLM when asked to
-generate new text based on a given input text and some instructions derived from
-HLF statistics computed on a corpus containing multiple texts.
-The experiment relies on choosing LLMs to evaluate and finding datasets from
-which we can derive corpuses.
+Our experiment analyses LLM output when asked to generate new text based on
+given input text and instructions derived from HLFs.
+We compute statistics of HLFs on a corpus to derive the text generation
+instructions.
+
+To run the experiment we must select the LLMs to evaluate and finding datasets
+from which we can derive corpuses.
 Then there's the matter of selecting the HLFs for our experiment.
-Let us outline the experiment process before going into further detail.
 
-The first task is to establish a baseline.
-We do so by instructing the target LLM to generate text retaining the meaning of
-the input text without any further instruction related to style or the
-linguistic features of the generated text.
-We repeat the text generation step 10 times using the same prompt and the same
-input text.
+We think it's best to describe the experimental process before going over our
+selection for the experiment's parameters.
 
-For each text generation, we compute the following statistics for each of our
-chosen HLFs:
+\subsection{Process}\label{subsec:experiment-process}
 
+Assume we have a target LLM, a corpus containing texts, some examples extracted
+from the corpus, a selection of HLFs and input text both from within and from
+outside the corpus.
+This description of the experiment process assumes those parameters have stable
+values.
+Changing the parameters requires restarting the process.
+
+The first activity involves establishing baselines for each experiment scenario.
+
+In the first scenario the target LLM is instructed to generate text retaining
+the meaning of  the input text without any further instruction related to style
+or the linguistic features of the generated text.
+This step is repeated 10 times, computing each HLF in our selection for the
+generated text.
+The computed values make up the first scenario baselines for each HLF.
+
+The second scenario consists in generating text from the same input text, but
+with the aid of some examples from the corpus.
+In this scenario, we believe that the choice of input text affects the outcome.
+Therefore we propose two variants for this scenario: one with input text
+extraneous to the corpus and one with input text from the corpus.
+
+We add the examples to the initial LLM prompt and follow the same process like
+in the first scenario.
+We do this for each variant of the second scenario to obtain two more baselines
+for each HLF for the corpus.
+
+The number of examples is chosen so that we do not overrun the context window of
+the LLM.
+Some context windows are smaller than others, settling the number of examples at
+three.
+
+The next step requires computing statistics on the corpus for each HLF:
 \begin{itemize}
-    \item \textbf{min}: the minimum value of the HLF on the generated text;
-    \item \textbf{max}: the maximum value of the HLF on the generated text;
-    \item \textbf{avg}: the mean value of the HLF on the generated text;
+    \item \textbf{min}: the minimum value of the HLF on the corpus;
+    \item \textbf{max}: the maximum value of the HLF on the corpus;
+    \item \textbf{avg}: the mean value of the HLF on the corpus.
 \end{itemize}
 
-A second baseline is obtained by following the same process and same input text,
-but with a new prompt that builds upon the first one by adding the instruction
-to use example text from our corpus of choice.
-The examples are three texts chosen randomly once at the beginning of the
-experiment from the used corpus.
-We use the same example texts for all evaluated LLMs.
+Doing so allows writing an HLF prompt derived from each of our baseline prompts.
+The HLF prompts instruct the LLM to generate text whose HLFs comply with the
+previously computed statistics.
+The individual (per-HLF) instructions are all are part of the same HLF prompt.
+The prompts are constructed using Jinja templates which are located in the
+\texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/src/llm_tst_consistency/templates}{templates}}
+directory of the source code used to run the experiment.
+The instruction prompts corresponding to our two scenarios are
+`\texttt{prompt\_1}' and `\texttt{prompt\_2}', respectively.
+The rest of the templates in the directory are used to construct the individual
+HLF instructions.
 
-We choose three texts to not overrun the context window of the LLM.
-This hints at the main drawback for our approach: it uses up the context window
-with system instructions.
-While this isn't an issue with all models, some only allow a context window of
-around 8000 tokens so we should be mindful.
+In a similar manner to how we generated the baselines, we run 10 trials for each
+scenario and variant.
+We compare each baseline with the results obtained by using the corresponding
+HLF prompt.
 
-We construct the second baseline by conducting 10 trials using the same
-prompt and input text and otherwise in the same manner in which we created the
-first baseline.
+The first scenario is indicative of whether LLMs acknowledge HLF instructions.
+If they do then the results obtained from HLF instructions should be
+significantly different from the corresponding baseline results.
 
-The next step is to devise HLF prompts derived from both baseline prompts.
-The HLF prompts contain additional instructions to generate text that would
-comply with certain HLF values.
-These HLF values are obtained by computing the statistics outlined above on
-the entirety of the target benchmark dataset.
-The HLF prompts are constructed from templates that take into account the HLF
-values.
-The prompt templates part of the experiment's source code.
-The instructions concerning all choseon HLFs are given concomitently within the
-same prompt.
-In a similar manner to how we generated the baselines, we run ten trials for
-each case (with or without example articles from the target benchmark dataset).
-
-We compare the first baseline with the results obtained by using the first
-modified HLF prompt to understand whether we can influence LLM text generation
-using HLFs.
-Our reasoning is that if the LLM were influenced by the HLF prompt, the output
-would show different HLF values compared to the baseline.
-
-We now turn our attention to the second baseline.
-Given that the LLM now also has example articles, it can freely immitate those
-articles when generating the text.
-If there is a consistent difference over the ten trials between generating text
-using the baseline or using the HLF prompt, this difference can only be a result
-of the LLM complying to HLF instructions.
-This difference is expressed by the change of value for each HLF between the
-baseline and HLF enhanced text generation.
-
-Because we provide the LLM with examples from the corpus, it is more likely to
-intuit the linguistic features of the corpus.
-To understand whether HLF instructions actually make a difference, we perform
-the experiment using the second type of prompt using input text both from within
-and from outside the corpus.
+Both variants of the second scenario quantify how similar the HLFs of the texts
+generated by the LLM are to the corpus average \textit{because of} the HLF
+instructions.
+The rationale here is that the LLM can generate text very similar to text from
+the corpus by using the supplied examples from the corpus.
+That would leave the HLF instructions as the remaining possible cause for
+generating text with HLFs that are consistently different from the corresponding
+baseline.
 
 \subsection{LLM Selection}\label{llm-selection}
 
-For our experiment we will use state of the art large language models.
-We used the Chatbot Arena~\cite{chiang2024chatbot} leaderboard for constructing
-our selection.
-In the interest of covering more ground, we chose five top performers in the
-Chatbot Arena from different vendors.
-The final selection is available in Table~\ref{table-llm}. The identifier
+We only use state of the art large language models for the experiment.
+The Chatbot Arena~\cite{chiang2024chatbot} leaderboard is essential in our
+selection.
+To cover more ground we find top performers from different vendors interesting.
+The final selection is available in Table~\ref{table-llm}.
 
 \begin{table*}[ht]
     \setlength\tabcolsep{6pt}
@@ -300,7 +304,8 @@ The final selection is available in Table~\ref{table-llm}. The identifier
     \caption{Large Language Model Selection}\label{table-llm}
 \end{table*}
 
-The ID of the LLM is used as the reference throughout figures and tables.
+The ID of the LLM is referenced throughout figures, tables and generally
+throughout the rest of the paper.
 
 \subsection{HLF Selection}\label{hlf-selection}
 
@@ -312,12 +317,12 @@ readability assessment or fake news detection.
 Besides the domain and family, we also choose features based on their influence
 over text style as recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
 
-In this experiment we create specific instructions for each HLF.
+The instructions for each HLF are specifically crafted using natural language.
 The resulting instructions can be catalogued on the concrete-abstract spectrum.
 For example, `write 100 words' is a more concrete instruction than `write as if
-you were in junior highschool'~\cite{kincaid1975derivation}.
+you were in junior highschool'.
 We divide HLFs in five categories ranging from very concrete to highly abstract
-and choose 2 features from each category for a grand total of 10 HLFs.
+and choose 2 features from each category.
 Table~\ref{table-hlf} showcases our selection of features.
 
 \begin{table*}[ht]
@@ -343,17 +348,15 @@ Table~\ref{table-hlf} showcases our selection of features.
 \end{table*}
 \footnotetext{as described in the figure in~\cite{lugea2023stylistics}, chapter 1, page 7}
 
-Each of these features is well documented~\cite{lftk-2023}, barring the need for
-an extended description here.
 The LFTK ID is used throughout tables and figures to refer to a specific HLF.
 
-\subsection{DataSet Selection}\label{ds-selection}
+\subsection{Corpus Selection}\label{ds-selection}
 
-The experiment design rests upon measuring HLFs on corpuses of texts and
+The experiment design rests upon measuring HLFs on a corpus of texts and
 computing statistics.
 LLMs also make use of examples extracted from a corpus to guide text generation.
-We obtain a corpus from a dataset.
-Our final selection of datasets is listed in Table~\ref{table-ds}.
+Our approach idempotently derives a corpus of texts from a well known dataset.
+Our selection of datasets is listed in Table~\ref{table-ds}.
 
 \begin{table*}[ht]
     \setlength\tabcolsep{6pt}
@@ -380,57 +383,45 @@ are loaded from \texttt{abisee/cnn\_dailymail}.
 
 The Yelp review data set provides a diverse assortment of reviews from online
 users.
-The authors employ a casual writing style, very similar to what a average
-writing style of an average person would be like.
-The dataset as a whole is useful for many tasks.
-The corpus we construct based on this dataset contains the first 1000 reviews
-from its test split.
+The authors employ a casual writing style, very similar to the writing style of
+an average person.
+We construct a corpus containing the first 1000 reviews from the test split of
+this dataset.
 
 CNN/DailyMail contains stories and news with diverse styles.
-The style varies from one author to another, but also based on the publishing
-entity.
+The style varies from one author to another and it also follows the publisher's
+editorial style.
 The articles are more formal, longer and more complex in structure than Yelp
-reviews which makes this dataset a good alternative choice.
+reviews which makes this dataset a good alternative.
 The corpus that is based on this dataset contains the first 1000 CNN articles
 from the test split of the dataset.
 
 \subsection{User Prompt and Text}\label{input-text}
 
 This experiment presupposes instructing various large language models to reword
-an input text so that it conforms to a bunch of handcrafted linguistic features.
-The input text is provided via a user prompt.
+an input text so that it conforms to some HLFs.
 
-We provide two input texts that are external to our corpuses, one input text per
+There is an input text corresponding to each corpus that is external to that
 corpus.
-The input texts are located in the
+These texts are located in the
 \texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{data}}
 folder of the experiment's source code.
-These user prompts are used when we're not using an input text from the
-corpus itself.
 
-For the CNN/DailyMail dataset, the user prompt from outside the dataset is an
-extract from the classic text \textit{The Life and Opinions of Tristram Shandy,
-    Gentleman}, by Laurence Sterne~\cite{sterne2003life}.
-This text is far from a news article in terms of both style and exhibited
-linguistic features from the CNN/DailyMail dataset contents.
-We see a text that is similarly divorced from the style and linguistic
-features of most Yelp reviews in Oscar Wilde's \textit{Sonnet to
-    Liberty}~\cite{wilde1909poems}.
-Having input texts that are vastly different from a dataset should inform an LLM
-to generate a baseline that does not conform to the linguistic features of the
-dataset.
+For the variant that uses an input text from the corpus, we draw the text
+randomly from the corpus once, at the start of the experiment.
 
-We use Jinja templates to compile the text generation instructions for the LLM.
-Both the model prompts and the HLF instructions are constructed using these
-templates.
-The Jinja templates are located in the
-\texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{templates}}
-folder of the experiment's source code.
+The input text that is external to the CNN article corpus is an extract from the
+classic \textit{The Life and Opinions of Tristram Shandy, Gentleman}, by
+Laurence Sterne~\cite{sterne2003life}.
+The text style is very dissimilar compared to news articles.
+Its linguistic features are also very unlike the average on the CNN article
+corpus.
+A text that is similarly divorced from the style and linguistic features of most
+Yelp reviews is Oscar Wilde's \textit{Sonnet toLiberty}~\cite{wilde1909poems}.
 
-There are two main text generation instruction templates: one without example
-content~(called `\texttt{prompt\_1}') and one with examples from the
-corpus~(`\texttt{prompt\_2}').
-Each of the two instruction templates allow the presence of HLF instructions.
+Choosing input texts that are vastly different from their corresponding corpus
+is based in the assumption that LLMs would generate baseline results that do not
+conform to the HLF statistics on that corpus.
 
 \section{Experiment Results}
 
@@ -438,7 +429,7 @@ Each of the two instruction templates allow the presence of HLF instructions.
 
 Handcrafted linguistic features are integer or floating point values that we
 can compute on text.
-All our graphs show the HLF on the vertical axis, while the horizontal axis is
+Plot figures show the HLF on the vertical axis, while the horizontal axis is
 reserved for the trial number.
 HLF values for the text generated using baseline prompts are plotted as a
 continuous grey line, while the values obtained by using HLF enhanced prompts
@@ -447,59 +438,63 @@ The minimum and maximum HLF on the benchmark dataset are plotted using dotted
 black lines.
 A continuous black line designates the average HLF on the corpus.
 We sometimes refer to this average as the \textit{target} value because the LLM
-is primarily instructed to conform to this value.
+is instructed to generate text that primarily conforms to this value.
 
 Result tables highlight the difference between plots obtained using a
-baseline prompt versus the ones obtained using HLF-enhanced prompts.
-Firstly, we care about the difference between each plot (baseline and HLF) and
-the target (the corpus average).
-Secondly, we measure how different baselines are from HLF-enhanced plots.
+baseline prompt versus the ones obtained using HLF instruction prompts.
+Firstly, we measure how different baselines are from HLF-enhanced plots.
+Secondly, we compare the closeness of the baseline and HLF-enhanced plots to the
+target average.
+Table values where the text is \textbf{bold} mark significant differences
+between baseline and HLF instruction results.
+\underline{Underlined} values mark situations where the result of using HLF
+instructions is closer to the target than the baseline.
+\textit{Italic} values mark situations where the baseline is closer to the
+target.
+
+\subsection{Measurements}\label{subsec:measurements}
 
 We use the two-sampled Kolmogorov-Smirnov~\cite{kolmogorov1933,smirnov1939} test
 to determine whether the baseline results are different from the HLF-enhanced
 results.
 We consider that the results are different for a resulting $p\_value \le 0.05$.
 
-To determine which of the two results is closer to the target, we compute the
-area between each result and the target.
-Another way to measure the geometric closeness to the target is by computing the
-Euclidian norm of the vectorial difference between result and target.
+To determine which of two results is closer to the target, we compute the area
+between each result and the target.
+Another way in which we measure the closeness of the result to the target is by
+computing the Euclidian norm of the vectorial difference between the result and
+target.
+
+Note that each HLF can have a different range of values than other HLFs.
+When we compute the area and the Euclidian norm, we use the raw values of each
+HLF, without preprocessing them.
+Therefore the results for one HLF are not comparable with the results for
+another HLF.
+
+Remember that we don't quantify how different the baseline is from the
+HLF-enhanced result.
+Instead we calculate the relative closeness to a common target.
+Because we took this approach, comparing values for the same HLF, but different
+LLMs is also ill-advised.
+
 Let us denote with $A_b$ and $A_h$ the areas between baseline and target and HLF
 instruction result and target, respectively.
 Let us similarly denote with $N_b$ and $N_h$ the Euclidian norms.
-Finally, we define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$.
+We define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$.
 
 The result tables show $Diff_A$ and $Diff_N$ for each LLM in the context of a
 prompt and a dataset.
 All result tables for each dataset and prompt variant are available in the
 appendix.
 
-To save space, we illustrate significant differences between the baseline and
-the HLF instruction results in \textbf{bold} typeface.
-The \underline{underlined} values represent situations when the HLF-enhanced
-prompt lead to results that are significantly closer to the corpus average than
-the baseline.
-\textit{Italicized} values represent situations when the baseline was
-significantly closer to the target than the HLF-enhanced result.
-
-Lastly, it should be noted that each HLF has an independent value range.
-The number of total words ranges from small numbers into the hundreds or more,
-while the corrected verb variation is always a small number.
-The area and the Euclidian norm are calculated using the raw values of each HLF.
-That makes the values in each table column incomparable to the values in another
-table column.
-Because we don't show the measure of the difference between the baseline and the
-result, but the relative closeness to a target based on that measure, comparing
-values from the same column is also ill-advised.
-
-In the next sections we only present the most relevant results of the
-experiment.
+In the next sections we present our perspective on the most relevant results of
+the experiment.
 
 \subsection{HLF Instruction Impact}
 
-The results on the corpus containing CNN articles showcased in
-Table~\ref{table-prompt-1-cnn-dailymail} shows that most LLMs take into account
-instructions concerning the linguistic features of their output.
+The results on the CNN article corpus showcased in Table~\ref{table-prompt-1-cnn-dailymail}
+shows that LLMs take into account instructions concerning the HLFs of their
+output.
 
 The results on the review corpus generated from the Yelp dataset are similarly
 significant, but the HLF instructions determine outcomes that are further away
@@ -554,19 +549,13 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
 
 \subsection{HLF Instructions and Context Awareness}
 
-The second type of instructional prompt we feed to the LLM contains three
-examples from the corpus.
-The hypothesis is that this will influence the baseline result to be closer to
-the corpus average.
+In the second scenario of the experiment we try to quantify the impact of using
+HLF instructions on the output of the LLM.
+There are two variants of this scenario: input text from within or from outside
+the corpus.
 
-In this case, it is interesting to see how the LLM generates text based on input
-text from both within the corpus that contains the example articles and from
-outside the corpus.
-
-In Table~\ref{table-prompt-2-cnn-dailymail} we see the results when an input from
-outside the corpus is used.
-The outlook is similar for what we saw in the first experiment with GPT
-being the least responsive to HLF instructions.
+Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant.
+The outlook is similar to the first experiment scenario.
 
 \begin{table*}[hpb]
     \centering
@@ -590,11 +579,11 @@ being the least responsive to HLF instructions.
     \label{table-prompt-2-cnn-dailymail}
 \end{table*}
 
-GPT's results would be good if the baseline were very close to the target value.
+A possible explanation for having fewer significant differences in results might
+lie in the closeness to the target.
 As we can see in Figure~\ref{fig-p2-gpt-twords}, this is not always the case.
-We also notice that Command-R+(fig.~\ref{fig-p2-command-r-simpttr}) and Gemini
-(fig.~\ref{fig-p2-gemini-a-kup-pw}) both registered significantly negative
-results, in contrast to their performance in our first scenario.
+In~\cref{fig-p2-command-r-simpttr,fig-p2-gemini-a-kup-pw} we observe regressions
+in performance with significant differences between baseline and result.
 
 \begin{figure*}[hpb]
     \centering
@@ -617,13 +606,13 @@ results, in contrast to their performance in our first scenario.
     \end{minipage}
 \end{figure*}
 
-The results obtained in our first scenario are largely confirmed by our second
-scenario.
-So now we turn to see how using a text from within the corpus affects the
-performance of the large language models.
-The hypothesis is that if the text is `familiar', both the baseline and the HLF
-instruction prompt will produce results that are much closer to the target
-value.
+Even so, the results obtained in our first scenario are largely confirmed in the
+first variant of our second scenario.
+
+We finally look at the second variant of the second scenario of our experiment.
+The hypothesis in this variant is that LLMs will generate text that exhibits
+HLFs much closer to the target corpus average if the input text is from that
+corpus.
 The expectation is to see less significant results.
 
 \begin{table*}[ht]
@@ -650,13 +639,14 @@ The expectation is to see less significant results.
 
 The results shown in Table~\ref{table-prompt-2-ifd-cnn-dailymail} contradict our
 expectations outright.
-The most surprising behaviour is exhibited in the context of more concrete HLFs
-such as the total number of words or the number of unique adjectives.
-Claude3 shows regressive behaviour for the number of unique adjectives in
-Figure~\ref{fig-p2-ifd-claude3-nuadj}, while Gemini constructs texts using a
-very different amount of words in Figure~\ref{fig-p2-ifd-gemini-twords}.
-Less surprisingly, Llama3 fails to generate text that conforms to the correct
-Kuperman age of acquisition per word in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
+The most surprising behaviour is exhibited for HLFs which are derived into more
+concrete generation instructions, such as the total number of words.
+This behaviour is highlighted in figure~\ref{fig-p2-ifd-gemini-twords}.
+Additionally, we notice regressive behaviour for some models compared to the
+previously explored results in figure~\ref{fig-p2-ifd-claude3-nuadj}.
+Finally, the abstractness of the text generation instructions for certain HLFs
+leads to the generated text not being compliant as exemplified in
+figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 
 \begin{figure*}[ht]
     \centering
@@ -680,9 +670,8 @@ Kuperman age of acquisition per word in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 \end{figure*}
 
 The results in this last scenario show that whether LLMs take examples listed in
-the prompt into account or not with respect to conforming to certain linguistic
-features is debatable, providing them with specific instructions derived from
-HLFs makes a significant impact.
+the prompt into account is debatable when it comes to generating text with
+similar linguistic features as the examples'.
 
 \section{Discussion}
 
@@ -690,78 +679,66 @@ In terms of our first question --- whether LLMs are able to follow instructions
 concerning handcrafted linguistic features --- the response is in our opinion
 affirmative.
 Certainly, not all LLMs are created equal in this regard.
-It is debatable whether this experiment is well designed because of the choice
-to derive target HLF values for the LLM from the corpus.
-This is evident in the results obtained for the Yelp dataset.
+
+The design of the experiment leaves room for improvement because of the choices
+regarding computing HLF statistics on a corpus, input text, the corpus
+itself or the instruction prompt.
+The importance of these factors is evidentiated by the difference in results
+obtained using the Yelp reviews corpus when compared to the results obtained
+on the CNN article corpus.
 While these results also show a significant influence when using HLFs in the
 prompt, the influence is mostly negative.
-This can be attributed to the choice of input text in relation to the corpus,
-the wording in the instruction prompt or to each model's specific training.
 
 This leads us to our second question: how much do handcrafted linguistic feature
 instructions affect the way LLMs write text.
 The results in this regards show us a much less conclusive picture.
+It is not apparent the LLM will follow HLF instructions as intended.
+In fact, using the same prompt on different data lead to wildly different
+outcomes.
+Whether this is because of circumstances such as the selection of HLFs, the LLM,
+the HLF target values, the input text, a.s.o remains to be determined.
+We can observe some idioms, though.
 
-Firstly, we cannot assume that the LLM will follow HLF instructions the way we
-intend.
-Whether we obtain the expected outcome or not depends largely on the prompt,
-the chosen HLFs, the model, the target values for the HLFs, a.s.o
-We do, however, notice a few patterns.
-The more abstract the instruction, the less it seems to make a positve impact.
-More importantly, by inspecting the result data, a more abstract instruction
-seems more likely to produce a negative impact on the desired outcome.
+The more abstract the instruction to comply to an HLF, the fewer the chances of
+a significant impact on the outcome.
+When the outcome is significant, it tends to be negative.
+This tells us that large language models are likely good at following
+instructions about HLFs when those instructions are more concrete.
 
-Secondly, the choice of input text in relation to the target HLF values seems
-very important.
-Choosing to reword a poem so that it has the same reading ease as a user review
-seems like a setup for poor results.
-This leads us to intuit that LLMs are clearly able to use HLF instructions to
-generate text differently, but there is a limit to their `creativity'.
+Then, the choice of input text in relation to the target HLF values seems very
+important.
+LLMs don't seem able yet to cover the vast gulf between the linguistic features
+of an Oscar Wilde poem and the average linguistic features of text written by
+Yelp reviewers.
+This leads us to propose that even if LLMs are able to generate text that
+complies to certain target HLFs, there is a limit to this ability.
 
-Finally, the choice of HLFs is very important.
-The text generated by an LLM is less likely to conform to HLFs that result in
-more abstract instructions.
-Furthermore, the combination of chosen HLFs is important.
+Finally, the overall selection of HLFs is important.
 Choosing HLFs that measure the uniqueness of a linguistic element (words,
 structures, a.s.o) limits the LLMs ability to conform to other HLFs (for example
 total number of sentences or reading ease).
 This is highlighted in the experiment specifically in the tension between the
 age of acquisition and the adjective or verb variation.
-Predictably, the more concrete instructions take precedence over the more
-abstract ones.
 
 \section{Conclusions and Future Work}
 
-We started out by trying to understand whether it is possible to conform the
-output of a large language model to exhibit specific linguistic features.
+We started out by trying to understand whether it is possible to generate text
+that exhibits certain linguistic features using a large language model.
 To our surprise, it turns out that instructing language models to write text
 that conforms to a selected assortment of linguistic features almost always
-yields significant changes in how the text is being generated.
+leads to significantly different linguistic featues of generated text.
 
-This doesn't mean that the results are always satisfying.
-What the model writes about and the chosen target values for the linguistic
-features are major factors in how successful the overall experience is.
-Unfortunately, at this stage, finding out good target values and good writing
-instructions is a question of trial and error.
+The results are not always satisfying, though.
+At this stage, the more pragmatic answer seems to involve prompt engineering and
+a careful choice of language features.
+Providing examples does not seem to influence the model's ability to comply with
+the user's desires.
 
-Other experiment designs might have been more opportune in examining the
-questions layed out in the introduction.
-For example, using set target values for HLFs (without deriving them from a
-corpus of text) and choosing input text where the HLFs vary greatly would have
-been an alternate design.
-Following through on those approaches is one of the possible expansions on the
-current work.
-
-Another way of expanding on the current work is finding the settings in which
-large language models are most responsive to linguistic features.
-The current experiment was inconclusive in this regard and a legitimate further
-question is whether settings in which text generated by language models
-consistently conforms to certain linguistic features actually exist.
-
-Lastly, a simpler question that is left unanswered relates to the number of
-linguistic features that were used.
-What if we would have measured models' behaviour for single linguistic features
-independently?
+Other experiments are required to better understand the capabilities of large
+language models with regard to handcrafted linguistic features.
+For example, testing the response of language models to features in isolation
+or not using a corpus or input text are different setups that could eliminate
+some of the unknowns left uncovered by the current experiment.
 
 \bibliography{references}
 
