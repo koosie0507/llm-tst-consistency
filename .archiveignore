@@ -1,0 +1,12 @@
+article/*
+.venv/*
+.idea/*
+.out/*
+.git/*
+**/__pycache__/*
+.env
+LICENSE
+.archiveignore
+.gitignore
+.tempignore
+.DS_Store
