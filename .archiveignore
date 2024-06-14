@@ -10,3 +10,4 @@ LICENSE
 .gitignore
 .tempignore
 .DS_Store
+**/.DS_Store

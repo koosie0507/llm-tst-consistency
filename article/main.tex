@@ -287,7 +287,7 @@ The final selection is available in Table~\ref{table-llm}.
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{@{}llllll@{}}
             \toprule
-            ID          & Name                    & Parameters  & Context Size & Elo Score & License Type        \\ \toprule
+            ID          & Name                    & Parameters  & Context Size & Elo Score & License             \\ \toprule
             gpt         & OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
             gemini      & Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
             claude3     & Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
@@ -357,15 +357,15 @@ Our selection of datasets is listed in Table~\ref{table-ds}.
     \setlength\tabcolsep{6pt}
     \centering
     \resizebox{\textwidth}{!}{%
-        \begin{tabular}{@{}lllll@{}}
+        \begin{tabular}{@{}llllll@{}}
             \toprule
-            Name            & Task                     & Number of Samples & Content Type & Reference              \\ \toprule
-            Yelp Reviews    & Sentiment Classification & 50000             & Reviews      & \cite{yelp2015neurips} \\
-            (test split)    & Text Style Transfer      &                   &              &                        \\
-                            & Text Classification      &                   &              &                        \\ \midrule
-            CNN / DailyMail & Summarization            & 11490             & News         & \cite{cnndm2015}       \\
-            (test split)    & Question Answering       &                   & Stories      & \cite{cnndm2017}       \\
-                            & Text Generation          &                   &              &                        \\ \midrule
+            Name            & Task                     & Number of Samples & Content Type & Reference              & License           \\ \toprule
+            Yelp Reviews    & Sentiment Classification & 50000             & Reviews      &~\cite{yelp2015neurips} & Yelp Dataset      \\
+            (test split)    & Text Style Transfer      &                   &              &                        & License Agreement \\
+                            & Text Classification      &                   &              &                        &                   \\ \midrule
+            CNN / DailyMail & Summarization            & 11490             & News         &~\cite{cnndm2015}       & Apache 2.0        \\
+            (test split)    & Question Answering       &                   & Stories      &~\cite{cnndm2017}       &                   \\
+                            & Text Generation          &                   &              &                        &                   \\ \bottomrule
         \end{tabular}%
     }
     \caption{Source Datasets}\label{table-ds}
