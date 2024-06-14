@@ -98,14 +98,12 @@ are different things, we intuit that we can define writing style only in terms
 of both syntax and meaning.
 We shy away from discussing meaning, but syntax and orderly constructs like it
 seem to be within our grasp.
-
 Traditionally, linguistic style was thought to be the result of morphological
 and syntactic arrangements~\cite{lugea2023stylistics}.
 More recent schools of thought on linguistic style find semantics and pragmatics
 to be inextricably linked to author style~\cite{verma2019lexical}, but argue
 that a great deal can still be inferred from lexicon, syntax and a `surface'
 level which contains basic HLFs such as the number of words in a sentence.
-
 Some have observed that many characteristics of written text can be computed as
 HLFs~\cite{hovy1987generating,lugea2023stylistics}.
 Combining multiple HLFs that are revelatory of linguistic style could provide us
@@ -198,11 +196,9 @@ Our experiment analyses LLM output when asked to generate new text based on
 given input text and instructions derived from HLFs.
 We compute statistics of HLFs on a corpus to derive the text generation
 instructions.
-
 To run the experiment we must select the LLMs to evaluate and finding datasets
 from which we can derive corpuses.
 Then there's the matter of selecting the HLFs for our experiment.
-
 We think it's best to describe the experimental process before going over our
 selection for the experiment's parameters.
 
@@ -218,27 +214,33 @@ Changing the parameters requires restarting the process.
 The first activity involves establishing baselines for each experiment scenario.
 
 In the first scenario the target LLM is instructed to generate text retaining
-the meaning of  the input text without any further instruction related to style
-or the linguistic features of the generated text.
+the meaning of the input text from outside the corpus without any further
+instruction related to style or the linguistic features of the generated text.
 This step is repeated 10 times, computing each HLF in our selection for the
 generated text.
-The computed values make up the first scenario baselines for each HLF.
+The computed values represent the baseline HLF values for the first scenario.
 
-The second scenario consists in generating text from the same input text, but
-with the aid of some examples from the corpus.
-In this scenario, we believe that the choice of input text affects the outcome.
-Therefore we propose two variants for this scenario: one with input text
-extraneous to the corpus and one with input text from the corpus.
-
-We add the examples to the initial LLM prompt and follow the same process like
-in the first scenario.
-We do this for each variant of the second scenario to obtain two more baselines
-for each HLF for the corpus.
-
+The second scenario consists in generating text based on input text, but with
+the aid of some examples from the corpus.
+The examples are appended to the instruction prompt used in the first scenario.
 The number of examples is chosen so that we do not overrun the context window of
 the LLM.
 Some context windows are smaller than others, settling the number of examples at
 three.
+Adding examples to the LLM's instruction prompt also makes the provenance of the
+input text more important.
+Therefore we experiment with two variants of the second scenario: one with input
+text extraneous to the corpus and one with input text from the corpus.
+The text from outside the corpus is the same text we used in the first scenario.
+The text from within the corpus is chosen randomly once at the start of the
+experiment.
+Following the process from the first scenario results in obtaining baseline HLF
+values for each variant of the second scenario.
+
+From here on we refer to `baseline HLF values' as `baseline'.
+We now have three baselines: one for the first scenario and one for each variant
+of the second scenario.
+
 
 The next step requires computing statistics on the corpus for each HLF:
 \begin{itemize}
@@ -247,8 +249,9 @@ The next step requires computing statistics on the corpus for each HLF:
     \item \textbf{avg}: the mean value of the HLF on the corpus.
 \end{itemize}
 
-Doing so allows writing an HLF prompt derived from each of our baseline prompts.
-The HLF prompts instruct the LLM to generate text whose HLFs comply with the
+These statistics allow writing an HLF prompt derived from each of our baseline
+prompts.
+The HLF prompts instruct the LLM to generate text with HLFs that comply with the
 previously computed statistics.
 The individual (per-HLF) instructions are all are part of the same HLF prompt.
 The prompts are constructed using Jinja templates which are located in the
@@ -263,6 +266,8 @@ In a similar manner to how we generated the baselines, we run 10 trials for each
 scenario and variant.
 We compare each baseline with the results obtained by using the corresponding
 HLF prompt.
+From here on we refer to the results obtained by using prompts with HLF
+instructions as `HLF-enhanced results', `HLF results' or even simply `results'.
 
 The first scenario is indicative of whether LLMs acknowledge HLF instructions.
 If they do then the results obtained from HLF instructions should be
@@ -396,26 +401,24 @@ reviews which makes this dataset a good alternative.
 The corpus that is based on this dataset contains the first 1000 CNN articles
 from the test split of the dataset.
 
-\subsection{User Prompt and Text}\label{input-text}
+\subsection{External Input Texts}\label{input-text}
 
-This experiment presupposes instructing various large language models to reword
-an input text so that it conforms to some HLFs.
+The experiment involves using input text from both outside the corpus and from
+within it.
+This section describes how we use text external to the corpus, having already
+described our usage of text from within the corpus.
 
-There is an input text corresponding to each corpus that is external to that
-corpus.
+We use a different external input text for each corpus.
 These texts are located in the
 \texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{data}}
 folder of the experiment's source code.
 
-For the variant that uses an input text from the corpus, we draw the text
-randomly from the corpus once, at the start of the experiment.
-
-The input text that is external to the CNN article corpus is an extract from the
-classic \textit{The Life and Opinions of Tristram Shandy, Gentleman}, by
-Laurence Sterne~\cite{sterne2003life}.
+The text external to the CNN article corpus is an extract from the classic
+\textit{The Life and Opinions of Tristram Shandy, Gentleman}, by Laurence
+Sterne~\cite{sterne2003life}.
 The text style is very dissimilar compared to news articles.
-Its linguistic features are also very unlike the average on the CNN article
-corpus.
+Its linguistic features are also very unlike the average values computed for the
+CNN article corpus.
 A text that is similarly divorced from the style and linguistic features of most
 Yelp reviews is Oscar Wilde's \textit{Sonnet toLiberty}~\cite{wilde1909poems}.
 
@@ -440,7 +443,7 @@ A continuous black line designates the average HLF on the corpus.
 We sometimes refer to this average as the \textit{target} value because the LLM
 is instructed to generate text that primarily conforms to this value.
 
-Result tables highlight the difference between plots obtained using a
+Result tables highlight the difference between the results obtained using a
 baseline prompt versus the ones obtained using HLF instruction prompts.
 Firstly, we measure how different baselines are from HLF-enhanced plots.
 Secondly, we compare the closeness of the baseline and HLF-enhanced plots to the
@@ -549,13 +552,18 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
 
 \subsection{HLF Instructions and Context Awareness}
 
-In the second scenario of the experiment we try to quantify the impact of using
-HLF instructions on the output of the LLM.
+We attempt quantifying the impact of using HLF instructions on the output of the
+LLM by eliminating as many factors as possible that would lead to a different
+text being generated when compared to a baseline.
+In the second scenario of our experiment we use examples to allow the LLM to
+generate better baselines, thus hopefully narrowing the gap between baseline
+and HLF-enhanced result.
+
 There are two variants of this scenario: input text from within or from outside
 the corpus.
-
-Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant.
-The outlook is similar to the first experiment scenario.
+Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant:
+input from the corpus.
+We notice these results are similar to those in the first experiment scenario.
 
 \begin{table*}[hpb]
     \centering
