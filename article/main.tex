@@ -77,7 +77,7 @@ more specialized tasks.
 Multiple surveys~\cite{minaee2024llmsurvey,zhao2023survey} and
 benchmarks~\cite{papcode2024hellaswag,chiang2024chatbot} show that large
 language models are good at following instructions.
-We can also intuit that training LLMs on diverse data (for instance the
+We intuit that training LLMs on diverse data (for instance the
 Pile~\cite{gao2020pile}) uniquely qualifies them to produce text in a wide
 variety of styles.
 
@@ -99,9 +99,10 @@ They can be used to instruct the generation of text (``write no more than 10
 sentences''), but they can also be used to analyse text.
 This allows us to verify if a text has the \textit{expected} value for an HLF.
 
-Taking Noam Chomsky's ideas~\cite{chomsky2002syntactic} that syntax and meaning
-are different things, we intuit that writing style is defined in terms of both.
-We shy away from discussing meaning, but syntax and orderly constructs like it
+Taking Noam Chomsky's ideas that syntax and meaning are different
+things~\cite{chomsky2002syntactic}, we intuit that writing style is defined in
+terms of both.
+We shy away from discussing meaning, but syntax and similarly orderly constructs
 seem to be within our grasp.
 Traditionally, linguistic style revolved around morphological and syntactic
 arrangements~\cite{lugea2023stylistics}.
@@ -143,9 +144,8 @@ Linguistic style is the sum of identifiable language choices manifest in a text
 made from the language system by the text producer~\cite{lugea2023stylistics}.
 Another way to think about it is that style is the form used for delivering
 meaning~\cite{tst_sigkdd_review_2022}.
-Opinions that style depends on context and author choice vis-a-vis a
-communication goal seem to converge~\cite{mcdonald1985computational,
-    hovy1987generating}.
+Opinions seem to converge that style depends on context and author choice
+vis-a-vis a communication goal~\cite{mcdonald1985computational,hovy1987generating}.
 The author's choice is available at all linguistic levels, including the
 morphological, lexical, syntactic, semantic and pragmatic
 levels~\cite{dimarco1994model,lugea2023stylistics}.
@@ -166,7 +166,7 @@ described in this paper.
 HLFs are used in the context of other, connected tasks such as assessing text
 readability~\cite{lee-etal-2021-pushing}.
 
-Our approach stands out for its simplicity and focus.
+Our approach stands out through its simplicity and focus.
 We propose engineering instruction prompts for LLMs, a straightforward strategy
 distinct from complex alternatives.
 With discussions on style transfer or author verification beyond this paper's
@@ -307,7 +307,7 @@ instructions to conform to HLFs.
 LFTK~\cite{lftk-2023} is a framework built on top of spaCy~\cite{spacy}
 that provides implementations for computing many HLFs.
 We use these two libraries to perform our experiment.
-They categorize HLFs by domain and family and make available information on the
+LFTK categorizes HLFs by domain and family and make available information on the
 suitability of each HLF for given tasks such as readability assessment or fake
 news detection.
 Besides the domain and family, we also choose features based on their influence
@@ -467,7 +467,7 @@ compute the relative closeness to a common target, comparing values for the same
 HLF but different LLMs is also ill-advised.
 
 Let us denote with $A_b$ and $A_h$ the areas between baseline and target and HLF
-instruction result and target, respectively.
+result and target, respectively.
 Let us similarly denote with $N_b$ and $N_h$ the Euclidian norms.
 We define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$.
 
@@ -476,8 +476,7 @@ prompt and a dataset.
 All result tables for each dataset and prompt variant are available in the
 appendix.
 
-In the next sections we present our perspective on the most relevant results of
-the experiment.
+Next, we present our perspective on the most relevant results of the experiment.
 
 \subsection{HLF Instruction Impact}
 
@@ -694,8 +693,8 @@ reviews dataset.
 
 Highly abstract HLF instructions are unlikely to have the desired effect.
 Furthermore, the impact tends to be adverse.
-This suggests that LLMs are particularly adept at following instructions
-regarding HLFs when those instructions are more concrete.
+This suggests that LLMs are more adept at following instructions regarding HLFs
+when those instructions are more concrete.
 
 The choice of input text in relation to the target HLF values also seems
 important.
@@ -712,30 +711,35 @@ adjective variation.
 \section{Limitations and Future Work}
 
 Other experiments are required to better understand the capabilities of large
-language models with regard to handcrafted linguistic features.
+language models with regard to HLFs.
 The selection of language models, the reliance on a corpus for computing target
 linguistic features, the fixed choice of input text are all limitations of the
 current approach.
+Making different experiment design choices in all these respects might shed more
+light on this matter.
 Using a selection of HLFs and not individually analysing the behaviour of the
-LLM under the influence of each individual HLF is another limitation of our
-approach.
+LLM under the influence of each individual HLF is another limiting choice that
+invites to future work on the alternative.
 
 \section{Conclusions}
 
 We began by trying to understand whether it is possible to generate text that
 exhibits certain linguistic features by instructing a large language model.
-To our surprise, it turns out that instructing large language models to write
-text that conforms to a selected assortment of linguistic features leads to
-significantly different linguistic featues of the generated text.
+To our surprise, it turns out state of the art large language models are
+receptive to instructions regarding the linguistic features of the output.
 This is especially true for concrete instructions.
 
-However, the outcomes are not always desirable.
+However, the outcomes are not always good.
 From a pragmatic standpoint, prompt engineering and a careful choice of language
 features and input text seem like a good idea to alleviate results.
 Providing examples in the input prompt does not seem as beneficial.
 
-\bibliography{references}
 \newpage
+
+\bibliography{references}
+
+\newpage
+
 \appendix
 
 \section{Additional Result Tables}\label{sec:yelp-tables}
