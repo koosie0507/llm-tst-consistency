@@ -11,3 +11,5 @@ LICENSE
 .tempignore
 .DS_Store
 **/.DS_Store
+errors-main.json
+errors-*.png
