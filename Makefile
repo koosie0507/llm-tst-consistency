@@ -1,3 +1,9 @@
+ifeq ($(shell uname -s),Darwin)
+    SED_INPLACE := sed -i ''
+else
+    SED_INPLACE := sed -i
+endif
+
 .PHONY: .check .clean-article .rebuild-article article archive
 
 
@@ -28,7 +34,7 @@ article: .clean-article .build-article
 
 # Target for creating a zip archive
 archive: .check .clean-archive .archiveignore pyproject.toml
-	sed -i '' 's/^\(authors =\).*/\1 ["anonymous"]/' pyproject.toml
+	$(SED_INPLACE) 's/^\(authors =\).*/\1 ["anonymous"]/' pyproject.toml
 	zip -r archive.zip . -x @.archiveignore
 	git checkout pyproject.toml
 
