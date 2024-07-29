@@ -22,7 +22,7 @@ endif
 	@git clean -fdx ./article
 
 .clean-archive: 
-	@rm -f archive.zip
+	@rm -fv *.{zip,png,json}
 
 .install-deps: .venv/bin/aclpubcheck
 	@poetry install

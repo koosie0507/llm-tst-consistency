@@ -284,7 +284,7 @@ selection.
 To cover more ground we find top performers from different vendors interesting.
 The final selection is available in Table~\ref{table-llm}.
 
-\begin{table*}[ht]
+\begin{table*}[ht!]
     \setlength\tabcolsep{6pt}
     \centering
     \resizebox{\textwidth}{!}{%
@@ -325,7 +325,7 @@ and choose 2 features from each category.
 Table~\ref{table-hlf} showcases our selection of features.
 The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
 
-\begin{table*}[ht]
+\begin{table*}[ht!]
     \setlength\tabcolsep{6pt}
     \centering
     \resizebox{\textwidth}{!}{%
@@ -356,7 +356,7 @@ LLMs also make use of examples extracted from a corpus to guide text generation.
 Our approach idempotently derives a corpus of texts from a well known dataset.
 Our selection of datasets is listed in Table~\ref{table-ds}.
 
-\begin{table*}[ht]
+\begin{table*}[ht!]
     \setlength\tabcolsep{6pt}
     \centering
     \resizebox{\textwidth}{!}{%
@@ -491,7 +491,7 @@ The results on the review corpus generated from the Yelp dataset are similarly
 significant, but the HLF instructions determine outcomes that are further away
 from the target.
 
-\begin{table*}[htp]
+\begin{table*}[ht!]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
@@ -517,7 +517,7 @@ Figure~\ref{fig-gpt-fkgl} shows a negative result, where the baseline is closer
 to the target.
 Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
 
-\begin{figure*}[htp]
+\begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail_t_word.png}
@@ -550,7 +550,7 @@ Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant:
 input from the corpus.
 We notice these results are similar to those in the first experiment scenario.
 
-\begin{table*}[hpb]
+\begin{table*}[ht!]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
@@ -579,7 +579,7 @@ in performance with significant differences between baseline and result.
 Even so, the results obtained in our first scenario are largely confirmed in the
 first variant of our second scenario.
 
-\begin{figure*}[hpb]
+\begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail_t_word.png}
@@ -634,7 +634,7 @@ figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
     \caption{CNN Results\\Input Inside Corpus}\label{table-prompt-2-ifd-cnn-dailymail}
 \end{table*}
 
-\begin{figure*}[ht]
+\begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
