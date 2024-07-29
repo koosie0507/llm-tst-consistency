@@ -5,13 +5,16 @@ transfer.
 The question is, though, how might we evaluate their usefulness.
 There's already lots of answers to this question and all of them come with
 caveats.
-Far from being a perfect answer, handcrafted linguistic features can evaluate at
-least partially whether one text style matches another.
+Albeit not a perfect answer to this question, handcrafted linguistic features
+are:
 
-HLFs are well documented in computational linguistics and have received recent
-attention in the context of assessing text readability.
-This reposiory contains an experiment that assesses how well large language
-models can follow instructions derived from handcrafted linguistic features.
+* a well documented notion in computational linguisitics
+* able to evaluate text style (at least partially).
+
+HLFs have received recent attention in the context of assessing text
+readability.
+This repository contains an experiment that assesses how well large language
+models can follow instructions derived from HLFs.
 
 ## Running the Experiment
 
