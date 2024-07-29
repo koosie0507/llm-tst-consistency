@@ -1,3 +1,4 @@
+errors*.png
 src/llm_tst_consistency/basic.py
 .DS_Store
 report_*.tex
