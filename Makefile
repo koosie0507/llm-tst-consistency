@@ -14,7 +14,12 @@
 
 # Target for cleaning the LaTeX build files
 .clean-article: .check
-	cd article && latexmk -c main.tex && cd -
+	@git clean -fdx ./article
+
+.clean-archive: 
+	@rm -f archive.zip
+
+clean: .clean-article .clean-archive
 
 build: article archive
 
@@ -22,8 +27,7 @@ build: article archive
 article: .clean-article .build-article
 
 # Target for creating a zip archive
-archive: .check .archiveignore pyproject.toml
-	@rm -f archive.zip
+archive: .check .clean-archive .archiveignore pyproject.toml
 	sed -i '' 's/^\(authors =\).*/\1 ["anonymous"]/' pyproject.toml
 	zip -r archive.zip . -x @.archiveignore
 	git checkout pyproject.toml
