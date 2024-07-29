@@ -24,7 +24,7 @@ endif
 .clean-archive: 
 	@rm -fv *.{zip,png,json}
 
-.install-deps: .venv/bin/aclpubcheck
+.venv/bin/aclpubcheck:
 	@poetry install
 
 .finalize: article/main.tex
@@ -37,7 +37,7 @@ build: article archive
 # Target for rebuilding the LaTeX project
 article: .clean-article .build-article
 
-check-article: .install-deps .finalize article
+check-article: .venv/bin/aclpubcheck .finalize article
 	@poetry run aclpubcheck --paper_type long article/main.pdf
 	@git checkout article/main.tex
 
