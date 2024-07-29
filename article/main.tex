@@ -1,8 +1,8 @@
+\documentclass[11pt]{article}
 \pdfoutput=1
 
-\documentclass[11pt]{article}
+\usepackage[review]{coling}
 
-\usepackage[review]{acl}
 \usepackage{times}
 \usepackage{latexsym}
 
@@ -128,7 +128,7 @@ transfer and authorship verification.
 Answering this question might point to cheaper, less intrusive and more user
 friendly solutions than fine tuning large language models for these tasks.
 Fine tuning LLMs also incurs some loss of generality~\cite{yang2024unveiling},
-going directly against the purpose of having a generic language model.
+going directly against the purpose of generic language models.
 
 Secondly, we ask \textbf{if it's possible to quantify how closely an LLM is able
     to follow prompts concerning the compliance of the generated text to HLFs?}
@@ -154,7 +154,7 @@ morphological, lexical, syntactic, semantic and pragmatic
 levels~\cite{dimarco1994model,lugea2023stylistics}.
 The influence of syntactic structure over text style is apparent also from a
 formalist perspective~\cite{chomsky2002syntactic}.
-Our selection of HLFs is informed by aspects of linguistic style.
+Our selection of HLFs is informed by the various aspects of linguistic style.
 
 Constructing style from fine-grained aspects is not new.
 The StylePTB authors explain this in detail with respect to lexical,
@@ -671,7 +671,7 @@ similar linguistic features as the examples'.
 
 In terms of our first question --- whether HLF instructions impact an LLM's
 writing, the response is affirmative.
-Certainly, not all LLMs are created equal in this regard.
+Not all LLMs are equally susceptible to HLF instructions, though.
 The experiment design involves choices that rely on the presence of a corpus and
 the usage of a fixed external input text.
 This is relevant as evidentiated by the difference in results obtained using the
@@ -690,9 +690,8 @@ desired impact on the generated text.
 There isn't conclusive evidence that improving the LLM's odds of producing a
 better baseline results in a smaller difference between baseline and result
 relative to the target.
-More importantly, there is evidence that HLF instructions might have an effect
-that is opposite to the desired effect when comparing the results on the Yelp
-reviews dataset.
+More importantly, there is evidence that HLF instructions have an adverse effect
+when comparing the results on the Yelp reviews dataset.
 
 Highly abstract HLF instructions are unlikely to have the desired effect.
 Furthermore, the impact tends to be adverse.
@@ -734,14 +733,10 @@ This is especially true for concrete instructions.
 
 However, the outcomes are not always good.
 From a pragmatic standpoint, prompt engineering and a careful choice of language
-features and input text seem like a good idea to alleviate results.
+features and input text seem like the way to obtain desirable results.
 Providing examples in the input prompt does not seem as beneficial.
 
-\newpage
-
 \bibliography{references}
-
-\newpage
 
 \appendix
 
