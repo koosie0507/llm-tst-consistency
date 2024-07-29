@@ -100,7 +100,7 @@ These values are usually easy to compute with methods that are idempotent.
 This makes HLFs very attractive because of their dual potential.
 They can be used to instruct the generation of text (``write no more than 10
 sentences''), but they can also be used to analyse text.
-This allows us to verify if a text has the \textit{expected} value for an HLF.
+This allows us to verify if a text has the \textit{expected} value for an HLF.\@
 
 Taking Noam Chomsky's ideas that syntax and meaning are different
 things~\cite{chomsky2002syntactic}, we intuit that writing style is defined in
@@ -221,7 +221,7 @@ The second scenario consists in generating text based on input text, but with
 the aid of some examples from the corpus.
 The examples are appended to the instruction prompt used in the first scenario.
 The number of examples is chosen so that we do not overrun the context window of
-the LLM.
+the LLM.\@
 Some context windows are smaller than others, settling the number of examples at
 three.
 Adding examples to the LLM's instruction prompt also makes the provenance of the
@@ -238,9 +238,9 @@ From here on we refer to `baseline HLF values' as `baseline'.
 We now have three baselines: one for the first scenario and one for each variant
 of the second scenario.
 
-The next step requires computing statistics on the corpus for each HLF:
-\textbf{min}(the minimum value), \textbf{max}(the maximum value) and
-\textbf{avg}(the mean).
+The next step requires computing statistics on the corpus for each HLF:\@
+\textbf{min}\~(the minimum value), \textbf{max}\~(the maximum value) and
+\textbf{avg}\~(the mean).
 These statistics allow writing an HLF prompt derived from each of our baseline
 prompts.
 
@@ -294,7 +294,7 @@ The final selection is available in Table~\ref{table-llm}.
             gpt         & OpenAI GPT-4o           & undisclosed & 128000       & 1287      & Proprietary         \\
             gemini      & Google Gemini 1.5 Pro   & undisclosed & 1048576      & 1268      & Proprietary         \\
             claude3     & Anthropic Claude 3 Opus & undisclosed & 200000       & 1248      & Proprietary         \\
-            llama3\_70b & Meta Llama 3-70B        & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
+            llama3\_70b & Meta Llama 3-{}70B      & 70 Billion  & 8000         & 1208      & Llama 3 Community   \\
             command\_r  & Cohere Command R+       & 104 Billion & 128000       & 1189      & CC-BY-NC 4.0        \\
                         &                         &             &              &           & with Acceptable Use \\
                         &                         &             &              &           & Addendum            \\ \bottomrule
@@ -323,7 +323,7 @@ you were in junior highschool'.
 We divide HLFs in five categories ranging from very concrete to highly abstract
 and choose 2 features from each category.
 Table~\ref{table-hlf} showcases our selection of features.
-The LFTK ID is used throughout tables and figures to refer to a specific HLF.
+The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
 
 \begin{table*}[ht]
     \setlength\tabcolsep{6pt}
@@ -331,17 +331,17 @@ The LFTK ID is used throughout tables and figures to refer to a specific HLF.
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{@{}llllll@{}}
             \toprule
-            LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark \\ \toprule
-            t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical                  \\
-            t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic                \\ \bottomrule
-            n\_uverb        & total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                 \\
-            n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic                \\ \bottomrule
-            simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic                \\
-            a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic                \\ \bottomrule
-            corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                  \\
-            corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                  \\ \bottomrule
-            fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic                \\
-            a\_kup\_pw      & Kuperman age of aquisition        & worddiff         & lexico-semantics & highly abstract & lexical                  \\ \bottomrule
+            LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark\\ \toprule
+            t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical                 \\
+            t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic               \\ \bottomrule
+            n\_uverb        & total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                \\
+            n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic               \\ \bottomrule
+            simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic               \\
+            a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic               \\ \bottomrule
+            corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                 \\
+            corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                 \\ \bottomrule
+            fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic               \\
+            a\_kup\_pw      & Kuperman age of aquisition        & worddiff         & lexico-semantics & highly abstract & lexical                 \\ \bottomrule
         \end{tabular}%
     }
     \caption{Handcrafted Linguistic Features}\label{table-hlf}
@@ -374,8 +374,8 @@ Our selection of datasets is listed in Table~\ref{table-ds}.
     \caption{Source Datasets}\label{table-ds}
 \end{table*}
 
-We use the Huggingface ecosystem~\cite{lhoest-etal-2021-datasets} to load the
-datasets.
+The Huggingface ecosystem~\cite{lhoest-etal-2021-datasets} makes the selected
+datasets easily accessible.
 Yelp reviews are loaded from \texttt{Yelp/yelp\_review\_full}, while CNN stories
 are loaded from \texttt{abisee/cnn\_dailymail}.
 
@@ -449,9 +449,9 @@ to the target.
 
 \subsection{Measurements}\label{subsec:measurements}
 
-We use the two-sampled Kolmogorov-Smirnov~\cite{kolmogorov1933,smirnov1939} test
-to determine whether the baseline results are different from the HLF-enhanced
-results, as implemented in Scipy~\cite{2020SciPy-NMeth}.
+Determining whether the baseline results differ from the HLF-enhanced results is
+a classic use case for the Kolmogorov-Smirnov~\cite{kolmogorov1933,smirnov1939}
+test, as implemented in Scipy~\cite{2020SciPy-NMeth}.
 We consider that the results are different for a resulting $p\_value \le 0.05$.
 
 To determine which of two results is closer to the target, we compute the area
@@ -464,7 +464,7 @@ Note that each HLF can have a different range of values than other HLFs.
 When we compute the area and the Euclidian norm using Numpy~\cite{harris2020array},
 we use the raw values of each HLF, without preprocessing them.
 Therefore the results for one HLF are not comparable with the results for
-another HLF.
+another HLF.\@
 Since we don't quantify how different the baseline is from the result and we
 compute the relative closeness to a common target, comparing values for the same
 HLF but different LLMs is also ill-advised.
@@ -521,20 +521,17 @@ Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail_t_word.png}
-        \caption{Command-R+\\Total Words}
-        \label{fig-command-r-t-word}
+        \caption{Command-R+\\Total Words}\label{fig-command-r-t-word}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail_fkgl.png}
-        \caption{GPT\\Flesch-Kincaid Grade Level}
-        \label{fig-gpt-fkgl}
+        \caption{GPT\\Flesch-Kincaid Grade Level}\label{fig-gpt-fkgl}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail_a_verb_pw.png}
-        \caption[center]{Claude3\\Average Verbs per Word}
-        \label{fig-llama-simp-ttr}
+        \caption[center]{Claude3\\Average Verbs per Word}\label{fig-llama-simp-ttr}
     \end{minipage}
 \end{figure*}
 
@@ -571,8 +568,7 @@ We notice these results are similar to those in the first experiment scenario.
             llama3\_70b $Diff\_A$ & \textbf{\underline{1088.5}}  & \textbf{\underline{45.0}}  & \textbf{\underline{113.0}}  & 41.0                       & \textbf{\underline{0.65}} & \textbf{\underline{0.18}} & 3.53                      & \textbf{\underline{8.56}} & 0.27                       & -0.68                     \\ \bottomrule
         \end{tabular}%
     }
-    \caption{prompt 2 - CNN Results\\Input Outside Corpus}
-    \label{table-prompt-2-cnn-dailymail}
+    \caption{prompt 2 - CNN Results\\Input Outside Corpus}\label{table-prompt-2-cnn-dailymail} % chktex-file 8
 \end{table*}
 
 A possible explanation for having fewer significant differences in results might
@@ -587,20 +583,17 @@ first variant of our second scenario.
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail_t_word.png}
-        \caption{GPT\\Total Words}
-        \label{fig-p2-gpt-twords}
+        \caption{GPT\\Total Words}\label{fig-p2-gpt-twords}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail_simp_ttr.png}
-        \caption{Command-R+\\Simple TTR}
-        \label{fig-p2-command-r-simpttr}
+        \caption{Command-R+\\Simple TTR}\label{fig-p2-command-r-simpttr}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Gemini\\Kuperman Age of Aquisition}
-        \label{fig-p2-gemini-a-kup-pw}
+        \caption[center]{Gemini\\Kuperman Age of Aquisition}\label{fig-p2-gemini-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
@@ -638,34 +631,30 @@ figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
             llama3\_70b $Diff\_A$ & \textbf{\underline{2928.0}}  & \textbf{\underline{118.5}}  & \textbf{\underline{222.0}}  & \textbf{\underline{133.5}} & \textbf{\underline{1.43}} & \textbf{\underline{0.05}} & \textbf{\underline{10.77}} & \textbf{\underline{13.42}} & 17.21                      & \textbf{\textit{-6.2}}  \\ \bottomrule
         \end{tabular}%
     }
-    \caption{CNN Results\\Input Inside Corpus}
-    \label{table-prompt-2-ifd-cnn-dailymail}
+    \caption{CNN Results\\Input Inside Corpus}\label{table-prompt-2-ifd-cnn-dailymail}
 \end{table*}
 
 \begin{figure*}[ht]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
-        \caption{Claude3\\Number of Unique Adjectives}
-        \label{fig-p2-ifd-claude3-nuadj}
+        \caption{Claude3\\Number of Unique Adjectives}\label{fig-p2-ifd-claude3-nuadj}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_t_word.png}
-        \caption{Gemini\\Total Words}
-        \label{fig-p2-ifd-gemini-twords}
+        \caption{Gemini\\Total Words}\label{fig-p2-ifd-gemini-twords}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Llama3\\Kuperman Age of Aquisition}
-        \label{fig-p2-ifd-llama3-a-kup-pw}
+        \caption[center]{Llama3\\Kuperman Age of Aquisition}\label{fig-p2-ifd-llama3-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
-The results in this last scenario show that whether LLMs take examples listed in
-the prompt into account is debatable when it comes to generating text with
-similar linguistic features as the examples'.
+The outcomes from the latest experiment are ambiguous. The LLMs do not seem to
+utilize the examples given in the prompt to their advantage when they generate
+text that should mirror the linguistic features of those examples.
 
 \section{Discussion}
 
@@ -763,8 +752,7 @@ experiment results on the corpus of reviews extracted from the Yelp dataset.
             llama3\_70b $Diff\_A$ & \textbf{\textit{-607.52}} & \textbf{\underline{19.42}} & \textbf{\textit{-41.22}} & \textbf{\textit{-44.77}} & -0.42     & \textbf{\textit{-0.05}} & \textbf{\textit{-5.48}} & \textbf{\textit{-4.34}} & 9.79                       & \textbf{\textit{-4.98}}  \\ \bottomrule
         \end{tabular}%
     }
-    \caption{Yelp Results - Prompt Without Examples}
-    \label{table-prompt-1-yelp}
+    \caption{Yelp Results - Prompt Without Examples}\label{table-prompt-1-yelp} % chktex-file 8
 \end{table*}
 
 \begin{table*}[!ht]
@@ -785,8 +773,7 @@ experiment results on the corpus of reviews extracted from the Yelp dataset.
             llama3\_70b $Diff\_A$ & -561.24 & -18.78  & -49.94   & 5.07    & -0.38     & -0.14       & 1.62                      & -4.81           & 29.26                      & 3.11       \\ \bottomrule
         \end{tabular}%
     }
-    \caption{Yelp Results - Prompt With Examples\\Input External To Corpus}
-    \label{table-prompt-2-yelp}
+    \caption{Yelp Results - Prompt With Examples\\Input External To Corpus}\label{table-prompt-2-yelp}
 \end{table*}
 \begin{table*}[!ht]
     \centering
@@ -806,8 +793,7 @@ experiment results on the corpus of reviews extracted from the Yelp dataset.
             llama3\_70b $Diff\_A$ & \textbf{\textit{-687.34}} & \textbf{\textit{-3.42}} & 10.7                      & \textbf{\textit{-61.64}} & -0.31                   & -0.04       & \textbf{\textit{-5.6}}  & -0.89                   & 3.0                     & -1.92                   \\ \bottomrule
         \end{tabular}%
     }
-    \caption{Yelp Results - Prompt With Examples\\Input From Corpus}
-    \label{table-prompt-2-ifd-yelp}
+    \caption{Yelp Results - Prompt With Examples\\Input From Corpus}\label{table-prompt-2-ifd-yelp}
 \end{table*}
 
 \section{Additional Plots}
@@ -819,33 +805,27 @@ show the experiment results for the Claude 3 Opus large language model.
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt Without Examples}
-    \label{fig:gpt-prompt1-cnn}
+    \caption{GPT on CNN Corpus\\Prompt Without Examples}\label{fig:gpt-prompt1-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gpt-yelp/prompt_1-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt Without Examples}
-    \label{fig:gpt-prompt1-yelp}
+    \caption{GPT on Yelp Corpus\\Prompt Without Examples}\label{fig:gpt-prompt1-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:gpt-prompt2-cnn}
+    \caption{GPT on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gpt-prompt2-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gpt-yelp/prompt_2-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:gpt-prompt2-yelp}
+    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gpt-prompt2-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:gpt-prompt2-cnn-ifd}
+    \caption{GPT on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gpt-prompt2-cnn-ifd}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gpt-yelp/prompt_2-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:gpt-prompt2-yelp-ifd}
+    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gpt-prompt2-yelp-ifd}
 \end{figure*}
 
 \subsection{Gemini}
@@ -855,33 +835,27 @@ show the experiment results for the Claude 3 Opus large language model.
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gemini-cnn_dailymail/prompt_1-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt Without Examples}
-    \label{fig:gemini-prompt1-cnn}
+    \caption{Gemini on CNN Corpus\\Prompt Without Examples}\label{fig:gemini-prompt1-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gemini-yelp/prompt_1-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt Without Examples}
-    \label{fig:gemini-prompt1-yelp}
+    \caption{Gemini on Yelp Corpus\\Prompt Without Examples}\label{fig:gemini-prompt1-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:gemini-prompt2-cnn}
+    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gemini-prompt2-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gemini-yelp/prompt_2-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:gemini-prompt2-yelp}
+    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gemini-prompt2-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:gemini-prompt2-cnn-ifd}
+    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gemini-prompt2-cnn-ifd}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gemini-yelp/prompt_2-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:gemini-prompt2-yelp-ifd}
+    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gemini-prompt2-yelp-ifd}
 \end{figure*}
 
 \subsection{Claude3}
@@ -891,33 +865,27 @@ show the experiment results for the Claude 3 Opus large language model.
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt Without Examples}
-    \label{fig:claude3-prompt1-cnn}
+    \caption{Claude3 on CNN Corpus\\Prompt Without Examples}\label{fig:claude3-prompt1-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-claude3-yelp/prompt_1-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt Without Examples}
-    \label{fig:claude3-prompt1-yelp}
+    \caption{Claude3 on Yelp Corpus\\Prompt Without Examples}\label{fig:claude3-prompt1-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:claude3-prompt2-cnn}
+    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:claude3-prompt2-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-claude3-yelp/prompt_2-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:claude3-prompt2-yelp}
+    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:claude3-prompt2-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:claude3-prompt2-cnn-ifd}
+    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:claude3-prompt2-cnn-ifd}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-claude3-yelp/prompt_2-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:claude3-prompt2-yelp-ifd}
+    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:claude3-prompt2-yelp-ifd}
 \end{figure*}
 
 \subsection{Llama3}
@@ -927,33 +895,27 @@ show the experiment results for the Claude 3 Opus large language model.
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-llama3_70b-cnn_dailymail/prompt_1-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt Without Examples}
-    \label{fig:llama3_70b-prompt1-cnn}
+    \caption{Llama3 on CNN Corpus\\Prompt Without Examples}\label{fig:llama3_70b-prompt1-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-llama3_70b-yelp/prompt_1-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt Without Examples}
-    \label{fig:llama3_70b-prompt1-yelp}
+    \caption{Llama3 on Yelp Corpus\\Prompt Without Examples}\label{fig:llama3_70b-prompt1-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:llama3_70b-prompt2-cnn}
+    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:llama3_70b-prompt2-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-llama3_70b-yelp/prompt_2-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:llama3_70b-prompt2-yelp}
+    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:llama3_70b-prompt2-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:llama3_70b-prompt2-cnn-ifd}
+    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:llama3_70b-prompt2-cnn-ifd}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-llama3_70b-yelp/prompt_2-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:llama3_70b-prompt2-yelp-ifd}
+    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:llama3_70b-prompt2-yelp-ifd}
 \end{figure*}
 
 \subsection{Command R+}
@@ -963,33 +925,27 @@ show the experiment results for the Claude 3 Opus large language model.
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt Without Examples}
-    \label{fig:command_r-prompt1-cnn}
+    \caption{Command R on CNN Corpus\\Prompt Without Examples}\label{fig:command_r-prompt1-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-command_r-yelp/prompt_1-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt Without Examples}
-    \label{fig:command_r-prompt1-yelp}
+    \caption{Command R on Yelp Corpus\\Prompt Without Examples}\label{fig:command_r-prompt1-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:command_r-prompt2-cnn}
+    \caption{Command R on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:command_r-prompt2-cnn}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-command_r-yelp/prompt_2-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Extraneous Input}
-    \label{fig:command_r-prompt2-yelp}
+    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:command_r-prompt2-yelp}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:command_r-prompt2-cnn-ifd}
+    \caption{Command R on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:command_r-prompt2-cnn-ifd}
 \end{figure*}
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-command_r-yelp/prompt_2-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Input from Corpus}
-    \label{fig:command_r-prompt2-yelp-ifd}
+    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:command_r-prompt2-yelp-ifd}
 \end{figure*}
 
 \end{document}
