@@ -31,11 +31,14 @@ generate data based on 2 datasets:
 * Yelp reviews
 * CNN/DailyMail
 
-To run the experiment use the following command.
+To run the experiment code use the following command.
 
 ```shell
 poetry run python -m llm_tst_consistency.evaluator 
 ```
+
+To run the experiment with the parameters used in the accompanying paper, use
+the `./run_experiment.sh` shell script.
 
 You may configure the input text used for text generation for each dataset by
 changing the contents of the corresponding files in the [`./data`](./data)
