@@ -239,8 +239,8 @@ We now have three baselines: one for the first scenario and one for each variant
 of the second scenario.
 
 The next step requires computing statistics on the corpus for each HLF:\@
-\textbf{min}\~(the minimum value), \textbf{max}\~(the maximum value) and
-\textbf{avg}\~(the mean).
+\textbf{min}~(the minimum value), \textbf{max}~(the maximum value) and
+\textbf{avg}~(the mean).
 These statistics allow writing an HLF prompt derived from each of our baseline
 prompts.
 
@@ -800,9 +800,6 @@ experiment results on the corpus of reviews extracted from the Yelp dataset.
 
 \subsection{GPT}
 
-\Cref{fig:gpt-prompt1-cnn,fig:gpt-prompt1-yelp,fig:gpt-prompt2-cnn,fig:gpt-prompt2-yelp,fig:gpt-prompt2-cnn-ifd,fig:gpt-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail.png}
     \caption{GPT on CNN Corpus\\Prompt Without Examples}\label{fig:gpt-prompt1-cnn}
@@ -828,10 +825,10 @@ show the experiment results for the Claude 3 Opus large language model.
     \caption{GPT on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gpt-prompt2-yelp-ifd}
 \end{figure*}
 
-\subsection{Gemini}
-
-\Cref{fig:gemini-prompt1-cnn,fig:gemini-prompt1-yelp,fig:gemini-prompt2-cnn,fig:gemini-prompt2-yelp,fig:gemini-prompt2-cnn-ifd,fig:gemini-prompt2-yelp-ifd}
+\Cref{fig:gpt-prompt1-cnn,fig:gpt-prompt1-yelp,fig:gpt-prompt2-cnn,fig:gpt-prompt2-yelp,fig:gpt-prompt2-cnn-ifd,fig:gpt-prompt2-yelp-ifd}
 show the experiment results for the Claude 3 Opus large language model.
+
+\subsection{Gemini}
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gemini-cnn_dailymail/prompt_1-gemini-cnn_dailymail.png}
@@ -858,10 +855,10 @@ show the experiment results for the Claude 3 Opus large language model.
     \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gemini-prompt2-yelp-ifd}
 \end{figure*}
 
-\subsection{Claude3}
-
-\Cref{fig:claude3-prompt1-cnn,fig:claude3-prompt1-yelp,fig:claude3-prompt2-cnn,fig:claude3-prompt2-yelp,fig:claude3-prompt2-cnn-ifd,fig:claude3-prompt2-yelp-ifd}
+\Cref{fig:gemini-prompt1-cnn,fig:gemini-prompt1-yelp,fig:gemini-prompt2-cnn,fig:gemini-prompt2-yelp,fig:gemini-prompt2-cnn-ifd,fig:gemini-prompt2-yelp-ifd}
 show the experiment results for the Claude 3 Opus large language model.
+
+\subsection{Claude3}
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail.png}
@@ -888,10 +885,10 @@ show the experiment results for the Claude 3 Opus large language model.
     \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:claude3-prompt2-yelp-ifd}
 \end{figure*}
 
-\subsection{Llama3}
-
-\Cref{fig:llama3_70b-prompt1-cnn,fig:llama3_70b-prompt1-yelp,fig:llama3_70b-prompt2-cnn,fig:llama3_70b-prompt2-yelp,fig:llama3_70b-prompt2-cnn-ifd,fig:llama3_70b-prompt2-yelp-ifd}
+\Cref{fig:claude3-prompt1-cnn,fig:claude3-prompt1-yelp,fig:claude3-prompt2-cnn,fig:claude3-prompt2-yelp,fig:claude3-prompt2-cnn-ifd,fig:claude3-prompt2-yelp-ifd}
 show the experiment results for the Claude 3 Opus large language model.
+
+\subsection{Llama3}
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-llama3_70b-cnn_dailymail/prompt_1-llama3_70b-cnn_dailymail.png}
@@ -918,10 +915,10 @@ show the experiment results for the Claude 3 Opus large language model.
     \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:llama3_70b-prompt2-yelp-ifd}
 \end{figure*}
 
-\subsection{Command R+}
-
-\Cref{fig:command_r-prompt1-cnn,fig:command_r-prompt1-yelp,fig:command_r-prompt2-cnn,fig:command_r-prompt2-yelp,fig:command_r-prompt2-cnn-ifd,fig:command_r-prompt2-yelp-ifd}
+\Cref{fig:llama3_70b-prompt1-cnn,fig:llama3_70b-prompt1-yelp,fig:llama3_70b-prompt2-cnn,fig:llama3_70b-prompt2-yelp,fig:llama3_70b-prompt2-cnn-ifd,fig:llama3_70b-prompt2-yelp-ifd}
 show the experiment results for the Claude 3 Opus large language model.
+
+\subsection{Command R+}
 
 \begin{figure*}[ht]
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail.png}
@@ -947,5 +944,8 @@ show the experiment results for the Claude 3 Opus large language model.
     \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-command_r-yelp/prompt_2-command_r-yelp.png}
     \caption{Command R on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:command_r-prompt2-yelp-ifd}
 \end{figure*}
+
+\Cref{fig:command_r-prompt1-cnn,fig:command_r-prompt1-yelp,fig:command_r-prompt2-cnn,fig:command_r-prompt2-yelp,fig:command_r-prompt2-cnn-ifd,fig:command_r-prompt2-yelp-ifd}
+show the experiment results for the Claude 3 Opus large language model.
 
 \end{document}
