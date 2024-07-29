@@ -30,6 +30,7 @@ cohere = "^5.5.6"
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.2.1"
 black = "^24.4.2"
+aclpubcheck = {git = "https://github.com/acl-org/aclpubcheck"}
 
 [build-system]
 requires = ["poetry-core"]
