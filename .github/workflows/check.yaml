@@ -1,0 +1,18 @@
+name: Check TeX
+on:
+  pull_request:
+    branches:
+    - main
+jobs:
+  check_tex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: check TeX documents
+        uses: xu-cheng/texlive-action@v2
+        with:
+          scheme: full
+          run: |
+            apk add make
+            make check

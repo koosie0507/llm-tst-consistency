@@ -1,0 +1,30 @@
+name: Build PDF
+on:
+  push:
+    branches:
+    - master
+    - main
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Artifacts
+        uses: xu-cheng/texlive-action@v2
+        with:
+          scheme: full
+          run: |
+            apk add make git
+            make build
+      - name: Publish Article
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-tst-consistency-article
+          path: ./article/*.pdf
+      - name: Publish Article
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-tst-consistency-source
+          path: ./archive.zip
