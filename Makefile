@@ -37,7 +37,7 @@ build: article archive
 # Target for rebuilding the LaTeX project
 article: .clean-article .build-article
 
-check-article: .install-deps .finalize .clean-article .build-article
+check-article: .install-deps .finalize article
 	@poetry run aclpubcheck --paper_type long article/main.pdf
 	@git checkout article/main.tex
 
