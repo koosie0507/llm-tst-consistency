@@ -87,7 +87,7 @@ variety of styles.
 \textbf{Text style transfer (TST)} is defined as the ``task of transforming the
 stylistic manner in which a sentence is written, while preserving the meaning of
 the original sentence''~\cite{tst-review-2021}.
-This definition can be extended to entire articles or corpuses of text because
+This definition can be extended to entire articles or corpora of text because
 these are also the object of linguistic style and
 stylistics~\cite{lugea2023stylistics}.
 The task of transferring text style has a certain maturity.
@@ -173,8 +173,8 @@ Our approach stands out through its simplicity and focus.
 We propose engineering instruction prompts for LLMs, a straightforward strategy
 distinct from complex alternatives.
 With discussions on style transfer or author verification beyond this paper's
-scope, we present a method controlling LLM text generation through the use of
-HLFs.
+scope, we present a method for controlling LLM text generation through the use
+of HLFs.
 
 The presented experiment is one of controllable text
 generation (CTG)~\cite{zhang-ctg-2022}.
@@ -195,7 +195,7 @@ given input text and instructions derived from HLFs.
 We compute statistics of HLFs on a corpus to derive the text generation
 instructions.
 To run the experiment we must select LLMs to evaluate and find datasets from
-which we can derive corpuses.
+which we can derive corpora.
 Then we must also select the HLFs for our experiment.
 Before going over our selection for the experiment's parameters, let us go
 through the experimental process.
@@ -222,7 +222,7 @@ the aid of some examples from the corpus.
 The examples are appended to the instruction prompt used in the first scenario.
 The number of examples is chosen so that we do not overrun the context window of
 the LLM.\@
-Some context windows are smaller than others, settling the number of examples at
+Some context windows are smaller than others, setting the number of examples at
 three.
 Adding examples to the LLM's instruction prompt also makes the provenance of the
 input text more important.
@@ -231,8 +231,8 @@ text extraneous to the corpus and one with input text from the corpus.
 The text from outside the corpus is the same text we used in the first scenario.
 The text from within the corpus is chosen randomly once at the start of the
 experiment.
-Following the process from the first scenario results in obtaining baseline HLF
-values for each variant of the second scenario.
+We repeat the same process from the first scenario to obtain baseline HLF values
+for each variant of the second scenario.
 
 From here on we refer to `baseline HLF values' as `baseline'.
 We now have three baselines: one for the first scenario and one for each variant
@@ -260,7 +260,7 @@ scenario and variant.
 We compare each baseline with the results obtained by using the corresponding
 HLF prompt.
 From here on we refer to the results obtained by using prompts with HLF
-instructions as `HLF-enhanced results', `HLF results' or even simply `results'.
+instructions as `HLF results'.
 
 The first scenario indicates whether LLMs acknowledge HLF instructions.
 If they do, the HLF results should be significantly different from their
@@ -335,14 +335,14 @@ The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
             LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark\\ \toprule
             t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical                 \\
             t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic               \\ \bottomrule
-            n\_uverb        & total number of unique adjectives & partofspeech     & syntax           & concrete        & semantic                \\
+            n\_uverb        & total number of unique verbs      & partofspeech     & syntax           & concrete        & syntactic               \\
             n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic               \\ \bottomrule
             simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic               \\
             a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic               \\ \bottomrule
             corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                 \\
             corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                 \\ \bottomrule
             fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic               \\
-            a\_kup\_pw      & Kuperman age of aquisition        & worddiff         & lexico-semantics & highly abstract & lexical                 \\ \bottomrule
+            a\_kup\_pw      & Kuperman age of acquisition       & worddiff         & lexico-semantics & highly abstract & lexical                 \\ \bottomrule
         \end{tabular}%
     }
     \caption{Handcrafted Linguistic Features}\label{table-hlf}
@@ -388,8 +388,8 @@ We construct a corpus containing the first 1000 reviews from the test split of
 this dataset.
 
 CNN/DailyMail contains stories and news with diverse styles.
-The style varies from one author to another and it also follows the publisher's
-editorial style.
+The style follows the publisher's guidelines, but, within those guidelines, it
+varies for each author.
 The articles are more formal, longer and more complex in structure than Yelp
 reviews which makes this dataset a good alternative.
 The corpus that is based on this dataset contains the first 1000 CNN articles
@@ -450,11 +450,10 @@ to the target.
 
 \subsection{Measurements}\label{subsec:measurements}
 
-Determining whether the baseline results differ from the HLF-enhanced results is
-a classic use case for the Kolmogorov-Smirnov
-test~\cite{kolmogorov1933,smirnov1939}, as implemented in the
-Scipy library~\cite{2020SciPy-NMeth}.
-We consider that the results are different for a resulting $p\_value \le 0.05$.
+We can determine whether the baseline results differ from the HLF results using
+the Kolmogorov-Smirnov test~\cite{kolmogorov1933,smirnov1939}, as implemented in
+the Scipy library~\cite{2020SciPy-NMeth}.
+We consider that the results are different for a $p\_value \le 0.05$.
 
 To determine which of two results is closer to the target, we compute the area
 between each result and the target.
@@ -485,13 +484,12 @@ Next, we present our perspective on the most relevant results of the experiment.
 
 \subsection{HLF Instruction Impact}
 
-The results on the CNN article corpus showcased in Table~\ref{table-prompt-1-cnn-dailymail}
-shows that LLMs take into account instructions concerning the HLFs of their
-output.
-
-The results on the review corpus generated from the Yelp dataset are similarly
-significant, but the HLF instructions determine outcomes that are further away
-from the target.
+Table~\ref{table-prompt-1-cnn-dailymail} shows that LLMs take into account
+HLF instructions when running the experiment.
+On the CNN article corpus, the HLF instructions lead to HLF results that are
+closer than the baseline to the target HLF.\@
+On the Yelp dataset, the HLF instructions generate results that are further away
+than the baseline from the target HLF.\@
 
 \begin{table*}[ht!]
     \centering
@@ -546,11 +544,14 @@ In the second scenario of our experiment we use examples to allow the LLM to
 generate better baselines, thus hopefully narrowing the gap between baseline
 and HLF-enhanced result.
 
-There are two variants of this scenario: input text from within or from outside
-the corpus.
+There are two variants of this scenario depending on the provenance of the input
+text.
+The input text may be from outside the corpus or a text from within the corpus.
 Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant:
-input from the corpus.
-We notice these results are similar to those in the first experiment scenario.
+input from outside the corpus.
+We notice the HLF results tend to be closer to the target than the baseline
+results.
+This picture is similar to the one we saw in the first scenario.
 
 \begin{table*}[ht!]
     \centering
@@ -573,8 +574,10 @@ We notice these results are similar to those in the first experiment scenario.
     \caption{prompt 2 - CNN Results\\Input Outside Corpus}\label{table-prompt-2-cnn-dailymail} % chktex-file 8
 \end{table*}
 
-A possible explanation for having fewer significant differences in results might
-lie in the closeness to the target.
+On the other hand, there are fewer significant differences between baseline and
+HLF results.
+A possible explanation for this situation might lie in the closeness of the
+input prompt (which contains examples from the corpus)to the target.
 As we can see in Figure~\ref{fig-p2-gpt-twords}, this is not always the case.
 In~\cref{fig-p2-command-r-simpttr,fig-p2-gemini-a-kup-pw} we observe regressions
 in performance with significant differences between baseline and result.
@@ -595,7 +598,7 @@ first variant of our second scenario.
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Gemini\\Kuperman Age of Aquisition}\label{fig-p2-gemini-a-kup-pw}
+        \caption[center]{Gemini\\Kuperman Age of Acquisition}\label{fig-p2-gemini-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
@@ -651,7 +654,7 @@ figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Llama3\\Kuperman Age of Aquisition}\label{fig-p2-ifd-llama3-a-kup-pw}
+        \caption[center]{Llama3\\Kuperman Age of Acquisition}\label{fig-p2-ifd-llama3-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
@@ -666,41 +669,32 @@ writing, the response is affirmative.
 Not all LLMs are equally susceptible to HLF instructions, though.
 The experiment design involves choices that rely on the presence of a corpus and
 the usage of a fixed external input text.
-This is relevant as evidentiated by the difference in results obtained using the
-Yelp reviews corpus when compared to the results obtained on the CNN article
-corpus.
+This is relevant as evidentiated by the difference in HLF results obtained using
+the Yelp reviews corpus when compared to the HLF results obtained on the CNN
+article corpus.
 While similarly significant, the HLF results on Yelp reviews are mostly worse
 than their corresponding baselines failing to confirm the positive impact of HLF
 instructions.
 The importance of the choice of the external text is highlighted by the better
-results obtained using an input text from the corpus.
+HLF results obtained using an input text from the corpus.
 
-This leads us to our second question: how much do HLF instructions impact an
-LLM's writing?
+Let us move on to how much HLF instructions impact an LLM's writing.
 The metrics we compute dismiss the idea that HLF instructions have a consistent
 desired impact on the generated text.
-There isn't conclusive evidence that improving the LLM's odds of producing a
-better baseline results in a smaller difference between baseline and result
-relative to the target.
-More importantly, there is evidence that HLF instructions have an adverse effect
-when comparing the results on the Yelp reviews dataset.
+There isn't conclusive evidence that if we improve the LLM's chances of
+producing a better baseline, this will result in a smaller difference between
+baseline and HLF result relative to the target HLF.
+In fact, there is evidence that HLF instructions have an adverse effect when
+examining the HLF results obtained on the Yelp reviews dataset.
+This is especially true of highly abstract HLF instructions.
+LLMs do not seem to follow these instructions well in most scenarios.
+The impact of highly abstract HLF instructions tends to be adverse.
 
-Highly abstract HLF instructions are unlikely to have the desired effect.
-Furthermore, the impact tends to be adverse.
-This suggests that LLMs are more adept at following instructions regarding HLFs
-when those instructions are more concrete.
-
-The choice of input text in relation to the target HLF values also seems
-important.
+The choice of input text in relation to the target HLF values is consequential.
 LLMs don't yet seem able to cover the gulf between Oscar Wilde poems and the
 average Yelp review in terms of linguistic features.
 We surmise that even if LLMs are able to generate text that complies to certain
 target HLFs, there is a limit to this ability.
-
-Finally, selecting HLFs that are in tension with one another will affect the
-LLMs ability to comply.
-This is highlighted in the experiment with age of acquisition versus adjective
-variation.
 
 \section{Limitations and Future Work}
 
