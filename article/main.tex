@@ -1,20 +1,20 @@
-\documentclass[11pt]{article}
+\documentclass[a4paper,twoside]{article}
 \pdfoutput=1
-
-\usepackage[review]{coling}
 
 \usepackage{times}
 \usepackage{latexsym}
 
-\usepackage{algorithmic}
-\usepackage{algorithm}
+\usepackage{algorithm2e}
 \usepackage{array}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{amstext}
 \usepackage{amsthm}
+\usepackage{apalike}
 \usepackage{balance}
 \usepackage{booktabs}
+\usepackage{calc}
 \usepackage[justification=centering]{caption}
 \usepackage{cleveref}
 \usepackage{comment}
@@ -22,6 +22,7 @@
 \usepackage{epsfig}
 \usepackage{fancyhdr}
 \usepackage[T1]{fontenc}
+\usepackage[bottom]{footmisc}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{inconsolata}
@@ -30,9 +31,10 @@
 \usepackage{microtype}
 \usepackage{multicol}
 \usepackage{multirow}
+\usepackage{pslatex}
 \usepackage{rotating}
 \usepackage{setspace}
-\usepackage{subfigure}
+\usepackage{subcaption}
 \usepackage{tabularx}
 \usepackage{tikz}
 \usepackage{url}
@@ -42,16 +44,18 @@
 
 \usepackage[true]{anonymous-acm}
 
-\title{LLM Output Compliance with Handcrafted Linguistic Features --- An Experiment}
-\authoranon{
-\author{Andrei Olar\\
-Universitatea Babeș-Bolyai, Cluj-Napoca, România\\
-\texttt{andrei.olar@ubbcluj.ro}\\}
-}
+\usepackage{SCITEPRESS}
 
 \begin{document}
-\maketitle
-\begin{abstract}
+
+\title{LLM Output Compliance with Handcrafted Linguistic Features --- An Experiment}
+
+\author{\authorname{Andrei Olar\sup{1}\orcidAuthor{0009-0006-7913-9276}}
+\affiliation{\sup{1}Mathematics and Computer Science Faculty, Babeș-Bolyai University, Cluj-Napoca, România}
+\email{andrei.olar@ubbcluj.ro}
+}
+\keywords{handcrafted linguistic features, large language models, controlled text generation, text style transfer}
+\abstract{
     Can we control the writing style of large language models (LLMs) by specifying
     desired linguistic features?
     We address this question by investigating the impact of handcrafted linguistic
@@ -66,8 +70,9 @@ Universitatea Babeș-Bolyai, Cluj-Napoca, România\\
     Our findings highlight the potential and limitations of utilizing HLFs for
     guiding LLM text generation and underscore the need for further research into
     optimizing prompt design and feature selection.
-\end{abstract}
+}
 
+\onecolumn \maketitle \normalsize \setcounter{footnote}{0} \vfill
 
 \section{Introduction}\label{introduction}
 
@@ -104,7 +109,7 @@ This makes HLFs very attractive because of their dual potential.
 On the one hand, an LLM might be instructed using a prompt containing the value
 of an HLF.\@
 An example prompt instruction which asks the LLM to conform to a maximum
-\textit{sentence count} of 10 would read ``write no more than 10 sentences''.
+\textit{sentence count} of 10 could be ``write no more than 10 sentences''.
 On the other hand, HLFs can be computed on the text output by an LLM, too.
 This dual nature of HLFs allows inspecting how closely does LLM generated text
 conform to the goal outlined in the input prompt HLF instruction.\@
@@ -230,7 +235,7 @@ selection of HLFs, a corpus containing texts, a target LLM, examples from the
 chosen corpus, one input text from the chosen corpus and one input text from
 outside the chosen corpus.
 
-Once the parameters have been determined, the HLF statistics are computed on the
+Once the parameters have been determined, HLF statistics are computed on the
 text corpus.
 Remembering that HLFs are just floating point numbers, the following statistics
 are computed for each HLF:~\textbf{min}~(the minimum value), \textbf{max}~(the
@@ -256,59 +261,58 @@ is preserved.
 In addition to the primary directive from `\texttt{prompt\_1}',
 `\texttt{prompt\_2}' contains instructions concerning the interpretation of the
 provided examples, as well as logic to incorporate them.
-Both prompt templates contain logic to distinguish between the situation when
-HLF instructions were given versus not.
+Both prompt templates contain logic to distinguish between when HLF instructions
+were given or not.
 
-With the preliminary steps completed, baseline HLFs for the target LLM are
-computed.
+Baseline HLFs for the LLM output are computed after the preliminary steps are
+completed.
 For the first scenario, the LLM is instructed to reword the input text 10 times
 by using `\texttt{prompt\_1}' without HLF instructions.
-The HLFs in our selection are computed for each generated text, resulting in
-a 10-dimensional vector for each HLF.\@
-These vectors represent the baseline HLFs for the LLM in the first scenario.
+The HLFs in our selection are computed for each LLM output, resulting in a
+10-dimensional vector for each HLF.\@
+These vectors are the baseline HLFs for the LLM output in the first scenario.
 
-The second scenario baseline values are computed similarly using the
-`\texttt{prompt\_2}' template and the examples provided as one of the experiment
-parameters.
+The second scenario baseline HLFs are computed similarly to the first scenario
+baselines, using the `\texttt{prompt\_2}' template and the examples provided as
+an experiment parameter.
 Remembering that the second scenario has two variants, we obtain two sets of
-baseline vectors: a set for input from the corpus and one for input outside the
-corpus.
-The input from outside the corpus is the same as the input for the first
-scenario.
+baseline vectors, one for each variant.
+Note that the input from outside the corpus is the same as the input for the
+first scenario, while the input from inside the corpus is selected along with
+the corpus so that its HLFs are close to the average HLFs of the corpus.
 
 From here on we refer to the HLFs computed using the above process as
 \textit{baselines}.
-Note that we have 3 sets of baselines: 1 for the first scenario and 2 for the
-second scenario.
+We have 3 sets of baselines: 1 for the first scenario and 2 for the second
+scenario.
 
-For each type of baseline, we run 10 text generations using the corresponding
+For each set of baselines, we run 10 text generations using the corresponding
 prompt augmented with the HLF instructions computed earlier in the process.
 Doing this results in 3 sets of 10-dimensional vectors, each corresponding to
 the baselines.
 We refer to these vectors as \textit{HLF results}.
 
-The last step is to compare baselines with their corresponding HLF results for
-each HLF in our selection, for each scenario and variant.
+Lastly, we compare baselines with their corresponding HLF results for each HLF
+in our selection, for each scenario and variant.
 
 The comparison result for the first scenario indicates whether LLMs acknowledge
 HLF instructions at all.
 If they do, the HLF results should be significantly different from their
 baseline.
-
-Both variants of the second scenario quantify how similar the HLFs of the texts
-generated by the LLM are to the corpus average \textit{because of} the HLF
-instructions.
-This hypothesis emerges from the assumption that LLMs are able to mimic examples
-when they are provided in the system prompt.
+Both variants of the second scenario quantify how much HLF instructions
+influence text generation.
+The underlying assumption is that LLMs are able to mimic examples when they are
+provided in the system prompt.
 In such a case, the presence of HLF instructions would remain among the few
-possible explanations for deviations from the baseline.
+possible explanations for deviations from the baseline, especially when the
+baseline is already statistically close to the desired HLF values.
 
 \subsection{LLM Selection}\label{llm-selection}
 
 The LLMs selected for the experiment must represent the state of the art.
 The Chatbot Arena~\cite{chiang2024chatbot} leaderboard is essential in our
 selection based on this criterion.
-To cover more ground we find top performers from different vendors interesting.
+To cover more ground we encourage vendor diversity in our selection.
 The final selection is available in Table~\ref{table-llm}.
 
 \begin{table*}[ht!]
@@ -338,10 +342,10 @@ ID assigned to each one in Table~\ref{table-llm}.
 Our main focus is to understand how susceptible LLMs are to prompts containing
 instructions to conform to HLFs.
 In this experiment we use LFTK~\cite{lftk-2023}, a framework built on top of
-spaCy~\cite{spacy} that provides implementations for computing many HLFs.
+spaCy~\cite{spacy} which provides implementations for computing many HLFs.
 LFTK categorizes HLFs by domain and family.
-We select HLFs from the catalog which is implemented by LFTK based on their
-domain and family, with the interest to make a diverse selection with respect to
+We select HLFs based on their domain and family from the catalog implemented by
+LFTK, with the interest to make a diverse selection with respect to both
 these attributes.
 Besides the domain and family, we also choose features based on their influence
 over text style as recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
@@ -434,8 +438,8 @@ within it.
 
 An input text from within each corpus is chosen so that it exhibits the closest
 HLFs to the averages computed on the corpus.
-The choice is made when the text corpora are selected and is stable throughout
-all experimental evaluations.
+The inputs are chosen from the corpora when the corpora are selected and are
+stable throughout all experimental evaluations.
 
 External input text is chosen in relation to each corpus.
 The chosen texts are located in the
@@ -461,9 +465,9 @@ conform to the HLF statistics on that corpus.
 
 \subsection{Interpretation Conventions}
 
-HLFs are real numbers that we can derive from text idempotently.
-Plot figures show the HLF on the vertical axis and the trial number on the horizontal
-axis.
+HLFs are real numbers derived from text.
+Plot figures show the HLF on the vertical axis and the text generation trial
+number on the horizontal axis.
 We plot the baseline using a continuous grey line and the HLF result using a
 continuous grenat line.
 The minimum and maximum HLF on the corpus are plotted using dotted black lines.
@@ -637,7 +641,7 @@ In~\cref{fig-p2-command-r-simpttr,fig-p2-gemini-a-kup-pw} we even observe
 regressions in performance with significant differences between baseline and
 result.
 Even so, these are exceptions and the results obtained in our first scenario are
-largely confirmed.
+largely confirmed on the CNN article corpus.
 
 Finally, the second variant of the second scenario investigates the suggestion
 power of HLF instructions.
@@ -670,7 +674,7 @@ concrete generation instructions, such as the total number of
 words~(Figure~\ref{fig-p2-ifd-gemini-twords}).
 Additionally, we notice regressive behaviour for some models compared to the
 previously explored results in Figure~\ref{fig-p2-ifd-claude3-nuadj}.
-Finally, notice that the abstractness of the text generation instructions for
+Finally, we notice that the abstractness of the text generation instructions for
 certain HLFs leads to non-compliance in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 
 \begin{figure*}[ht!]
@@ -692,8 +696,9 @@ certain HLFs leads to non-compliance in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 \end{figure*}
 
 The overall sentiment, taking into account the additional results obtained on
-the Yelp dataset, is that LLMs do \textit{not} take advantage of the examples
-from text corpora for the tasks performed in this experiment.
+the Yelp dataset, is that LLMs do not take much advantage of the examples
+from text corpora, nor of the input from the corpora for the tasks performed in
+this experiment.
 
 \section{Discussion}
 
@@ -708,20 +713,15 @@ article corpus.
 While similarly significant, the HLF results on Yelp reviews are mostly worse
 than their corresponding baselines failing to confirm the positive impact of HLF
 instructions.
-The importance of the choice of the external text is highlighted by the better
-HLF results obtained using an input text from the corpus.
 
-There is more doubt in response to how much HLF instructions impact an LLM's
-writing.
-The metrics we compute dismiss the idea that HLF instructions have a consistent
-desired impact on the generated text.
+The impact HLF instructions have on LLM output is limited.
+Our metrics do not show a consistent desired impact on the LLM output either.
 There isn't conclusive evidence that if we improve the LLM's chances of
-producing a better baseline, this will result in a smaller difference between
-baseline and HLF result relative to the target HLF.
-In fact, there is evidence that HLF instructions have an adverse effect when
-examining the HLF results obtained on the Yelp reviews dataset.
+producing a better baseline, this will result in closer HLF results to the 
+desired target values.\@
+In fact, there is some evidence that HLF instructions have an adverse effect
+when examining the HLF results obtained on the Yelp reviews dataset.
 This is especially true of highly abstract HLF instructions.
-LLMs do not seem to follow these instructions well in most scenarios.
 
 The choice of input text in relation to the target HLF values is consequential.
 LLMs don't yet seem able to cover the gulf between Oscar Wilde poems and the
