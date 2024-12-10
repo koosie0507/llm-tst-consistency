@@ -96,23 +96,33 @@ The interest in this task is renewed by the advancements made with LLMs.
 \textbf{Handcrafted linguistic features (HLFs)} are single numerical values
 produced by a uniquely identifiable method on any natural
 language~\cite{lftk-2023}.
-These values are usually easy to compute with methods that are idempotent.
+Examples of HLFs range from simple constructs such as counts or averages of
+words, sentences or specific parts of speech~(adjectives, verbs, a.s.o) to more
+complex statistics based on heuristics.
+All HLFs share the characteristics of computational ease and idempotence.
 This makes HLFs very attractive because of their dual potential.
-They can be used to instruct the generation of text (``write no more than 10
-sentences''), but they can also be used to analyse text.
-This allows us to verify if a text has the \textit{expected} value for an HLF.\@
+On the one hand, an LLM might be instructed using a prompt containing the value
+of an HLF.\@
+An example prompt instruction which asks the LLM to conform to a maximum
+\textit{sentence count} of 10 would read ``write no more than 10 sentences''.
+On the other hand, HLFs can be computed on the text output by an LLM, too.
+This dual nature of HLFs allows inspecting how closely does LLM generated text
+conform to the goal outlined in the input prompt HLF instruction.\@
 
-Taking Noam Chomsky's ideas that syntax and meaning are different
-things~\cite{chomsky2002syntactic}, we intuit that writing style is defined in
-terms of both.
-We shy away from discussing meaning, but syntax and similarly orderly constructs
-seem to be within our grasp.
-Traditionally, linguistic style revolved around morphological and syntactic
+If syntax differs from meaning~\cite{chomsky2002syntactic} the intuition is that
+writing style is defined in terms of both.
+The distinction is important in order to set boundaries.
+HLFs are largely focused on syntax and similarly orderly constructs.
+Therefore, we cover the influence of meaning on author style minimally and
+superficially at best.
+
+This limitation should not deter readers because, traditionally, linguistic
+style is centered around morphological and syntactic
 arrangements~\cite{lugea2023stylistics}.
-More recent descriptions find semantics and pragmatics to be inextricably linked
-to author style~\cite{verma2019lexical}, but argue that a great deal can still
-be inferred from lexicon, syntax and a `surface' level which contains basic HLFs
-such as the number of words in a sentence.
+Although recent descriptions find semantics and pragmatics to be inextricably
+linked to author style~\cite{verma2019lexical}, they too argue that a great deal
+can still be inferred from lexicon, syntax and a `surface' level which contains
+basic HLFs such as the number of words in a sentence.
 Some have observed that many characteristics of written text can be computed as
 HLFs~\cite{hovy1987generating,lugea2023stylistics}.
 Combining multiple HLFs that are revelatory of linguistic style could provide us
@@ -152,8 +162,8 @@ vis-a-vis a communication goal~\cite{mcdonald1985computational,hovy1987generatin
 The author's choice is available at all linguistic levels, including the
 morphological, lexical, syntactic, semantic and pragmatic
 levels~\cite{dimarco1994model,lugea2023stylistics}.
-The influence of syntactic structure over text style is apparent also from a
-formalist perspective~\cite{chomsky2002syntactic}.
+The influence of syntactic structure over text style is apparent from a formal
+perspective~\cite{chomsky2002syntactic}.
 Our selection of HLFs is informed by the various aspects of linguistic style.
 
 Constructing style from fine-grained aspects is not new.
@@ -190,95 +200,116 @@ ability to generate text that conforms to some chosen target HLF values.
 
 \section{Experiment Design}\label{method}
 
-Our experiment analyses LLM output when asked to generate new text based on
-given input text and instructions derived from HLFs.
-We compute statistics of HLFs on a corpus to derive the text generation
-instructions.
-To run the experiment we must select LLMs to evaluate and find datasets from
-which we can derive corpora.
-Then we must also select the HLFs for our experiment.
-Before going over our selection for the experiment's parameters, let us go
-through the experimental process.
+Our experiment aims to find out how well LLMs can follow prompts which have
+instructions derived from HLFs.
+Two scenarios are investigated.
+
+The aim in the first scenario is to use an LLM to reword an input text so that
+its style resembles the text style of texts from a predetermined corpus of
+similarly styled texts.
+In this scenario the LLM rewords the input by following instructions which only
+contain HLFs.
+The input text used for this scenario is necessarily from outside the corpus.
+
+The second scenario is designed to show how much bearing do instructions
+containing HLFs have on the way LLMs generate text.
+The task of the LLM remains the same as in the first scenario.
+However, examples from the chosen corpus are added to the LLM prompt which means
+the LLM rewords text aided by the examples.
+The second scenario has two variants because of this particularity.
+In the first variant, similarly to the first scenario, the LLM rewords input
+from outside the corpus.
+In the second variant of the second scenario the LLM uses input text from within
+the corpus.
 
 \subsection{Process}\label{subsec:experiment-process}
 
-Assume we have a target LLM, a corpus containing texts, some examples extracted
-from the corpus, a selection of HLFs and input text both from within and from
-outside the corpus.
-This description of the experiment process assumes those parameters have stable
-values.
-Changing the parameters requires restarting the process.
+The experiment starts with choosing experiment parameter values.
+The following parameters have stable values throughout the experiment process: a
+selection of HLFs, a corpus containing texts, a target LLM, examples from the
+chosen corpus, one input text from the chosen corpus and one input text from
+outside the chosen corpus.
 
-The first activity involves establishing baselines for each experiment scenario.
-In the first scenario the target LLM is instructed to generate text retaining
-the meaning of the input text from outside the corpus without any further
-instruction related to style or the linguistic features of the generated text.
-This step is repeated 10 times, computing each HLF in our selection for the
-generated text.
-The computed values represent the baseline HLF values for the first scenario.
+Once the parameters have been determined, the HLF statistics are computed on the
+text corpus.
+Remembering that HLFs are just floating point numbers, the following statistics
+are computed for each HLF:~\textbf{min}~(the minimum value), \textbf{max}~(the
+maximum value) and \textbf{avg}~(the mean).
 
-The second scenario consists in generating text based on input text, but with
-the aid of some examples from the corpus.
-The examples are appended to the instruction prompt used in the first scenario.
-The number of examples is chosen so that we do not overrun the context window of
-the LLM.\@
-Some context windows are smaller than others, setting the number of examples at
-three.
-Adding examples to the LLM's instruction prompt also makes the provenance of the
-input text more important.
-Therefore we experiment with two variants of the second scenario: one with input
-text extraneous to the corpus and one with input text from the corpus.
-The text from outside the corpus is the same text we used in the first scenario.
-The text from within the corpus is chosen randomly once at the start of the
-experiment.
-We repeat the same process from the first scenario to obtain baseline HLF values
-for each variant of the second scenario.
+The subsequent step involves formulating prompt instructions that incorporate
+HLFs.
+For each HLF, an instruction is constructed in natural language, adhering to the
+previously calculated minimum, maximum, and mean values. For instance, an
+instruction corresponding to the total word count HLF might be expressed as
+follows:
 
-From here on we refer to `baseline HLF values' as `baseline'.
-We now have three baselines: one for the first scenario and one for each variant
-of the second scenario.
+\texttt{- Total Words: ensure the text contains 14 words (min=10, max=50).}
 
-The next step requires computing statistics on the corpus for each HLF:\@
-\textbf{min}~(the minimum value), \textbf{max}~(the maximum value) and
-\textbf{avg}~(the mean).
-These statistics allow writing an HLF prompt derived from each of our baseline
-prompts.
+The HLF instructions are used to build system prompts for the LLM.\@
+The prompts are assembled using Jinja2~\cite{jinja2} templates located in the
+\texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/src/llm_tst_consistency/templates}{templates}}
+directory of the experiment's source code.
 
-The HLF prompts instruct the LLM to generate text with HLFs that comply with the
-previously computed statistics.
-The individual (per-HLF) instructions are all part of the same HLF prompt.
-The prompts are constructed using the Jinja2~\cite{jinja2} templates which are
-located in the \texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/src/llm_tst_consistency/templates}{templates}}
-directory of the source code used to run the experiment.
-The instruction prompts corresponding to our two scenarios are
+The prompt templates correspond to each of the two experiment scenarios:
 `\texttt{prompt\_1}' and `\texttt{prompt\_2}', respectively.
-The rest of the templates in the directory are used to construct the individual
-HLF instructions.
+The static instruction in `\texttt{prompt\_1}' to ``\textit{Write text that
+conveys the meaning of the first user prompt}'' ensures that input text meaning
+is preserved.
+In addition to the primary directive from `\texttt{prompt\_1}',
+`\texttt{prompt\_2}' contains instructions concerning the interpretation of the
+provided examples, as well as logic to incorporate them.
+Both prompt templates contain logic to distinguish between the situation when
+HLF instructions were given versus not.
 
-In a similar manner to how we generated the baselines, we run 10 trials for each
-scenario and variant.
-We compare each baseline with the results obtained by using the corresponding
-HLF prompt.
-From here on we refer to the results obtained by using prompts with HLF
-instructions as `HLF results'.
+With the preliminary steps completed, baseline HLFs for the target LLM are
+computed.
+For the first scenario, the LLM is instructed to reword the input text 10 times
+by using `\texttt{prompt\_1}' without HLF instructions.
+The HLFs in our selection are computed for each generated text, resulting in
+a 10-dimensional vector for each HLF.\@
+These vectors represent the baseline HLFs for the LLM in the first scenario.
 
-The first scenario indicates whether LLMs acknowledge HLF instructions.
+The second scenario baseline values are computed similarly using the
+`\texttt{prompt\_2}' template and the examples provided as one of the experiment
+parameters.
+Remembering that the second scenario has two variants, we obtain two sets of
+baseline vectors: a set for input from the corpus and one for input outside the
+corpus.
+The input from outside the corpus is the same as the input for the first
+scenario.
+
+From here on we refer to the HLFs computed using the above process as
+\textit{baselines}.
+Note that we have 3 sets of baselines: 1 for the first scenario and 2 for the
+second scenario.
+
+For each type of baseline, we run 10 text generations using the corresponding
+prompt augmented with the HLF instructions computed earlier in the process.
+Doing this results in 3 sets of 10-dimensional vectors, each corresponding to
+the baselines.
+We refer to these vectors as \textit{HLF results}.
+
+The last step is to compare baselines with their corresponding HLF results for
+each HLF in our selection, for each scenario and variant.
+
+The comparison result for the first scenario indicates whether LLMs acknowledge
+HLF instructions at all.
 If they do, the HLF results should be significantly different from their
 baseline.
 
 Both variants of the second scenario quantify how similar the HLFs of the texts
 generated by the LLM are to the corpus average \textit{because of} the HLF
 instructions.
-Working under the assumption that an LLM can generate text that is similar to an
-example from the corpus, the presence of HLF instructions in the prompt would
-remain among the few possible explanations were we to observe deviations from
-the baseline.
+This hypothesis emerges from the assumption that LLMs are able to mimic examples
+when they are provided in the system prompt.
+In such a case, the presence of HLF instructions would remain among the few
+possible explanations for deviations from the baseline.
 
 \subsection{LLM Selection}\label{llm-selection}
 
-We only use state of the art large language models for the experiment.
+The LLMs selected for the experiment must represent the state of the art.
 The Chatbot Arena~\cite{chiang2024chatbot} leaderboard is essential in our
-selection.
+selection based on this criterion.
 To cover more ground we find top performers from different vendors interesting.
 The final selection is available in Table~\ref{table-llm}.
 
@@ -308,22 +339,23 @@ ID assigned to each one in Table~\ref{table-llm}.
 
 Our main focus is to understand how susceptible LLMs are to prompts containing
 instructions to conform to HLFs.
-LFTK~\cite{lftk-2023} is a framework built on top of spaCy~\cite{spacy}
-that provides implementations for computing many HLFs.
-We use these two libraries to perform our experiment.
-LFTK categorizes HLFs by domain and family and make available information on the
-suitability of each HLF for given tasks such as readability assessment or fake
-news detection.
+In this experiment we use LFTK~\cite{lftk-2023}, a framework built on top of
+spaCy~\cite{spacy} that provides implementations for computing many HLFs.
+LFTK categorizes HLFs by domain and family.
+We select HLFs from the catalog which is implemented by LFTK based on their
+domain and family, with the interest to make a diverse selection with respect to
+these attributes.
 Besides the domain and family, we also choose features based on their influence
 over text style as recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
 
-The instructions for each HLF are specifically crafted using natural language.
+The instructions for each HLF are specifically crafted using natural language.\@
 The resulting instructions can be catalogued on the concrete-abstract spectrum.
 For example, `write 100 words' is a more concrete instruction than `write as if
 you were in junior highschool'.
 We divide HLFs in five categories ranging from very concrete to highly abstract
 and choose 2 features from each category.
-Table~\ref{table-hlf} showcases our selection of features.
+
+Table~\ref{table-hlf} showcases our HLF selection.
 The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
 
 \begin{table*}[ht!]
@@ -351,11 +383,13 @@ The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
 
 \subsection{Corpus Selection}\label{ds-selection}
 
-The experiment design rests upon measuring HLFs on a corpus of texts and
-computing statistics.
-LLMs also make use of examples extracted from a corpus to guide text generation.
-Our approach idempotently derives a corpus of texts from a well known dataset.
-Our selection of datasets is listed in Table~\ref{table-ds}.
+A corpus of texts is required to perform the experiment.
+We have conducted the experiment using corpora derived idempotently from the
+datasets listed in Table~\ref{table-ds}.
+
+The main criteria for choosing these datasets were the difference in style
+between the texts contained in one corpus versus the other and the similarity in
+style between the texts from the same corpus.
 
 \begin{table*}[ht!]
     \setlength\tabcolsep{6pt}
@@ -389,32 +423,35 @@ this dataset.
 
 CNN/DailyMail contains stories and news with diverse styles.
 The style follows the publisher's guidelines, but, within those guidelines, it
-varies for each author.
+varies slightly for each author.
 The articles are more formal, longer and more complex in structure than Yelp
 reviews which makes this dataset a good alternative.
 The corpus that is based on this dataset contains the first 1000 CNN articles
 from the test split of the dataset.
 
-\subsection{External Input Texts}\label{input-text}
+\subsection{Input Text Choice}\label{input-text}
 
 The experiment involves using input text from both outside the corpus and from
 within it.
-This section describes how we use text external to the corpus, having already
-described our usage of text from within the corpus.
 
-We use a different external input text for each corpus.
-These texts are located in the
+An input text from within each corpus is chosen so that it exhibits the closest
+HLFs to the averages computed on the corpus.
+The choice is made when the text corpora are selected and is stable throughout
+all experimental evaluations.
+
+External input text is chosen in relation to each corpus.
+The chosen texts are located in the
 \texttt{\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/data}{data}}
 folder of the experiment's source code.
 
 The text external to the CNN article corpus is an extract from the classic
 \textit{The Life and Opinions of Tristram Shandy, Gentleman}, by Laurence
 Sterne~\cite{sterne2003life}.
-The text style is very dissimilar compared to news articles.
-Its linguistic features are also very unlike the average values computed for the
-CNN article corpus.
-A text that is similarly divorced from the style and linguistic features of most
-Yelp reviews is Oscar Wilde's \textit{Sonnet to Liberty}~\cite{wilde1909poems}.
+The text style is not similar to the style of news articles at all.
+Our selected HLFs are also very different from the average values computed for
+the CNN article corpus.
+A text that is similarly divorced from the style and HLFs of most Yelp reviews
+is Oscar Wilde's \textit{Sonnet to Liberty}~\cite{wilde1909poems}.
 Both texts are in the public domain and were obtained from Project
 Gutenberg~\cite{gutenberg}.
 
@@ -426,8 +463,7 @@ conform to the HLF statistics on that corpus.
 
 \subsection{Interpretation Conventions}
 
-Handcrafted linguistic features are integer or floating point values that we
-can compute on text.
+HLFs are real numbers that we can derive from text idempotently.
 Plot figures show the HLF on the vertical axis and the trial number on the horizontal
 axis.
 We plot the baseline using a continuous grey line and the HLF result using a
@@ -450,37 +486,48 @@ to the target.
 
 \subsection{Measurements}\label{subsec:measurements}
 
-We can determine whether the baseline results differ from the HLF results using
-the Kolmogorov-Smirnov test~\cite{kolmogorov1933,smirnov1939}, as implemented in
-the Scipy library~\cite{2020SciPy-NMeth}.
-We consider that the results are different for a $p\_value \le 0.05$.
+Because HLFs are just real numbers highlighting characteristics of text, they
+can be used for setting goals to aim for (`write a 100 word paragraph') and for
+describing text attributes (`this paragraph has 100 words').
+In our experiments we set goals for the chosen LLMs using instruction prompts
+and compute the corresponding HLFs on the generated text in order to measure
+LLM efficacy.
 
-To determine which of two results is closer to the target, we compute the area
-between each result and the target.
-Another way in which we measure the closeness of the result to the target is by
-computing the Euclidian norm of the vectorial difference between the result and
-target.
+As outlined in Subsection~\ref{subsec:experiment-process}, our experiment
+compares a baseline with the corresponding HLF results.
+Remember that in the context of a scenario variant, both the baseline and the
+HLF results for a specific HLF are vectors containing 10 real numbers.
+
+The Kolmogorov-Smirnov test~\cite{kolmogorov1933,smirnov1939} is useful for
+determining whether the baseline and HLF results vectors differ significantly.
+We use the Scipy~\cite{2020SciPy-NMeth} implementation of the test.
+In our experiment, the vectors are significantly different for a
+$p\_value \le 0.05$.
+
+For each HLF, the target HLF value is repeated 10 times to construct a vector
+which is compatible with the baselines and HLF results.
+This allows us to compute the Euclidian norm of the vectorial difference between
+the baselines and HLF results on one hand and the target vector, on the other.
+A similar computation can be performed based on the area between each of the
+vectors and the target.
+Because the area measurements are correlated with the Euclidian norm, we present
+results using only the Euclidian norm.
 
 Note that each HLF can have a different range of values than other HLFs.
-When we compute the area and the Euclidian norm using Numpy~\cite{harris2020array},
-we use the raw values of each HLF, without preprocessing them.
-Therefore the results for one HLF are not comparable with the results for
-another HLF.\@
-Since we don't quantify how different the baseline is from the result and we
-compute the relative closeness to a common target, comparing values for the same
-HLF but different LLMs is also ill-advised.
+While computing the Euclidian norm using Numpy~\cite{harris2020array}, we use
+the raw values of each HLF, without preprocessing.
+Therefore the norm computed for one HLF does not imply anything in relation to
+another HLF or LLM.\@
 
-Let us denote with $A_b$ and $A_h$ the areas between baseline and target and HLF
-result and target, respectively.
-Let us similarly denote with $N_b$ and $N_h$ the Euclidian norms.
-We define $Diff_A = A_b - A_h$ and $Diff_N = N_b - N_h$.
+Let us denote with $N_b$ and $N_h$ the Euclidian norms for the baseline and the
+HLF results, respectively.
+We denote the difference between the norms with $Diff_N = N_b - N_h$.
 
-The result tables show $Diff_A$ and $Diff_N$ for each LLM in the context of a
-prompt and a dataset.
-All result tables for each dataset and prompt variant are available in the
-appendix.
-
-Next, we present our perspective on the most relevant results of the experiment.
+The result tables show $Diff_N$ for each LLM in the context of a prompt and a
+text corpus.
+While the main body of the paper is focused on the CNN dataset and, an appendix
+to the paper documents the results collected by running the experiment for each
+dataset and prompt variant.
 
 \subsection{HLF Instruction Impact}
 
@@ -495,172 +542,160 @@ than the baseline from the target HLF.\@
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
-            model                 & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var            & fkgl                    & a\_kup\_pw                \\
+            model       & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var            & fkgl                    & a\_kup\_pw                \\
             \toprule
-            claude3 $Diff_N$     & \textbf{\underline{623.16}}  & \textbf{\underline{24.74}} & \textbf{\underline{51.18}}  & \textbf{\underline{26.68}} & 0.06                      & -0.0                      & \textbf{\underline{0.46}} & \textbf{\underline{1.4}}   & 1.44                    & \textbf{\textit{-1.66}}   \\ \midrule
-            claude3 $Diff_A$     & \textbf{\underline{1774.0}}  & \textbf{\underline{74.0}}  & \textbf{\underline{158.84}} & \textbf{\underline{81.2}}  & 0.2                       & -0.01                     & \textbf{\underline{1.88}} & \textbf{\underline{4.49}}  & 5.01                    & \textbf{\textit{-4.09}}   \\ \midrule
-            gemini $Diff_N$      & \textbf{\underline{985.86}}  & \textbf{\underline{34.52}} & \textbf{\underline{100.36}} & \textbf{\underline{53.39}} & \textbf{\underline{0.52}} & 0.05                      & \textbf{\underline{2.62}} & \textbf{\underline{4.68}}  & -4.17                   & \textbf{\textit{-2.43}}   \\ \midrule
-            gemini $Diff_A$      & \textbf{\underline{2990.5}}  & \textbf{\underline{106.5}} & \textbf{\underline{320.34}} & \textbf{\underline{159.1}} & \textbf{\underline{1.5}}  & 0.09                      & \textbf{\underline{7.24}} & \textbf{\underline{13.15}} & -12.65                  & \textbf{\textit{-7.13}}   \\ \midrule
-            gpt $Diff_N$         & \textbf{\underline{125.87}}  & 1.46                       & 10.95                       & 10.77                      & 0.02                      & -0.01                     & 0.71                      & 0.81                       & \textbf{\textit{-1.72}} & 0.43                      \\ \midrule
-            gpt $Diff_A$         & \textbf{\underline{327.0}}   & 3.0                        & 29.0                        & 27.0                       & 0.08                      & -0.01                     & 1.82                      & 2.24                       & \textbf{\textit{-5.72}} & 0.44                      \\ \midrule
-            command\_r $Diff_N$  & \textbf{\underline{1024.78}} & \textbf{\underline{39.67}} & \textbf{\underline{81.58}}  & \textbf{\underline{41.46}} & \textbf{\underline{0.46}} & \textbf{\underline{0.03}} & \textbf{\underline{2.67}} & \textbf{\underline{3.78}}  & 1.4                     & \textbf{\underline{0.14}} \\ \midrule
-            command\_r $Diff_A$  & \textbf{\underline{3132.5}}  & \textbf{\underline{120.5}} & \textbf{\underline{246.84}} & \textbf{\underline{132.2}} & \textbf{\underline{1.36}} & \textbf{\underline{0.06}} & \textbf{\underline{7.88}} & \textbf{\underline{11.21}} & 3.9                     & \textbf{\underline{1.03}} \\ \midrule
-            llama3\_70b $Diff_N$ & \textbf{\underline{459.45}}  & \textbf{\underline{17.78}} & \textbf{\underline{36.5}}   & \textbf{\underline{19.75}} & \textbf{\underline{0.12}} & \textbf{\underline{0.03}} & \textbf{\underline{1.43}} & \textbf{\underline{2.18}}  & 1.5                     & \textbf{\textit{-0.06}}   \\ \midrule
-            llama3\_70b $Diff_A$ & \textbf{\underline{1363.5}}  & \textbf{\underline{54.0}}  & \textbf{\underline{106.5}}  & \textbf{\underline{60.5}}  & \textbf{\underline{0.36}} & \textbf{\underline{0.09}} & \textbf{\underline{4.33}} & \textbf{\underline{6.38}}  & 7.46                    & \textbf{\textit{-0.11}}   \\ \bottomrule
+            claude3     & \textbf{\underline{623.16}}  & \textbf{\underline{24.74}} & \textbf{\underline{51.18}}  & \textbf{\underline{26.68}} & 0.06                      & -0.0                      & \textbf{\underline{0.46}} & \textbf{\underline{1.4}}   & 1.44                    & \textbf{\textit{-1.66}}   \\ \midrule
+            gemini      & \textbf{\underline{985.86}}  & \textbf{\underline{34.52}} & \textbf{\underline{100.36}} & \textbf{\underline{53.39}} & \textbf{\underline{0.52}} & 0.05                      & \textbf{\underline{2.62}} & \textbf{\underline{4.68}}  & -4.17                   & \textbf{\textit{-2.43}}   \\ \midrule
+            gpt         & \textbf{\underline{125.87}}  & 1.46                       & 10.95                       & 10.77                      & 0.02                      & -0.01                     & 0.71                      & 0.81                       & \textbf{\textit{-1.72}} & 0.43                      \\ \midrule
+            command\_r  & \textbf{\underline{1024.78}} & \textbf{\underline{39.67}} & \textbf{\underline{81.58}}  & \textbf{\underline{41.46}} & \textbf{\underline{0.46}} & \textbf{\underline{0.03}} & \textbf{\underline{2.67}} & \textbf{\underline{3.78}}  & 1.4                     & \textbf{\underline{0.14}} \\ \midrule
+            llama3\_70b & \textbf{\underline{459.45}}  & \textbf{\underline{17.78}} & \textbf{\underline{36.5}}   & \textbf{\underline{19.75}} & \textbf{\underline{0.12}} & \textbf{\underline{0.03}} & \textbf{\underline{1.43}} & \textbf{\underline{2.18}}  & 1.5                     & \textbf{\textit{-0.06}}   \\ \midrule
         \end{tabular}%
-    }\caption{CNN Results}\label{table-prompt-1-cnn-dailymail}
+    }\caption{$Diff_N$ on the CNN-DailyMail corpus\\Scenario 1}\label{table-prompt-1-cnn-dailymail}
 \end{table*}
 
 Figure~\ref{fig-command-r-t-word} shows a positive result, where the result
 obtained with the aid of HLF instructions is closer to the target.
 Figure~\ref{fig-gpt-fkgl} shows a negative result, where the baseline is closer
 to the target.
-Figure~\ref{fig-llama-simp-ttr} shows an inconclusive result.
+Figure~\ref{fig-claude3-avpw} shows an inconclusive result.
 
 \begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail_t_word.png}
-        \caption{Command-R+\\Total Words}\label{fig-command-r-t-word}
+        \caption{Command-R+~\texttt{t\_word}\\CNN-DailyMail,~Scenario 1}\label{fig-command-r-t-word}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail_fkgl.png}
-        \caption{GPT\\Flesch-Kincaid Grade Level}\label{fig-gpt-fkgl}
+        \caption{GPT~\texttt{fkgl}\\CNN-DailyMail,~Scenario 1}\label{fig-gpt-fkgl}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail_a_verb_pw.png}
-        \caption[center]{Claude3\\Average Verbs per Word}\label{fig-llama-simp-ttr}
+        \caption[center]{Claude3~\texttt{a\_verb\_pw}\\CNN-DailyMail,~Scenario 1}\label{fig-claude3-avpw}
     \end{minipage}
 \end{figure*}
 
 \subsection{HLF Instructions and Context Awareness}
 
-We attempt quantifying the impact of using HLF instructions on the output of the
-LLM by eliminating as many factors as possible that would lead to a different
-text being generated when compared to a baseline.
-In the second scenario of our experiment we use examples to allow the LLM to
-generate better baselines, thus hopefully narrowing the gap between baseline
-and HLF-enhanced result.
+The second scenario of our experiment uses examples to allow the LLM to
+generate better baselines.
+As pointed out at the end of Subsection~\ref{subsec:experiment-process}, we
+assume that the difference we measure between baselines and HLF results is due
+to the HLF instructions in the system prompt.
 
-There are two variants of this scenario depending on the provenance of the input
-text.
-The input text may be from outside the corpus or a text from within the corpus.
-Table~\ref{table-prompt-2-cnn-dailymail} contains results for the first variant:
-input from outside the corpus.
+The first variant of the second scenario involves using input text from outside
+the corpus.
+Table~\ref{table-prompt-2-cnn-dailymail} contains the measurements we obtained
+in this context.
 We notice the HLF results tend to be closer to the target than the baseline
 results.
-This picture is similar to the one we saw in the first scenario.
+In terms of significance and efficacy of the HLF instructions, the results are
+similar to the ones obtained in the first scenario. 
 
 \begin{table*}[ht!]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
-            model                 & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var           & fkgl                       & a\_kup\_pw                \\
+            model       & t\_word                      & t\_sent                    & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var            & corr\_verb\_var           & fkgl                       & a\_kup\_pw                \\
             \toprule
-            claude3 $Diff_N$     & \textbf{\underline{718.49}}  & \textbf{\underline{24.13}} & \textbf{\underline{44.43}}  & \textbf{\underline{23.43}} & \textbf{\underline{0.4}}  & 0.03                      & 0.94                      & \textbf{\underline{0.77}} & 1.2                        & 0.07                      \\ \midrule
-            claude3 $Diff_A$     & \textbf{\underline{2345.54}} & \textbf{\underline{90.18}} & \textbf{\underline{148.36}} & \textbf{\underline{63.6}}  & \textbf{\underline{1.18}} & 0.07                      & 1.36                      & \textbf{\underline{2.55}} & 3.33                       & 0.52                      \\ \midrule
-            gemini $Diff_N$      & \textbf{\underline{785.6}}   & \textbf{\underline{25.8}}  & \textbf{\underline{60.5}}   & \textbf{\underline{41.6}}  & \textbf{\underline{0.41}} & \textbf{\underline{0.05}} & \textbf{\underline{1.95}} & \textbf{\underline{2.67}} & -4.62                      & \textbf{\textit{-1.94}}   \\ \midrule
-            gemini $Diff_A$      & \textbf{\underline{2512.0}}  & \textbf{\underline{81.5}}  & \textbf{\underline{210.34}} & \textbf{\underline{125.7}} & \textbf{\underline{1.25}} & \textbf{\underline{0.09}} & \textbf{\underline{5.84}} & \textbf{\underline{8.05}} & -9.46                      & \textbf{\textit{-5.82}}   \\ \midrule
-            gpt $Diff_N$         & 47.8                         & 5.18                       & 6.13                        & -0.13                      & 0.02                      & 0.0                       & 0.05                      & 0.3                       & 3.06                       & -0.27                     \\ \midrule
-            gpt $Diff_A$         & 77.0                         & 12.5                       & 13.0                        & -4.0                       & 0.04                      & 0.0                       & -0.17                     & 0.77                      & 8.45                       & -0.16                     \\ \midrule
-            command\_r $Diff_N$  & \textbf{\underline{263.51}}  & 5.35                       & \textbf{\underline{25.08}}  & \textbf{\underline{17.37}} & \textbf{\textit{-0.09}}   & -0.01                     & \textbf{\underline{1.74}} & \textbf{\underline{1.42}} & \textbf{\underline{10.46}} & \textbf{\underline{1.56}} \\ \midrule
-            command\_r $Diff_A$  & \textbf{\underline{896.0}}   & 20.5                       & \textbf{\underline{86.0}}   & \textbf{\underline{60.6}}  & \textbf{\textit{-0.21}}   & -0.03                     & \textbf{\underline{5.45}} & \textbf{\underline{4.95}} & \textbf{\underline{31.29}} & \textbf{\underline{5.67}} \\ \midrule
-            llama3\_70b $Diff_N$ & \textbf{\underline{376.0}}   & \textbf{\underline{15.63}} & \textbf{\underline{38.63}}  & 15.74                      & \textbf{\underline{0.24}} & \textbf{\underline{0.06}} & 1.69                      & \textbf{\underline{2.91}} & 0.31                       & -0.3                      \\ \midrule
-            llama3\_70b $Diff_A$ & \textbf{\underline{1088.5}}  & \textbf{\underline{45.0}}  & \textbf{\underline{113.0}}  & 41.0                       & \textbf{\underline{0.65}} & \textbf{\underline{0.18}} & 3.53                      & \textbf{\underline{8.56}} & 0.27                       & -0.68                     \\ \bottomrule
+            claude3     & \textbf{\underline{718.49}}  & \textbf{\underline{24.13}} & \textbf{\underline{44.43}}  & \textbf{\underline{23.43}} & \textbf{\underline{0.4}}  & 0.03                      & 0.94                      & \textbf{\underline{0.77}} & 1.2                        & 0.07                      \\ \midrule
+            gemini      & \textbf{\underline{785.6}}   & \textbf{\underline{25.8}}  & \textbf{\underline{60.5}}   & \textbf{\underline{41.6}}  & \textbf{\underline{0.41}} & \textbf{\underline{0.05}} & \textbf{\underline{1.95}} & \textbf{\underline{2.67}} & -4.62                      & \textbf{\textit{-1.94}}   \\ \midrule
+            gpt         & 47.8                         & 5.18                       & 6.13                        & -0.13                      & 0.02                      & 0.0                       & 0.05                      & 0.3                       & 3.06                       & -0.27                     \\ \midrule
+            command\_r  & \textbf{\underline{263.51}}  & 5.35                       & \textbf{\underline{25.08}}  & \textbf{\underline{17.37}} & \textbf{\textit{-0.09}}   & -0.01                     & \textbf{\underline{1.74}} & \textbf{\underline{1.42}} & \textbf{\underline{10.46}} & \textbf{\underline{1.56}} \\ \midrule
+            llama3\_70b & \textbf{\underline{376.0}}   & \textbf{\underline{15.63}} & \textbf{\underline{38.63}}  & 15.74                      & \textbf{\underline{0.24}} & \textbf{\underline{0.06}} & 1.69                      & \textbf{\underline{2.91}} & 0.31                       & -0.3                      \\ \midrule
         \end{tabular}%
     }
-    \caption{prompt 2 - CNN Results\\Input Outside Corpus}\label{table-prompt-2-cnn-dailymail} % chktex-file 8
+    \caption{$Diff_N$ on the CNN-DailyMail corpus\\Scenario 2, Input Outside Corpus}\label{table-prompt-2-cnn-dailymail} % chktex-file 8
 \end{table*}
 
-On the other hand, there are fewer significant differences between baseline and
+We should note that there are fewer significant differences between baseline and
 HLF results.
-A possible explanation for this situation might lie in the closeness of the
-input prompt (which contains examples from the corpus)to the target.
-As we can see in Figure~\ref{fig-p2-gpt-twords}, this is not always the case.
-In~\cref{fig-p2-command-r-simpttr,fig-p2-gemini-a-kup-pw} we observe regressions
-in performance with significant differences between baseline and result.
-Even so, the results obtained in our first scenario are largely confirmed in the
-first variant of our second scenario.
+This seems to validate our assumption that using examples in the system prompt
+causes the baselines to be closer to the target HLF value.
 
 \begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail_t_word.png}
-        \caption{GPT\\Total Words}\label{fig-p2-gpt-twords}
+        \caption{GPT~\texttt{t\_word}\\CNN-DailyMail, Scenario 2, Input Outside Corpus}\label{fig-p2-gpt-twords}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail_simp_ttr.png}
-        \caption{Command-R+\\Simple TTR}\label{fig-p2-command-r-simpttr}
+        \caption{Command-R+~\texttt{simp\_ttr}\\CNN-DailyMail, Scenario 2, Input Outside Corpus}\label{fig-p2-command-r-simpttr}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Gemini\\Kuperman Age of Acquisition}\label{fig-p2-gemini-a-kup-pw}
+        \caption[center]{Gemini~\texttt{a\_kup\_pw}\\CNN-DailyMail, Scenario 2, Input Outside Corpus}\label{fig-p2-gemini-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
-We finally look at the second variant of the second scenario of our experiment.
-The hypothesis in this scenario variant was that the baseline would exhibit HLFs
-that are much closer to the target corpus average if the input text is from that
-corpus.
-The expectation is to see fewer significant HLF results and that, as a rule of
-thumb, HLF results are closer to the baseline in all cases.
-The results shown in Table~\ref{table-prompt-2-ifd-cnn-dailymail} contradict our
-expectations outright.
-The most surprising behaviour is exhibited for HLFs which are derived into more
-concrete generation instructions, such as the total number of words.
-This behaviour is highlighted in Figure~\ref{fig-p2-ifd-gemini-twords}.
-Additionally, we notice regressive behaviour for some models compared to the
-previously explored results in Figure~\ref{fig-p2-ifd-claude3-nuadj}.
-Finally, the abstractness of the text generation instructions for certain HLFs
-leads to the generated text not being compliant as exemplified in
-Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
+There are exceptions to the general trend observed for the first scenario.
+One such exception is highlighted in Figure~\ref{fig-p2-gpt-twords}.
+In~\cref{fig-p2-command-r-simpttr,fig-p2-gemini-a-kup-pw} we even observe
+regressions in performance with significant differences between baseline and
+result.
+Even so, these are exceptions and the results obtained in our first scenario are
+largely confirmed.
+
+Finally, the second variant of the second scenario investigates the suggestion
+power of HLF instructions.
+By using input from the corpus, the LLM should produce baselines that comply
+even more to the target HLFs statistics computed on the corpus.
+We expect fewer significant differences between baselines and HLF results.
+Additionally, HLF results should be closer to the target than in our previous
+observations.
 
 \begin{table*}[ht]
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{lllllllllll}
-            model                 & t\_word                      & t\_sent                     & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var             & corr\_verb\_var            & fkgl                       & a\_kup\_pw              \\
+            model       & t\_word                      & t\_sent                     & n\_uverb                    & n\_uadj                    & simp\_ttr                 & a\_verb\_pw               & corr\_adj\_var             & corr\_verb\_var            & fkgl                       & a\_kup\_pw              \\
             \toprule
-            claude3 $Diff_N$     & \textbf{\underline{871.02}}  & \textbf{\underline{34.2}}   & \textbf{\underline{34.48}}  & \textbf{\textit{-7.38}}    & \textbf{\underline{0.27}} & 0.01                      & \textbf{\textit{-0.93}}    & \textbf{\textit{-0.72}}    & 1.16                       & -0.14                   \\ \midrule
-            claude3 $Diff_A$     & \textbf{\underline{2756.12}} & \textbf{\underline{117.18}} & \textbf{\underline{126.36}} & \textbf{\textit{-11.2}}    & \textbf{\underline{0.81}} & -0.01                     & \textbf{\textit{-2.52}}    & \textbf{\textit{-0.74}}    & 3.69                       & -0.4                    \\ \midrule
-            gemini $Diff_N$      & \textbf{\underline{1315.41}} & \textbf{\underline{46.19}}  & \textbf{\underline{114.47}} & \textbf{\underline{72.38}} & \textbf{\underline{1.17}} & 0.03                      & \textbf{\underline{5.25}}  & \textbf{\underline{6.64}}  & -1.6                       & \textbf{\textit{-2.1}}  \\ \midrule
-            gemini $Diff_A$      & \textbf{\underline{3996.0}}  & \textbf{\underline{138.0}}  & \textbf{\underline{357.36}} & \textbf{\underline{212.7}} & \textbf{\underline{3.3}}  & 0.06                      & \textbf{\underline{15.49}} & \textbf{\underline{19.4}}  & -13.22                     & \textbf{\textit{-6.19}} \\ \midrule
-            gpt $Diff_N$         & \textbf{\underline{521.29}}  & \textbf{\underline{23.3}}   & \textbf{\underline{43.13}}  & 19.85                      & \textbf{\underline{0.2}}  & 0.02                      & 1.08                       & \textbf{\underline{1.04}}  & 5.09                       & 0.67                    \\ \midrule
-            gpt $Diff_A$         & \textbf{\underline{1464.0}}  & \textbf{\underline{65.5}}   & \textbf{\underline{121.84}} & 58.1                       & \textbf{\underline{0.58}} & 0.05                      & 2.93                       & \textbf{\underline{2.59}}  & 14.23                      & 1.89                    \\ \midrule
-            command\_r $Diff_N$  & \textbf{\underline{371.08}}  & \textbf{\underline{13.31}}  & 22.06                       & \textbf{\underline{17.19}} & \textbf{\underline{0.17}} & \textbf{\underline{0.02}} & 0.88                       & 1.09                       & \textbf{\underline{4.05}}  & -0.15                   \\ \midrule
-            command\_r $Diff_A$  & \textbf{\underline{1198.0}}  & \textbf{\underline{42.5}}   & 73.0                        & \textbf{\underline{56.5}}  & \textbf{\underline{0.69}} & \textbf{\underline{0.07}} & 2.85                       & 3.99                       & \textbf{\underline{13.89}} & -0.11                   \\ \midrule
-            llama3\_70b $Diff_N$ & \textbf{\underline{1040.85}} & \textbf{\underline{41.99}}  & \textbf{\underline{80.58}}  & \textbf{\underline{49.12}} & \textbf{\underline{0.55}} & \textbf{\underline{0.04}} & \textbf{\underline{3.99}}  & \textbf{\underline{5.05}}  & 7.18                       & \textbf{\textit{-1.94}} \\ \midrule
-            llama3\_70b $Diff_A$ & \textbf{\underline{2928.0}}  & \textbf{\underline{118.5}}  & \textbf{\underline{222.0}}  & \textbf{\underline{133.5}} & \textbf{\underline{1.43}} & \textbf{\underline{0.05}} & \textbf{\underline{10.77}} & \textbf{\underline{13.42}} & 17.21                      & \textbf{\textit{-6.2}}  \\ \bottomrule
+            claude3     & \textbf{\underline{871.02}}  & \textbf{\underline{34.2}}   & \textbf{\underline{34.48}}  & \textbf{\textit{-7.38}}    & \textbf{\underline{0.27}} & 0.01                      & \textbf{\textit{-0.93}}    & \textbf{\textit{-0.72}}    & 1.16                       & -0.14                   \\ \midrule
+            gemini      & \textbf{\underline{1315.41}} & \textbf{\underline{46.19}}  & \textbf{\underline{114.47}} & \textbf{\underline{72.38}} & \textbf{\underline{1.17}} & 0.03                      & \textbf{\underline{5.25}}  & \textbf{\underline{6.64}}  & -1.6                       & \textbf{\textit{-2.1}}  \\ \midrule
+            gpt         & \textbf{\underline{521.29}}  & \textbf{\underline{23.3}}   & \textbf{\underline{43.13}}  & 19.85                      & \textbf{\underline{0.2}}  & 0.02                      & 1.08                       & \textbf{\underline{1.04}}  & 5.09                       & 0.67                    \\ \midrule
+            command\_r  & \textbf{\underline{371.08}}  & \textbf{\underline{13.31}}  & 22.06                       & \textbf{\underline{17.19}} & \textbf{\underline{0.17}} & \textbf{\underline{0.02}} & 0.88                       & 1.09                       & \textbf{\underline{4.05}}  & -0.15                   \\ \midrule
+            llama3\_70b & \textbf{\underline{1040.85}} & \textbf{\underline{41.99}}  & \textbf{\underline{80.58}}  & \textbf{\underline{49.12}} & \textbf{\underline{0.55}} & \textbf{\underline{0.04}} & \textbf{\underline{3.99}}  & \textbf{\underline{5.05}}  & 7.18                       & \textbf{\textit{-1.94}} \\ \midrule
         \end{tabular}%
     }
-    \caption{CNN Results\\Input Inside Corpus}\label{table-prompt-2-ifd-cnn-dailymail}
+    \caption{$Diff_N$ on CNN-DailyMail\\Scenario 2, Input Inside Corpus}\label{table-prompt-2-ifd-cnn-dailymail}
 \end{table*}
+
+The results shown in Table~\ref{table-prompt-2-ifd-cnn-dailymail} contradict
+these expectations.
+The most surprising behaviour is exhibited for HLFs which are derived into more
+concrete generation instructions, such as the total number of
+words~(Figure~\ref{fig-p2-ifd-gemini-twords}).
+Additionally, we notice regressive behaviour for some models compared to the
+previously explored results in Figure~\ref{fig-p2-ifd-claude3-nuadj}.
+Finally, notice that the abstractness of the text generation instructions for
+certain HLFs leads to non-compliance in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
 
 \begin{figure*}[ht!]
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
-        \caption{Claude3\\Number of Unique Adjectives}\label{fig-p2-ifd-claude3-nuadj}
+        \caption{Claude3\texttt{n\_uadj}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-claude3-nuadj}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_t_word.png}
-        \caption{Gemini\\Total Words}\label{fig-p2-ifd-gemini-twords}
+        \caption{Gemini\texttt{t\_word}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-gemini-twords}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Llama3\\Kuperman Age of Acquisition}\label{fig-p2-ifd-llama3-a-kup-pw}
+        \caption[center]{Llama3\texttt{a\_kup\_pw}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-llama3-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
-Overall, the LLMs do not seem to utilize the examples given in the prompt to
-their advantage when generating text that should mirror the linguistic features
-of those examples.
+The overall sentiment, taking into account the additional results obtained on
+the Yelp dataset, is that LLMs do \textit{not} take advantage of the examples
+from text corpora for the tasks performed in this experiment.
 
 \section{Discussion}
 
@@ -678,7 +713,8 @@ instructions.
 The importance of the choice of the external text is highlighted by the better
 HLF results obtained using an input text from the corpus.
 
-Let us move on to how much HLF instructions impact an LLM's writing.
+There is more doubt in response to how much HLF instructions impact an LLM's
+writing.
 The metrics we compute dismiss the idea that HLF instructions have a consistent
 desired impact on the generated text.
 There isn't conclusive evidence that if we improve the LLM's chances of
@@ -688,7 +724,6 @@ In fact, there is evidence that HLF instructions have an adverse effect when
 examining the HLF results obtained on the Yelp reviews dataset.
 This is especially true of highly abstract HLF instructions.
 LLMs do not seem to follow these instructions well in most scenarios.
-The impact of highly abstract HLF instructions tends to be adverse.
 
 The choice of input text in relation to the target HLF values is consequential.
 LLMs don't yet seem able to cover the gulf between Oscar Wilde poems and the
@@ -701,18 +736,20 @@ target HLFs, there is a limit to this ability.
 Other experiments are required to better understand the capabilities of large
 language models with regard to HLFs.
 The selection of language models, the reliance on a corpus for computing target
-linguistic features, the fixed choice of input text are all limitations of the
-current approach.
-Making different experiment design choices in all these respects might shed more
-light on this matter.
+linguistic features, the fixed choice of input text and not least of all the
+wording of the system prompts are all limitations of the current approach.
+
+Making different experiment design choices in all these respects might yield
+more positive and more powerful results.
 Using a selection of HLFs and not individually analysing the behaviour of the
 LLM under the influence of each individual HLF is another limiting choice that
 invites to future work on the alternative.
 
 \section{Conclusions}
 
-We began by trying to understand whether it is possible to generate text that
-exhibits certain linguistic features by instructing a large language model.
+We designed an experiment that tries to understand whether it is possible to
+generate text that exhibits certain linguistic features by instructing a large
+language model.
 It turns out state of the art large language models are receptive to
 instructions regarding the linguistic features of the output.
 This is especially true for concrete instructions.
@@ -722,14 +759,15 @@ From a pragmatic standpoint, prompt engineering and a careful choice of language
 features and input text seem like the way to obtain desirable results.
 Providing examples in the input prompt does not seem to influence the HLFs of
 the LLM output in the expected manner.
+Rewording text which already exhibits the desired linguistic features can have
+adverse effects, too.
 
 Finally, we've seen how we might use handcrafted linguistic features to assess
 LLM output.
 Setting up ``before and after'' scenarios to evaluate relative improvements of
 the LLM outcome in relation to the selected HLFs is one way to achieve this.
-Given enough measurements, the relative difference between the exhibited
-baseline and target HLFs can be quantified relatively easily using geometric or
-statistical means.
+With enough measurements, the relative difference between baselines and target
+HLFs can be quantified using geometric or statistical means.
 
 \bibliography{references}
 
