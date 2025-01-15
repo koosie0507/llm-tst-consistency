@@ -16,7 +16,6 @@
 \usepackage{booktabs}
 \usepackage{calc}
 \usepackage[justification=centering]{caption}
-\usepackage{cleveref}
 \usepackage{comment}
 \usepackage{enumitem}
 \usepackage{epsfig}
@@ -25,6 +24,8 @@
 \usepackage[bottom]{footmisc}
 \usepackage{geometry}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cleveref}
 \usepackage{inconsolata}
 \usepackage[utf8]{inputenc}
 \usepackage{interval}
@@ -42,17 +43,16 @@
 \usepackage{xcolor}
 \usepackage{xstring}
 
-\usepackage[true]{anonymous-acm}
+\usepackage[false]{anonymous-acm}
 
 \usepackage{SCITEPRESS}
 
 \begin{document}
-
 \title{LLM Output Compliance with Handcrafted Linguistic Features --- An Experiment}
-
-\author{\authorname{Andrei Olar\sup{1}\orcidAuthor{0009-0006-7913-9276}}
-\affiliation{\sup{1}Mathematics and Computer Science Faculty, Babeș-Bolyai University, Cluj-Napoca, România}
-\email{andrei.olar@ubbcluj.ro}
+\author{
+    \authorname{Andrei Olar\sup{1}\orcidAuthor{0009-0006-7913-9276}}
+    \affiliation{\sup{1}Mathematics and Computer Science Faculty, Babeș-Bolyai University, Cluj-Napoca, România}
+    \email{andrei.olar@ubbcluj.ro}
 }
 \keywords{handcrafted linguistic features, large language models, controlled text generation, text style transfer}
 \abstract{
@@ -71,8 +71,8 @@
     guiding LLM text generation and underscore the need for further research into
     optimizing prompt design and feature selection.
 }
-
 \onecolumn \maketitle \normalsize \setcounter{footnote}{0} \vfill
+\interfootnotelinepenalty=10000
 
 \section{Introduction}\label{introduction}
 
@@ -114,8 +114,8 @@ On the other hand, HLFs can be computed on the text output by an LLM, too.
 This dual nature of HLFs allows inspecting how closely does LLM generated text
 conform to the goal outlined in the input prompt HLF instruction.\@
 
-If syntax differs from meaning~\cite{chomsky2002syntactic} the intuition is that
-writing style is defined in terms of both.
+Syntax differs from meaning~\cite{chomsky2002syntactic} and the intuition is
+that writing style is defined in terms of both.
 The distinction is important in order to set boundaries.
 HLFs are largely focused on syntax and similarly orderly constructs.
 Therefore, we cover the influence of meaning on author style minimally and
@@ -347,8 +347,11 @@ LFTK categorizes HLFs by domain and family.
 We select HLFs based on their domain and family from the catalog implemented by
 LFTK, with the interest to make a diverse selection with respect to both
 these attributes.
-Besides the domain and family, we also choose features based on their influence
-over text style as recognized in literature~\cite{verma2019lexical,lugea2023stylistics}.
+Besides the domain and family, we also choose features based on the
+level\footnotemark~at which they influence text style as recognized in
+literature~\cite{verma2019lexical,lugea2023stylistics}.
+\footnotetext{the notion of style level is described
+in~\cite{lugea2023stylistics}, chapter 1, page 7}
 
 The instructions for each HLF are specifically crafted using natural language.\@
 The resulting instructions can be catalogued on the concrete-abstract spectrum.
@@ -360,28 +363,27 @@ and choose 2 features from each category.
 Table~\ref{table-hlf} showcases our HLF selection.
 The LFTK ID is used throughout tables and figures to refer to a specific HLF.\@
 
-\begin{table*}[ht!]
+\begin{table*}[h!]
     \setlength\tabcolsep{6pt}
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{@{}llllll@{}}
             \toprule
-            LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level\footnotemark\\ \toprule
-            t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical                 \\
-            t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic               \\ \bottomrule
-            n\_uverb        & total number of unique verbs      & partofspeech     & syntax           & concrete        & syntactic               \\
-            n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic               \\ \bottomrule
-            simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic               \\
-            a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic               \\ \bottomrule
-            corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical                 \\
-            corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical                 \\ \bottomrule
-            fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic               \\
-            a\_kup\_pw      & Kuperman age of acquisition       & worddiff         & lexico-semantics & highly abstract & lexical                 \\ \bottomrule
+            LFTK ID         & Name                              & Family           & Domain           & Abstraction     & Style Level \\ \toprule
+            t\_word         & total words                       & wordsent         & surface          & very concrete   & lexical     \\
+            t\_sent         & total sentences                   & wordsent         & surface          & very concrete   & syntactic   \\ \bottomrule
+            n\_uverb        & total number of unique verbs      & partofspeech     & syntax           & concrete        & syntactic   \\
+            n\_uadj         & total number of unique adjectives & partofspeech     & syntax           & concrete        & syntactic   \\ \bottomrule
+            simp\_ttr       & simple type token ratio           & typetokenratio   & lexico-semantics & regular         & pragmatic   \\
+            a\_verb\_pw     & number of verbs per word          & partofspeech     & surface          & regular         & syntactic   \\ \bottomrule
+            corr\_adj\_var  & corrected adjective variation     & lexicalvariation & lexico-semantics & abstract        & lexical     \\
+            corr\_verb\_var & corrected verb variation          & lexicalvariation & lexico-semantics & abstract        & lexical     \\ \bottomrule
+            fkgl            & Flesch-Kincaid grade level        & readformula      & surface          & highly abstract & pragmatic   \\
+            a\_kup\_pw      & Kuperman age of acquisition       & worddiff         & lexico-semantics & highly abstract & lexical     \\ \bottomrule
         \end{tabular}%
     }
     \caption{Handcrafted Linguistic Features}\label{table-hlf}
 \end{table*}
-\footnotetext{as described in the figure from~\cite{lugea2023stylistics}, chapter 1, page 7}
 
 \subsection{Corpus Selection}\label{ds-selection}
 
@@ -411,8 +413,8 @@ style between the texts from the same corpus.
     \caption{Source Datasets}\label{table-ds}
 \end{table*}
 
-The Huggingface ecosystem~\cite{lhoest-etal-2021-datasets} makes the selected
-datasets easily accessible.
+The datasets are available in the Huggingface
+ecosystem~\cite{lhoest-etal-2021-datasets}.
 Yelp reviews are loaded from \texttt{Yelp/yelp\_review\_full}, while CNN stories
 are loaded from \texttt{abisee/cnn\_dailymail}.
 
@@ -527,9 +529,9 @@ We denote the difference between the norms with $Diff_N = N_b - N_h$.
 
 The result tables show $Diff_N$ for each LLM in the context of a prompt and a
 text corpus.
-While the main body of the paper is focused on the CNN dataset and, an appendix
-to the paper documents the results collected by running the experiment for each
-dataset and prompt variant.
+The paper is focused on some key results observed on the CNN article corpus.
+Additional results are available
+\textlinkanon{https://github.com/koosie0507/llm-tst-consistency/tree/main/reports}{online}.
 
 \subsection{HLF Instruction Impact}
 
@@ -681,17 +683,17 @@ certain HLFs leads to non-compliance in Figure~\ref{fig-p2-ifd-llama3-a-kup-pw}.
     \centering
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail_n_uadj.png}
-        \caption{Claude3\texttt{n\_uadj}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-claude3-nuadj}
+        \caption{Claude3~\texttt{n\_uadj}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-claude3-nuadj}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail_t_word.png}
-        \caption{Gemini\texttt{t\_word}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-gemini-twords}
+        \caption{Gemini~\texttt{t\_word}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-gemini-twords}
     \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \includegraphics[width=\linewidth]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail_a_kup_pw.png}
-        \caption[center]{Llama3\texttt{a\_kup\_pw}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-llama3-a-kup-pw}
+        \caption[center]{Llama3~\texttt{a\_kup\_pw}\\CNN-DailyMail, Scenario 2, Input Inside Corpus}\label{fig-p2-ifd-llama3-a-kup-pw}
     \end{minipage}
 \end{figure*}
 
@@ -767,227 +769,8 @@ the LLM outcome in relation to the selected HLFs is one way to achieve this.
 With enough measurements, the relative difference between baselines and target
 HLFs can be quantified using geometric or statistical means.
 
-\bibliography{references}
-
-\appendix
-
-\section{Additional Result Tables}\label{sec:yelp-tables}
-\subsection{Yelp}
-\Cref{table-prompt-1-yelp,table-prompt-2-yelp,table-prompt-2-ifd-yelp} show the
-experiment results on the corpus of reviews extracted from the Yelp dataset.
-
-\begin{table*}[ht]
-    \centering
-    \resizebox{\textwidth}{!}{%
-        \begin{tabular}{lllllllllll}
-            model                 & t\_word                   & t\_sent                    & n\_uverb                 & n\_uadj                  & simp\_ttr & a\_verb\_pw             & corr\_adj\_var          & corr\_verb\_var         & fkgl                       & a\_kup\_pw               \\
-            \toprule
-            claude3 $Diff_N$     & \textbf{\textit{-281.9}}  & \textbf{\textit{-13.22}}   & \textbf{\textit{-25.79}} & -14.56                   & -0.06     & 0.0                     & -1.27                   & -1.14                   & \textbf{\underline{6.89}}  & \textbf{\underline{1.0}} \\ \midrule
-            claude3 $Diff_A$     & \textbf{\textit{-774.0}}  & \textbf{\textit{-27.76}}   & \textbf{\textit{-70.0}}  & -38.0                    & -0.19     & 0.02                    & -3.25                   & -3.39                   & \textbf{\underline{21.68}} & \textbf{\underline{2.9}} \\ \midrule
-            gemini $Diff_N$      & -109.27                   & 0.05                       & -7.25                    & -13.18                   & -0.14     & 0.01                    & -1.01                   & -0.4                    & 1.62                       & -0.4                     \\ \midrule
-            gemini $Diff_A$      & -252.82                   & -0.78                      & -17.5                    & -23.14                   & -0.52     & 0.01                    & -1.85                   & -1.07                   & 7.14                       & -0.93                    \\ \midrule
-            gpt $Diff_N$         & -21.62                    & 2.42                       & -3.8                     & -8.84                    & 0.0       & -0.01                   & -0.8                    & -0.53                   & 8.94                       & -0.37                    \\ \midrule
-            gpt $Diff_A$         & -34.72                    & 9.68                       & -10.54                   & -24.57                   & -0.03     & -0.02                   & -2.37                   & -1.58                   & 19.26                      & -1.03                    \\ \midrule
-            command\_r $Diff_N$  & -40.1                     & 1.22                       & 2.43                     & \textbf{\textit{-13.64}} & 0.05      & \textbf{\textit{-0.04}} & \textbf{\textit{-1.17}} & 0.59                    & \textbf{\textit{-7.25}}    & \textbf{\textit{-1.67}}  \\ \midrule
-            command\_r $Diff_A$  & -75.5                     & 1.5                        & 12.94                    & \textbf{\textit{-34.0}}  & 0.19      & \textbf{\textit{-0.12}} & \textbf{\textit{-2.76}} & 2.83                    & \textbf{\textit{-20.49}}   & \textbf{\textit{-4.76}}  \\ \midrule
-            llama3\_70b $Diff_N$ & \textbf{\textit{-210.45}} & \textbf{\underline{6.87}}  & \textbf{\textit{-13.46}} & \textbf{\textit{-15.17}} & -0.16     & \textbf{\textit{-0.02}} & \textbf{\textit{-1.78}} & \textbf{\textit{-1.31}} & 3.7                        & \textbf{\textit{-1.58}}  \\ \midrule
-            llama3\_70b $Diff_A$ & \textbf{\textit{-607.52}} & \textbf{\underline{19.42}} & \textbf{\textit{-41.22}} & \textbf{\textit{-44.77}} & -0.42     & \textbf{\textit{-0.05}} & \textbf{\textit{-5.48}} & \textbf{\textit{-4.34}} & 9.79                       & \textbf{\textit{-4.98}}  \\ \bottomrule
-        \end{tabular}%
-    }
-    \caption{Yelp Results - Prompt Without Examples}\label{table-prompt-1-yelp} % chktex-file 8
-\end{table*}
-
-\begin{table*}[!ht]
-    \centering
-    \resizebox{\textwidth}{!}{%
-        \begin{tabular}{lllllllllll}
-            model                 & t\_word & t\_sent & n\_uverb & n\_uadj & simp\_ttr & a\_verb\_pw & corr\_adj\_var            & corr\_verb\_var & fkgl                       & a\_kup\_pw \\
-            \toprule
-            claude3 $Diff_N$     & -121.77 & -4.61   & -9.9     & 18.41   & -0.11     & 0.03        & \textbf{\underline{1.4}}  & -0.33           & 1.81                       & 0.95       \\ \midrule
-            claude3 $Diff_A$     & -394.5  & -11.5   & -37.5    & 60.0    & -0.37     & 0.09        & \textbf{\underline{4.66}} & -1.49           & 5.38                       & 2.62       \\ \midrule
-            gemini $Diff_N$      & -23.49  & 1.52    & -0.55    & -1.29   & -0.02     & -0.01       & 0.09                      & -0.05           & \textbf{\underline{6.41}}  & 0.2        \\ \midrule
-            gemini $Diff_A$      & -83.0   & 3.0     & -2.5     & -6.36   & -0.0      & -0.03       & 0.26                      & -0.08           & \textbf{\underline{19.63}} & 0.53       \\ \midrule
-            gpt $Diff_N$         & 13.66   & 2.83    & -3.65    & -3.19   & 0.04      & -0.04       & -0.24                     & -0.22           & 7.5                        & 0.0        \\ \midrule
-            gpt $Diff_A$         & 55.5    & 9.5     & -9.86    & -12.86  & 0.14      & -0.11       & -0.84                     & -0.22           & 18.67                      & -0.38      \\ \midrule
-            command\_r $Diff_N$  & -188.71 & 0.69    & -10.73   & 1.17    & -0.23     & -0.01       & \textbf{\underline{0.74}} & -0.83           & \textbf{\textit{-5.02}}    & -0.08      \\ \midrule
-            command\_r $Diff_A$  & -516.82 & 2.02    & -29.22   & 8.28    & -0.66     & -0.0        & \textbf{\underline{2.98}} & -2.48           & \textbf{\textit{-14.52}}   & -0.48      \\ \midrule
-            llama3\_70b $Diff_N$ & -202.95 & -7.84   & -13.73   & 1.43    & -0.15     & -0.04       & 0.38                      & -1.39           & 10.67                      & 1.37       \\ \midrule
-            llama3\_70b $Diff_A$ & -561.24 & -18.78  & -49.94   & 5.07    & -0.38     & -0.14       & 1.62                      & -4.81           & 29.26                      & 3.11       \\ \bottomrule
-        \end{tabular}%
-    }
-    \caption{Yelp Results - Prompt With Examples\\Input External To Corpus}\label{table-prompt-2-yelp}
-\end{table*}
-\begin{table*}[!ht]
-    \centering
-    \resizebox{\textwidth}{!}{%
-        \begin{tabular}{lllllllllll}
-            model                 & t\_word                   & t\_sent                 & n\_uverb                  & n\_uadj                  & simp\_ttr               & a\_verb\_pw & corr\_adj\_var          & corr\_verb\_var         & fkgl                    & a\_kup\_pw              \\
-            \toprule
-            claude3 $Diff_N$     & -148.13                   & -1.63                   & -3.93                     & \textbf{\textit{-46.03}} & -0.11                   & -0.0        & \textbf{\textit{-3.08}} & -0.31                   & -4.3                    & \textbf{\textit{-1.53}} \\ \midrule
-            claude3 $Diff_A$     & -526.14                   & -7.98                   & -23.86                    & \textbf{\textit{-133.5}} & -0.41                   & -0.0        & \textbf{\textit{-8.98}} & -1.75                   & -21.03                  & \textbf{\textit{-5.34}} \\ \midrule
-            gemini $Diff_N$      & 74.27                     & 0.65                    & 4.67                      & 2.98                     & 0.04                    & -0.0        & -0.22                   & 1.05                    & 1.44                    & -0.65                   \\ \midrule
-            gemini $Diff_A$      & 221.0                     & 2.0                     & 10.5                      & 7.44                     & 0.12                    & -0.03       & -0.85                   & 2.73                    & 3.28                    & -1.79                   \\ \midrule
-            gpt $Diff_N$         & 0.65                      & 4.03                    & -1.19                     & -2.66                    & -0.03                   & -0.01       & -0.17                   & -0.13                   & 1.05                    & -0.67                   \\ \midrule
-            gpt $Diff_A$         & 17.0                      & 11.68                   & -3.68                     & -7.0                     & -0.1                    & -0.04       & -0.43                   & -0.05                   & 0.57                    & -1.75                   \\ \midrule
-            command\_r $Diff_N$  & \textbf{\textit{-236.11}} & \textbf{\textit{-3.6}}  & \textbf{\textit{-0.97}}   & \textbf{\textit{-27.04}} & \textbf{\textit{-0.23}} & 0.0         & -1.24                   & \textbf{\textit{-1.08}} & \textbf{\textit{-2.13}} & \textbf{\textit{-1.09}} \\ \midrule
-            command\_r $Diff_A$  & \textbf{\textit{-727.0}}  & \textbf{\textit{-9.24}} & \textbf{\underline{0.76}} & \textbf{\textit{-68.5}}  & \textbf{\textit{-0.64}} & 0.02        & -2.89                   & \textbf{\textit{-3.08}} & \textbf{\textit{-5.5}}  & \textbf{\textit{-3.0}}  \\ \midrule
-            llama3\_70b $Diff_N$ & \textbf{\textit{-333.03}} & \textbf{\textit{-5.19}} & 4.43                      & \textbf{\textit{-21.38}} & -0.16                   & -0.03       & \textbf{\textit{-1.77}} & -0.03                   & 1.87                    & -0.44                   \\ \midrule
-            llama3\_70b $Diff_A$ & \textbf{\textit{-687.34}} & \textbf{\textit{-3.42}} & 10.7                      & \textbf{\textit{-61.64}} & -0.31                   & -0.04       & \textbf{\textit{-5.6}}  & -0.89                   & 3.0                     & -1.92                   \\ \bottomrule
-        \end{tabular}%
-    }
-    \caption{Yelp Results - Prompt With Examples\\Input From Corpus}\label{table-prompt-2-ifd-yelp}
-\end{table*}
-
-\section{Additional Plots}
-
-\subsection{GPT}
-
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gpt-cnn_dailymail/prompt_1-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt Without Examples}\label{fig:gpt-prompt1-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gpt-yelp/prompt_1-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt Without Examples}\label{fig:gpt-prompt1-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gpt-prompt2-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gpt-yelp/prompt_2-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gpt-prompt2-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gpt-cnn_dailymail/prompt_2-gpt-cnn_dailymail.png}
-    \caption{GPT on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gpt-prompt2-cnn-ifd}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gpt-yelp/prompt_2-gpt-yelp.png}
-    \caption{GPT on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gpt-prompt2-yelp-ifd}
-\end{figure*}
-
-\Cref{fig:gpt-prompt1-cnn,fig:gpt-prompt1-yelp,fig:gpt-prompt2-cnn,fig:gpt-prompt2-yelp,fig:gpt-prompt2-cnn-ifd,fig:gpt-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
-\subsection{Gemini}
-
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gemini-cnn_dailymail/prompt_1-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt Without Examples}\label{fig:gemini-prompt1-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-gemini-yelp/prompt_1-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt Without Examples}\label{fig:gemini-prompt1-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gemini-prompt2-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-gemini-yelp/prompt_2-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:gemini-prompt2-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gemini-cnn_dailymail/prompt_2-gemini-cnn_dailymail.png}
-    \caption{Gemini on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gemini-prompt2-cnn-ifd}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-gemini-yelp/prompt_2-gemini-yelp.png}
-    \caption{Gemini on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:gemini-prompt2-yelp-ifd}
-\end{figure*}
-
-\Cref{fig:gemini-prompt1-cnn,fig:gemini-prompt1-yelp,fig:gemini-prompt2-cnn,fig:gemini-prompt2-yelp,fig:gemini-prompt2-cnn-ifd,fig:gemini-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
-\subsection{Claude3}
-
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-claude3-cnn_dailymail/prompt_1-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt Without Examples}\label{fig:claude3-prompt1-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-claude3-yelp/prompt_1-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt Without Examples}\label{fig:claude3-prompt1-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:claude3-prompt2-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-claude3-yelp/prompt_2-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:claude3-prompt2-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-claude3-cnn_dailymail/prompt_2-claude3-cnn_dailymail.png}
-    \caption{Claude3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:claude3-prompt2-cnn-ifd}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-claude3-yelp/prompt_2-claude3-yelp.png}
-    \caption{Claude3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:claude3-prompt2-yelp-ifd}
-\end{figure*}
-
-\Cref{fig:claude3-prompt1-cnn,fig:claude3-prompt1-yelp,fig:claude3-prompt2-cnn,fig:claude3-prompt2-yelp,fig:claude3-prompt2-cnn-ifd,fig:claude3-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
-\subsection{Llama3}
-
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-llama3_70b-cnn_dailymail/prompt_1-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt Without Examples}\label{fig:llama3_70b-prompt1-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-llama3_70b-yelp/prompt_1-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt Without Examples}\label{fig:llama3_70b-prompt1-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:llama3_70b-prompt2-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-llama3_70b-yelp/prompt_2-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:llama3_70b-prompt2-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-llama3_70b-cnn_dailymail/prompt_2-llama3_70b-cnn_dailymail.png}
-    \caption{Llama3 on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:llama3_70b-prompt2-cnn-ifd}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-llama3_70b-yelp/prompt_2-llama3_70b-yelp.png}
-    \caption{Llama3 on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:llama3_70b-prompt2-yelp-ifd}
-\end{figure*}
-
-\Cref{fig:llama3_70b-prompt1-cnn,fig:llama3_70b-prompt1-yelp,fig:llama3_70b-prompt2-cnn,fig:llama3_70b-prompt2-yelp,fig:llama3_70b-prompt2-cnn-ifd,fig:llama3_70b-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
-\subsection{Command R+}
-
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-command_r-cnn_dailymail/prompt_1-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt Without Examples}\label{fig:command_r-prompt1-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_1/prompt_1-command_r-yelp/prompt_1-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt Without Examples}\label{fig:command_r-prompt1-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:command_r-prompt2-cnn}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2/prompt_2-command_r-yelp/prompt_2-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Extraneous Input}\label{fig:command_r-prompt2-yelp}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-command_r-cnn_dailymail/prompt_2-command_r-cnn_dailymail.png}
-    \caption{Command R on CNN Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:command_r-prompt2-cnn-ifd}
-\end{figure*}
-\begin{figure*}[ht]
-    \includegraphics[width=\textwidth,height=0.9\textheight,scale=1]{plots/prompt_2_ifd/prompt_2-command_r-yelp/prompt_2-command_r-yelp.png}
-    \caption{Command R on Yelp Corpus\\Prompt With Examples\\Input from Corpus}\label{fig:command_r-prompt2-yelp-ifd}
-\end{figure*}
-
-\Cref{fig:command_r-prompt1-cnn,fig:command_r-prompt1-yelp,fig:command_r-prompt2-cnn,fig:command_r-prompt2-yelp,fig:command_r-prompt2-cnn-ifd,fig:command_r-prompt2-yelp-ifd}
-show the experiment results for the Claude 3 Opus large language model.
-
+\bibliographystyle{apalike}
+{\small
+\bibliography{references}}
+\balance
 \end{document}
